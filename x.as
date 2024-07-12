@@ -1,3 +1,7 @@
+macr mmacsssteomr t
+       cmp r3, #-6
+       bne END
+endmacr
        ; jmp r7
        ; add r4, #1
 ; this is a comment
@@ -5,7 +9,7 @@
 MAIN:  add r3, LIST
        jsr fn1
 LOOP:  prn #48
-macr mmacr
+macr mmacr 22
        cmp r3, #-6
        bne END
 endmacr
