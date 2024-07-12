@@ -53,11 +53,10 @@ void fill_am_file(FILE * am_file, FILE * as_file) {
     while (fgets(line, MAX_LINE, as_file) != NULL) {
         fputs(line, am_file);
     }
-    
 }
 
 void macro_processing(char * file_name) {
-    FILE * as_file;
+    FILE * as_file; /**/
     FILE * am_file;
     char * asFileName;
     char * amFileName;
@@ -83,6 +82,8 @@ void macro_processing(char * file_name) {
     
     fill_am_file(am_file, as_file);
 
+    close(as_file);
+    close(am_file);
     free(asFileName);
     free(amFileName); /* should we move it to main ?? */
 }
