@@ -1,29 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#define MAX_LINE 80
-#define DEF_MAT_SIZE 3
-#define MACRO_TABLE_SIZE 2
-#define SIZE_EOF 3
-
-FILE * read_file(char * file_name);
-FILE * create_file(char * file_name);
-void fill_am_file(FILE * am_file, FILE * as_file);
-void macro_processing(char * file_name);
-
-struct Macro {
-    char name[MAX_LINE];
-    char context[DEF_MAT_SIZE][DEF_MAT_SIZE];
-    int lines_counter;
-};
-
-enum MacroState {
-    MACRO_DEF,
-    MACRO_CALL,
-    MACRO_END,
-    REGULAR_LINE
-};
+#include "MacroProcessing.h"
 
 FILE * read_file(char * file_name) {
     FILE * file;
@@ -45,13 +23,51 @@ FILE * create_file(char * file_name) {
     return file;
 }
 
+int determine_line_type(char * line, struct Macro * macro_table, struct Macro * macro_ptr) {
+    if (is_macro_def(line, macro_ptr)) {
+        return MACRO_DEF;
+    } else if (is_macro_call(line, macro_table, macro_ptr)) {
+        return MACRO_CALL;
+    } else if (is_macro_end(line)) {
+        return MACRO_END;
+    } else {
+        return REGULAR_LINE;
+    }
+}
+
+int is_macro_def(char * line, struct Macro * macro_ptr) {
+    return 0;
+}
+
+int is_macro_call(char * line, struct Macro * macro_table, struct Macro * macro_ptr) {
+    return 0;
+}
+
+int is_macro_end(char * line) {
+    return 0;
+}
+
 void fill_am_file(FILE * am_file, FILE * as_file) {
     struct Macro macro_table[MACRO_TABLE_SIZE];
     struct Macro * macro_ptr = NULL;
     char line[MAX_LINE] = {0};
 
     while (fgets(line, MAX_LINE, as_file) != NULL) {
-        fputs(line, am_file);
+        switch(determine_line_type(line, macro_table, macro_ptr))
+        {
+            case MACRO_DEF:
+                printf("Macro def\n");
+                break;
+            case MACRO_CALL:
+                printf("Macro call\n");
+                break;
+            case MACRO_END:
+                printf("Macro end\n");
+                break;
+            case REGULAR_LINE:
+                printf("Regular line\n");
+                break;
+        }
     }
 }
 
@@ -86,8 +102,8 @@ void macro_processing(char * file_name) {
     
     fill_am_file(am_file, as_file);
 
-    close(as_file);
-    close(am_file);
+    fclose(as_file);
+    fclose(am_file);
     free(asFileName);
     free(amFileName); /* should we move it to main ?? */
 }
