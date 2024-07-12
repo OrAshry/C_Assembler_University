@@ -56,11 +56,15 @@ void fill_am_file(FILE * am_file, FILE * as_file) {
 }
 
 void macro_processing(char * file_name) {
-    FILE * as_file; /**/
+    /* Files define */
+    FILE * as_file; 
     FILE * am_file;
+
+    /* File name define char */
     char * asFileName;
     char * amFileName;
     
+    /* Allocate data memory */
     asFileName = (char *)calloc(strlen(file_name) + SIZE_EOF, sizeof(char));
     amFileName = (char *)calloc(strlen(file_name) + SIZE_EOF, sizeof(char));
     
