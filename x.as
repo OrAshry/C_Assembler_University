@@ -1,10 +1,9 @@
 macr mmacsssteomr
        cmp r3, #-6
        bne END
-       adsasdads
-       asdasdasd
-       asdsad
 endmacr
+
+mmacsssteomr
 
 macr mmacsssteomr3
        cmp r3, #-6
