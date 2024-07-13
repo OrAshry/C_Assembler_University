@@ -1,7 +1,26 @@
-macr mmacsssteomr t
+macr mmacsssteomr
+       cmp r3, #-6
+       bne END
+       adsasdads
+       asdasdasd
+       asdsad
+endmacr
+
+macr mmacsssteomr3
        cmp r3, #-6
        bne END
 endmacr
+
+macr mmacsssteomr2
+       cmp r3, #-6
+       bne END
+endmacr
+
+macr mmacs33ssteomr2
+       cmp r3, #-6
+       bne END
+endmacr
+
        ; jmp r7
        ; add r4, #1
 ; this is a comment
