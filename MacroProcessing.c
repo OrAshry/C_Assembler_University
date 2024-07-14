@@ -132,7 +132,7 @@ char *get_macro_name(char *token)
 
 void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int macro_counter)
 {
-    struct Macro **temp_ptr = NULL;
+    struct Macro *temp_ptr = NULL;
 
     if (macro_counter >= MACRO_TABLE_SIZE)
     {
@@ -150,17 +150,22 @@ void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int
     if (temp_macro == NULL)
     {
         printf("Error: Unable to allocate memory for temp macro\n");
+        free(temp_macro);
         return;
         /*continue to next file*/
     }
 
     memcpy(temp_macro, macro_ptr, sizeof(struct Macro));
     macro_table[macro_counter] = temp_macro;
-    free(macro_ptr);
 }
 
 int is_macro_def(char *line, struct Macro **macro_ptr)
 {
+    if(*macro_ptr != NULL)
+    {
+        return 0;
+    }
+
     char *token = NULL;
     char *temp_line = (char *)calloc(MAX_LINE, sizeof(char));
 
@@ -197,12 +202,19 @@ int is_macro_body(char *line, struct Macro **macro_ptr)
     return 1;
 }
 
-int is_macro_call(char *line, struct Macro **macro_table)
+int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_ptr)
 {
     char *token = NULL;
     int i = 0;
     char *macro_name = NULL;
-    char *temp_line = (char *)calloc(MAX_LINE, sizeof(char));
+    char *temp_line;
+
+    if(*macro_ptr != NULL)
+    {
+        return 0;
+    }
+
+    temp_line = (char *)calloc(MAX_LINE, sizeof(char));
     if (temp_line == NULL)
     {
         printf("Error: Unable to allocate memory for temp line\n");
@@ -224,6 +236,7 @@ int is_macro_call(char *line, struct Macro **macro_table)
     {
         if (strcmp(macro_table[i]->name, macro_name) == 0)
         {
+            *macro_ptr = macro_table[i];
             return 1;
         }
     }
@@ -273,7 +286,7 @@ int determine_line_type(char *line, struct Macro **macro_table, struct Macro **m
     {
         return MACRO_END;
     }
-    else if (is_macro_call(line, macro_table))
+    else if (is_macro_call(line, macro_table, macro_ptr))
     {
         return MACRO_CALL;
     }
@@ -298,7 +311,7 @@ void fill_am_file(FILE *am_file, FILE *as_file)
     if (macro_table == NULL)
     {
         printf("Error: Unable to allocate memory for macro table\n");
-        /*continue to nnext file*/
+        /*continue to next file*/
         return;
     }
 
@@ -309,10 +322,13 @@ void fill_am_file(FILE *am_file, FILE *as_file)
         case MACRO_DEF:
             break;
         case MACRO_CALL:
+            printf("MACRO_CALL\n");
+            printf("Macro name: %s\n", macro_ptr->name);
             break;
         case MACRO_END:
             append_macro_table(macro_table, macro_ptr, macro_counter);
             macro_counter++;
+            macro_ptr = NULL;
             break;
         case REGULAR_LINE:
             fputs(line, am_file);
@@ -320,6 +336,7 @@ void fill_am_file(FILE *am_file, FILE *as_file)
         case MACRO_BODY:
             break;
         }
+        memset(line, 0, sizeof(line)); /* initalize line variable */
     }
 }
 

@@ -32,7 +32,7 @@ void macro_processing(char *file_name);
 int determine_line_type(char *line, struct Macro **macro_table,struct Macro **macro_ptr);
 int is_macro_def(char *line, struct Macro **macro_ptr);
 int is_macro_body(char *line, struct Macro **macro_ptr);
-int is_macro_call(char *line, struct Macro **macro_table);
+int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_ptr);
 int is_macro_end(char * line, struct Macro **macro_ptr);
 struct Macro *create_macro(char *token);
 char *get_macro_name(char *token);
