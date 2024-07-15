@@ -16,13 +16,20 @@ struct Macro
     int lines_counter;
 };
 
+enum FunctionId
+{
+    CALLOC_ID,
+    MALLOC_ID,
+    REALLOC_ID
+};
+
 enum MacroState
 {
     MACRO_DEF,
     MACRO_CALL,
     MACRO_END,
     REGULAR_LINE,
-    MACRO_BODY,
+    MACRO_BODY
 };
 
 FILE *read_file(char *file_name);
@@ -32,7 +39,7 @@ void macro_processing(char *file_name);
 int determine_line_type(char *line, struct Macro **macro_table,struct Macro **macro_ptr);
 int is_macro_def(char *line, struct Macro **macro_ptr);
 int is_macro_body(char *line, struct Macro **macro_ptr);
-int is_macro_call(char *line, struct Macro **macro_table);
+int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_ptr);
 int is_macro_end(char * line, struct Macro **macro_ptr);
 struct Macro *create_macro(char *token);
 char *get_macro_name(char *token);
