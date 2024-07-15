@@ -16,13 +16,20 @@ struct Macro
     int lines_counter;
 };
 
+enum FunctionId
+{
+    CALLOC_ID,
+    MALLOC_ID,
+    REALLOC_ID
+};
+
 enum MacroState
 {
     MACRO_DEF,
     MACRO_CALL,
     MACRO_END,
     REGULAR_LINE,
-    MACRO_BODY,
+    MACRO_BODY
 };
 
 FILE *read_file(char *file_name);
