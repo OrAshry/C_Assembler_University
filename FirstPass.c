@@ -1,7 +1,5 @@
 include "FirstPass.h"
 
-define MAX_LINE_LENGTH 81
-
 int firstPass(char * file_name, FILE * file) {
     /* Declarations */
     int error_flag = 0;
@@ -10,7 +8,12 @@ int firstPass(char * file_name, FILE * file) {
     int L = 0;
     int line_counter = 1; 
     char read_line[MAX_LINE_LENGTH];
-    struct aft line = {0}; /* After front translation*/ 
+    struct aft line = {0}; /* After front translation line*/
+
+    /* Read lines from the am file */
+    while(fgets(read_line,sizeof(read_line),am_file)) {
+        aft line = front_trans(read_line);
+    }
 
     return error_flag;
 }
