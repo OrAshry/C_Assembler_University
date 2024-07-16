@@ -2,6 +2,9 @@ include <stdio.h>
 
 define MAX_SYMBOL_NAME 32
 
+/* Prototypes */
+int firstPass(char * file_name, FILE * file);
+
 struct symbol {
     char symbol_name[SYMBOL_NAME_MAX];
     int address;
