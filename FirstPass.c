@@ -1,4 +1,4 @@
-include "FirstPass.h"
+#include "FirstPass.h"
 
 int firstPass(char * file_name, FILE * file) {
     /* Declarations */
@@ -13,6 +13,11 @@ int firstPass(char * file_name, FILE * file) {
     /* Read lines from the am file */
     while(fgets(read_line,sizeof(read_line),am_file)) {
         aft line = front_trans(read_line);
+
+
+
+
+
     }
 
     return error_flag;
