@@ -1,4 +1,5 @@
 include <stdio.h>
+
 define MAX_SYMBOL_NAME 32
 
 struct symbol {
