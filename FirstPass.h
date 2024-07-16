@@ -1,5 +1,6 @@
 include <stdio.h>
 
+define MAX_LINE_LENGTH 81
 define MAX_SYMBOL_NAME 32
 
 /* Prototypes */
