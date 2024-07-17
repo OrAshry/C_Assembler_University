@@ -7,15 +7,15 @@
 int firstPass(char * file_name, FILE * file);
 
 struct symbol {
-    char symbol_name[SYMBOL_NAME_MAX];
+    char symbol_name[MAX_SYMBOL_NAME];
     int address;
 
     enum {
-        extern;
-        entry;
-        .code;
-        .data;
-        entry_code;
-        entry_data;
+        extern,
+        entry,
+        code,
+        data,
+        entry_code,
+        entry_data
     }symbol_type;
 };
