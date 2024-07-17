@@ -8,11 +8,18 @@ int firstPass(char * file_name, FILE * file) {
     int L = 0;
     int line_counter = 1; 
     char read_line[MAX_LINE_LENGTH];
-    struct aft line = {0}; /* After front returned line*/
+    struct afr line = {0}; /* After front returned line*/
 
     /* Read lines from the am file */
     while(fgets(read_line,sizeof(read_line),am_file)) {
-        aft line = front_trans(read_line);
+        line = front_answer(read_line);
+        if(line.error == 1) {
+            printf("In file %s at line %d there is a sysntax error: %s", am_file,L,line.error);
+            L++;
+            error_flag =1
+            continue;
+        }
+        
 
 
 
