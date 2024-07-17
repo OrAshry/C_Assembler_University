@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+#include "Symboltable.h"
+#include "Symboltable.c"
+
 #define MAX_LINE_LENGTH 81
 #define MAX_SYMBOL_NAME 32
 
@@ -11,10 +14,10 @@ struct symbol {
     int address;
 
     enum {
-        extern,
-        entry,
-        code,
-        data,
+        extern_symbol,
+        entry_symbol,
+        code_symbol,
+        data_symbol,
         entry_code,
         entry_data
     }symbol_type;
