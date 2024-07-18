@@ -18,7 +18,7 @@ int firstPass(char * file_name, FILE * file) {
         if(line.error == 1) {
             printf("In file %s at line %d there is a sysntax error: %s", am_file,L,line.error);
             L++;
-            error_flag =1
+            error_flag = 1;
             continue;
         }
 
