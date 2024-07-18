@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include "SymbolTable.h"
 
-int symbol_search(table_ptr p, char name[MAX_SYMBOL_NAME], int num) {
+int symbol_search(table_ptr p, const char *search_name) {
     int found = 0;
-    int i;
 
-    for(i;i < num;++i) {
-        if(strcmp(name,p) == 0) {
-            found = 1;
-            continue;
-        }
+    while(p != NULL) {
+            if(strcmp(search_name ,p -> name) == 0) {
+                found = 1; 
+            }
+            else {
+                p = p -> next;
+            }
     }
     return found;
 }
