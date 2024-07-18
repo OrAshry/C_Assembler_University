@@ -45,3 +45,4 @@ struct Macro *create_macro(char *token);
 char *get_macro_name(char *token);
 void update_macro_context(char *line, struct Macro **macro_ptr);
 void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int macro_counter);
+void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID);
