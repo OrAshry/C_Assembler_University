@@ -25,5 +25,3 @@ typedef struct symbol_table {
     enum type the_type;
     struct symbol_table *next;
 } symbol_table, * table_ptr;
-
-int num_of_symbols = 0;
