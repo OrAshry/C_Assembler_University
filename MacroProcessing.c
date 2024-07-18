@@ -31,12 +31,7 @@ struct Macro *create_macro(char *token)
 {
     char *macro_name = NULL;
 
-    struct Macro *macro_ptr = (struct Macro *)calloc(1, sizeof(struct Macro));
-    if (macro_ptr == NULL)
-    {
-        printf("Error: Unable to allocate memory for macro\n");
-        return NULL;
-    }
+    struct Macro *macro_ptr = (struct Macro *)allocateMemory(1, sizeof(struct Macro), CALLOC_ID);
 
     macro_ptr->lines_counter = 0;
     macro_name = get_macro_name(token);
@@ -53,13 +48,7 @@ struct Macro *create_macro(char *token)
         return 0;
     }
 
-    macro_ptr->context = (char **)calloc(DEF_MAT_SIZE, sizeof(char *));
-    if (macro_ptr->context == NULL)
-    {
-        printf("Error: Unable to allocate memory for macro context\n");
-        macro_ptr = NULL;
-        return NULL; /*need to continue to next file!*/
-    }
+    macro_ptr->context = (char **)allocateMemory(DEF_MAT_SIZE, sizeof(char *), CALLOC_ID);
 
     strcpy(macro_ptr->name, macro_name);
 
@@ -110,12 +99,8 @@ char *get_macro_name(char *token)
         return NULL;
     }
 
-    char *name = (char *)calloc(MAX_LINE, sizeof(char));
-    if (name == NULL)
-    {
-        printf("Error: Unable to allocate memory for macro name\n");
-        return NULL;
-    }
+    char *name = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+
     strcpy(name, token);
 
     token = strtok(NULL, " ");
@@ -155,14 +140,7 @@ void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int
         *macro_table = temp_ptr;
     }
 
-    struct Macro *temp_macro = (struct Macro *)calloc(1, sizeof(struct Macro));
-    if (temp_macro == NULL)
-    {
-        printf("Error: Unable to allocate memory for temp macro\n");
-        free(temp_macro);
-        return;
-        /*continue to next file*/
-    }
+    struct Macro *temp_macro = (struct Macro *)allocateMemory(1, sizeof(struct Macro), CALLOC_ID);
 
     memcpy(temp_macro, macro_ptr, sizeof(struct Macro));
     macro_table[macro_counter] = temp_macro;
@@ -176,13 +154,8 @@ int is_macro_def(char *line, struct Macro **macro_ptr)
     }
 
     char *token = NULL;
-    char *temp_line = (char *)calloc(MAX_LINE, sizeof(char));
+    char *temp_line = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
-    if (temp_line == NULL)
-    {
-        printf("Error: Unable to allocate memory for temp line\n");
-        return 0;
-    }
     strcpy(temp_line, line);
 
     token = strtok(temp_line, " ");
@@ -256,13 +229,8 @@ int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_p
 int is_macro_end(char *line, struct Macro **macro_ptr)
 {
     char *token = NULL;
-    char *temp_line = (char *)calloc(MAX_LINE, sizeof(char));
+    char *temp_line = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
-    if (temp_line == NULL)
-    {
-        printf("Error: Unable to allocate memory for temp line\n");
-        return 0;
-    }
     strcpy(temp_line, line);
 
     token = strtok(temp_line, " ");
@@ -319,20 +287,9 @@ void fill_am_file(FILE *am_file, FILE *as_file)
     int macro_counter = 0;
     int i;
 
-    line = (char *)calloc(MAX_LINE, sizeof(char));
-    if (line == NULL)
-    {
-        printf("Error: Unable to allocate memory for line\n");
-        return;
-    }
+    line = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
-    macro_table = (struct Macro **)calloc(MACRO_TABLE_SIZE, sizeof(struct Macro *));
-    if (macro_table == NULL)
-    {
-        printf("Error: Unable to allocate memory for macro table\n");
-        /*continue to next file*/
-        return;
-    }
+    macro_table = (struct Macro **)allocateMemory(MACRO_TABLE_SIZE, sizeof(struct Macro *), CALLOC_ID);
 
     while (fgets(line, MAX_LINE, as_file) != NULL)
     {
@@ -388,7 +345,7 @@ void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
     if (ptr == NULL)
     {
         printf("Error: Unable to allocate memory\n");
-        return 0;
+        exit(0);
         /*continue to next file*/
     }
     return ptr;
