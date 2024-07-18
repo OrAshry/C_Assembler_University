@@ -13,12 +13,29 @@ int firstPass(char * file_name, FILE * file) {
     /* Read lines from the am file */
     while(fgets(read_line,sizeof(read_line),am_file)) {
         line = front_answer(read_line);
+        
+        /* If there is a syntax error*/
         if(line.error == 1) {
             printf("In file %s at line %d there is a sysntax error: %s", am_file,L,line.error);
             L++;
             error_flag =1
             continue;
         }
+
+        /* If there is a symbol in the line */
+        if((line.symbol == 1) && ((line.type == data) || line.type == string)) {
+            
+            /* If the symbol is already exist in the table*/
+            if(symbol_search()) {
+                
+            }
+
+            /* If the symbol is not in the table*/
+            else {
+                add_symbol_to_table();
+            }
+        }
+
         
 
 
