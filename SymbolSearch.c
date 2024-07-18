@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "SymbolTable.h"
 
-int symbol_search(table_ptr p, const char *search_name) {
+int symbol_search(table_ptr p, const char search_name[MAX_SYMBOL_NAME]) {
     int found = 0;
 
     while(p != NULL) {
