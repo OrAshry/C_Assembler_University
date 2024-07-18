@@ -1,5 +1,7 @@
 #include <stdio.h>
 
-symbol_search() {
-    ;
+int symbol_search() {
+    int found = 0;
+
+    return found;
 }
