@@ -7,7 +7,8 @@ struct ast{
     enum{
         ast_inst,
         ast_dir,
-        ast_define,
+        ast_error,
+        ast_note,
         ast_empty
     }ast_type;
     union{
@@ -21,32 +22,23 @@ struct ast{
             }dir_type;
             union{
                 char * label;
-                char * string;
-                int data;
+                int * data;
+                int data_size;
             }dir_options;
         }dir;
 
         struct{
             enum{
-                ast_move,
-                ast_cmp,
-                ast_add,
-                ast_sub,
-                ast_lea,
-                ast_clr,
-                ast_not,
-                ast_inc,
-                ast_dec,
-                ast_jmp,
-                ast_bne,
-                ast_red,
-                ast_prn,
-                ast_jsr,
-                ast_rts,
+                ast_move, ast_cmp, ast_add,
+                ast_sub, ast_lea, ast_clr,
+                ast_not, ast_inc, ast_dec,
+                ast_jmp, ast_bne, ast_red,
+                ast_prn, ast_jsr, ast_rts,
                 ast_stop
             }inst_type;
             struct{
                 enum{
+                    ast_none,
                     ast_immidiate,
                     ast_label,      
                     ast_register
