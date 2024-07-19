@@ -5,6 +5,7 @@
 #define SPACES " \t\v\f"
 #define COMMENT_CHAR ';'
 #define DIRECTIVE_CHAR '.'
+#define MAX_LABEL 31
 
 struct string_split{
     char * string[MAX_LINE];
