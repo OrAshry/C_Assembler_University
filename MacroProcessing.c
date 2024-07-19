@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "MacroProcessing.h"
+#include "helpingFunction.c"
 
 FILE *read_file(char *file_name)
 {
@@ -327,28 +328,6 @@ void fill_am_file(FILE *am_file, FILE *as_file)
             memset(line, 0, sizeof(line)); /* initalize line variable */
         }
     }
-}
-
-void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
-{
-    void *ptr;
-    switch (functionID)
-    {
-    case MALLOC_ID:
-        ptr = malloc(numElements * sizeOfElement);
-        break;
-    case CALLOC_ID:
-        ptr = calloc(numElements, sizeOfElement);
-        break;
-    }
-
-    if (ptr == NULL)
-    {
-        printf("Error: Unable to allocate memory\n");
-        exit(0);
-        /*continue to next file*/
-    }
-    return ptr;
 }
 
 void macro_processing(char *file_name)
