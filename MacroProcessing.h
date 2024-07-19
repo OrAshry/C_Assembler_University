@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "constants.h"
 
-#define MAX_LINE 80
 #define DEF_MAT_SIZE 3
 #define MACRO_TABLE_SIZE 2
 #define SIZE_EOF 3
@@ -14,13 +14,6 @@ struct Macro
     char name[MAX_LINE];
     char ** context;
     int lines_counter;
-};
-
-enum FunctionId
-{
-    CALLOC_ID,
-    MALLOC_ID,
-    REALLOC_ID
 };
 
 enum MacroState
@@ -45,4 +38,3 @@ struct Macro *create_macro(char *token);
 char *get_macro_name(char *token);
 void update_macro_context(char *line, struct Macro **macro_ptr);
 void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int macro_counter);
-void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID);
