@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "helpingFunction.c"
 
 #define MAX_LINE_LENGTH 81
 #define MAX_SYMBOL_NAME 32
