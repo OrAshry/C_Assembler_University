@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "SymbolTable.h"
 
+/* Search if the symbol is already inside the symbol table*/
 int symbol_search(table_ptr p, const char search_name[MAX_SYMBOL_NAME]) {
     int found = 0;
 
