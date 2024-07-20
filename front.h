@@ -5,7 +5,12 @@
 #define SPACES " \t\v\f"
 #define COMMENT_CHAR ';'
 #define DIRECTIVE_CHAR '.'
-#define MAX_LABEL 31
+#define LABEL_CHAR ':'
+#define MAX_LABEL_SIZE 31
+#define COMMA_CHAR ','
+#define MIN_NUM -16384
+#define MAX_NUM 16383
+#define SPACE " "
 
 struct string_split{
     char * string[MAX_LINE];
@@ -40,7 +45,7 @@ struct inst inst_table[16] = {
 
 struct ast{
     char lineError[ERROR_LINE];
-    const char * labelName; 
+    char * labelName; 
     enum{
         ast_inst,
         ast_dir,
@@ -94,7 +99,9 @@ struct ast{
 
 struct ast get_ast_from_line(char * line);
 static int is_number(char * str, int min_num, int max_num, int * result);
-static int is_label(char * str);
+static int validate_numbers(struct string_split split_str, int index, int size, struct ast *ast);
+static int is_label(char *str, struct ast *ast);
+static int is_register(char *str);
 static void parse_operand(char * operand, int operand_type ,struct ast * ast, struct inst * inst);
 static void parse_operands(char * operands, struct ast * ast);
 struct string_split split_string(char * str);
