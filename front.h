@@ -15,6 +15,10 @@
 #define INST_SIZE 16
 #define DECIMAL_BASE 10
 #define RESULT_ARR_SIZE 100
+#define DIRECTIVE_DATA "data"
+#define DIRECTIVE_STRING "string"
+#define DIRECTIVE_EXTERN "extern"
+#define DIRECTIVE_ENTRY "entry"
 
 struct string_split{
     char * string[MAX_LINE];
@@ -66,10 +70,10 @@ struct ast{
                 ast_string,
                 ast_data
             }dir_type;
-            union{
+            struct{
                 char * label;
-                int * data;
                 int data_size;
+                int data[RESULT_ARR_SIZE];
             }dir_options;
         }dir;
 
