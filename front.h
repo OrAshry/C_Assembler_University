@@ -15,10 +15,11 @@
 #define INST_SIZE 16
 #define DECIMAL_BASE 10
 #define RESULT_ARR_SIZE 100
-#define DIRECTIVE_DATA "data"
-#define DIRECTIVE_STRING "string"
-#define DIRECTIVE_EXTERN "extern"
-#define DIRECTIVE_ENTRY "entry"
+#define DIRECTIVE_DATA ".data"
+#define DIRECTIVE_STRING ".string"
+#define DIRECTIVE_EXTERN ".extern"
+#define DIRECTIVE_ENTRY ".entry"
+#define STRING_CHAR '"'
 
 struct string_split{
     char * string[MAX_LINE];
@@ -107,9 +108,11 @@ struct ast{
 
 struct ast get_ast_from_line(char * line);
 static int is_number(char ** str, int min_num, int max_num, int * result);
-static int validate_numbers(struct string_split split_str, int size, struct ast *ast);
+static int validate_numbers(struct string_split split_str, int size, struct ast *ast, int index);
 static int is_label(char *str, struct ast *ast);
 static int is_register(char *str);
 static void parse_operand(char * operand, int operand_type ,struct ast * ast, struct inst * inst);
 static void parse_operands(char * operands, struct ast * ast);
 struct string_split split_string(char * str);
+static int is_string(char *str, struct ast *ast);
+static void fill_directive_ast(struct ast * ast, struct string_split split_result, int index);
