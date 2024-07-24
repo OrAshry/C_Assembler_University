@@ -33,14 +33,25 @@ static int is_number(char **str, int min_num, int max_num, int *result)
     return num;
 }
 
-static int validate_numbers(struct string_split split_str, int size, struct ast *ast)
+static int is_string(char *str, struct ast *ast)
+{
+    int i;
+    if (str[0] != STRING_CHAR || str[strlen(str) - 1] != STRING_CHAR)
+    {
+        strcpy(ast->lineError, "String must start and end with \"");
+        return 0;
+    }
+    return 1;
+}
+
+static int validate_numbers(struct string_split split_str, int size, struct ast *ast, int index)
 {
     int i, data_size_ = 0, flag_comma = 0, flag_number = 0, num, result;
     char *concat_str = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
     int results[RESULT_ARR_SIZE] = {0};
 
     /* Concat substring to single string */
-    for (i = 0; i < size; i++)
+    for (i = index; i < size; i++)
     {
         strcat(concat_str, split_str.string[i]);
         if (i != size - 1)
@@ -66,9 +77,7 @@ static int validate_numbers(struct string_split split_str, int size, struct ast 
                 return 0;
             }
 
-            flag_comma = 1;
-            flag_number = 0;
-
+            flag_comma = 1, flag_number = 0;
             concat_str++;
         }
 
@@ -80,8 +89,7 @@ static int validate_numbers(struct string_split split_str, int size, struct ast 
                 return 0;
             }
 
-            flag_number = 1;
-            flag_comma = 0;
+            flag_number = 1, flag_comma = 0;
             num = is_number(&concat_str, MIN_NUM, MAX_NUM, &result);
             switch (result)
             {
@@ -184,7 +192,7 @@ static void fill_directive_ast(struct ast *ast, struct string_split split_result
     if (strcmp(split_result.string[index], DIRECTIVE_DATA) == 0)
     {
         ast->ast_options.dir.dir_type = ast_data;
-        if (!validate_numbers(split_result, split_result.size - index - 1, ast))
+        if (!validate_numbers(split_result, split_result.size, ast, ++index))
         {
             ast->ast_type = ast_error;
         }
@@ -192,20 +200,38 @@ static void fill_directive_ast(struct ast *ast, struct string_split split_result
     else if (strcmp(split_result.string[index], DIRECTIVE_STRING) == 0)
     {
         ast->ast_options.dir.dir_type = ast_string;
+        if (!is_string(split_result.string[index + 1], ast))
+        {
+            ast->ast_type = ast_error;
+        }
+        else{
+            ast->ast_options.dir.dir_options.data_size = strlen(split_result.string[index + 1]) - 2;
+            memcpy(ast->ast_options.dir.dir_options.data, split_result.string[index + 1] + 1, ast->ast_options.dir.dir_options.data_size);
+        }
     }
     else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0)
     {
         ast->ast_options.dir.dir_type = ast_entry;
+        if (is_label(split_result.string[index + 1], ast))
+        {
+            ast->ast_options.dir.dir_options.label = split_result.string[index + 1];
+        }
     }
     else if (strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0)
     {
         ast->ast_options.dir.dir_type = ast_extern;
+        if (is_label(split_result.string[index + 1], ast))
+        {
+            ast->ast_options.dir.dir_options.label = split_result.string[index + 1];
+        }
     }
     else
     {
         strcpy(ast->lineError, "Invalid directive");
         ast->ast_type = ast_error;
     }
+
+    return;
 }
 
 struct string_split split_string(char *str)
@@ -308,7 +334,17 @@ int main()
 {
     int i;
     char line[100];
-    strcpy(line, "LABEL: .data 12,3,4, 44, 6, 88, 332, -1, 20000");
+    strcpy(line, ".string \"hello, world\"");
     struct ast ast = get_ast_from_line(line);
+    printf("Line type: %d\n", ast.ast_type);
+    printf("Line error: %s\n", ast.lineError);
+    printf("Label name: %s\n", ast.labelName);
+    printf("Directive type: %d\n", ast.ast_options.dir.dir_type);
+    printf("Data size: %d\n", ast.ast_options.dir.dir_options.data_size);
+    printf("Directive label: %s\n", ast.ast_options.dir.dir_options.label);
+    for (i = 0; i < ast.ast_options.dir.dir_options.data_size; i++)
+    {
+        printf("Data[%d]: %d\n", i, ast.ast_options.dir.dir_options.data[i]);
+    }
     return 0;
 }
