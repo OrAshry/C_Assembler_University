@@ -10,7 +10,11 @@
 #define COMMA_CHAR ','
 #define MIN_NUM -16384
 #define MAX_NUM 16383
+#define SPACE_CHAR ' '
 #define SPACE " "
+#define INST_SIZE 16
+#define DECIMAL_BASE 10
+#define RESULT_ARR_SIZE 100
 
 struct string_split{
     char * string[MAX_LINE];
@@ -24,7 +28,7 @@ struct inst {
     const char *dest;
 };
 
-struct inst inst_table[16] = {
+struct inst inst_table[INST_SIZE] = {
     {"mov", 0, "0123", "123"},
     {"cmp", 1, "0123", "0123"},
     {"add", 2, "0123", "123"},
@@ -98,8 +102,8 @@ struct ast{
 };
 
 struct ast get_ast_from_line(char * line);
-static int is_number(char * str, int min_num, int max_num, int * result);
-static int validate_numbers(struct string_split split_str, int index, int size, struct ast *ast);
+static int is_number(char ** str, int min_num, int max_num, int * result);
+static int validate_numbers(struct string_split split_str, int size, struct ast *ast);
 static int is_label(char *str, struct ast *ast);
 static int is_register(char *str);
 static void parse_operand(char * operand, int operand_type ,struct ast * ast, struct inst * inst);
