@@ -35,10 +35,9 @@ static int is_number(char **str, int min_num, int max_num, int *result)
 
 static int validate_numbers(struct string_split split_str, int size, struct ast *ast)
 {
-    int i, data_size = 0, flag_comma = 0, flag_number = 0, num, result;
+    int i, data_size_ = 0, flag_comma = 0, flag_number = 0, num, result;
     char *concat_str = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
-    int *results = (int *)allocateMemory(RESULT_ARR_SIZE, sizeof(int), CALLOC_ID);
-    int *realloc_results;
+    int results[RESULT_ARR_SIZE] = {0};
 
     /* Concat substring to single string */
     for (i = 0; i < size; i++)
@@ -90,17 +89,7 @@ static int validate_numbers(struct string_split split_str, int size, struct ast 
                 strcpy(ast->lineError, "Invalid number");
                 return 0;
             case 1:
-                if (data_size >= RESULT_ARR_SIZE)
-                {
-                    realloc_results = (int *)realloc(results, (data_size + 1) * sizeof(int));
-                    if (realloc_results == NULL)
-                    {
-                        strcpy(ast->lineError, "Memory allocation failed");
-                        return 0;
-                    }
-                    results = realloc_results;
-                }
-                results[data_size++] = num;
+                results[data_size_++] = num;
                 break;
             case 2:
                 strcpy(ast->lineError, "Number is too big");
@@ -117,12 +106,8 @@ static int validate_numbers(struct string_split split_str, int size, struct ast 
         }
     }
 
-    ast->ast_options.dir.dir_options.data = (int *)allocateMemory(data_size, sizeof(int), MALLOC_ID);
-    memcpy(ast->ast_options.dir.dir_options.data, results, data_size * sizeof(int));
-    ast->ast_options.dir.dir_options.data_size = data_size;
-
-    free(results);
-    /*free(realloc_results); SHOULD I PLACE IT HERE ???????? */
+    memcpy(ast->ast_options.dir.dir_options.data, results, data_size_ * sizeof(int));
+    ast->ast_options.dir.dir_options.data_size = data_size_;
 
     return 1;
 }
@@ -195,6 +180,32 @@ static void parse_operands(char *operands, struct ast *ast)
 static void fill_directive_ast(struct ast *ast, struct string_split split_result, int index)
 {
     ast->ast_type = ast_dir;
+
+    if (strcmp(split_result.string[index], DIRECTIVE_DATA) == 0)
+    {
+        ast->ast_options.dir.dir_type = ast_data;
+        if (!validate_numbers(split_result, split_result.size - index - 1, ast))
+        {
+            ast->ast_type = ast_error;
+        }
+    }
+    else if (strcmp(split_result.string[index], DIRECTIVE_STRING) == 0)
+    {
+        ast->ast_options.dir.dir_type = ast_string;
+    }
+    else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0)
+    {
+        ast->ast_options.dir.dir_type = ast_entry;
+    }
+    else if (strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0)
+    {
+        ast->ast_options.dir.dir_type = ast_extern;
+    }
+    else
+    {
+        strcpy(ast->lineError, "Invalid directive");
+        ast->ast_type = ast_error;
+    }
 }
 
 struct string_split split_string(char *str)
@@ -297,14 +308,7 @@ int main()
 {
     int i;
     char line[100];
-    strcpy(line, " -3 ,             2,              1,1");
-    struct string_split split_result = split_string(line);
-    struct ast ast2 = {0};
-    validate_numbers(split_result, split_result.size, &ast2);
-    for(i = 0; i < ast2.ast_options.dir.dir_options.data_size; i++)
-    {
-        printf("%d\n", ast2.ast_options.dir.dir_options.data[i]);
-    }
-    /*struct ast ast = get_ast_from_line(line);*/
+    strcpy(line, "LABEL: .data 12,3,4, 44, 6, 88, 332, -1, 20000");
+    struct ast ast = get_ast_from_line(line);
     return 0;
 }
