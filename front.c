@@ -1,52 +1,106 @@
 #include "front.h"
 #include <ctype.h>
+#include <string.h>
 #include "helpingFunction.c"
+#include <stdlib.h>
 
-static int is_number(char *str, int min_num, int max_num, int *result)
+static int is_number(char **str, int min_num, int max_num, int *result)
 {
-    /* using strtol */
+    char *endptr;
+    long int num;
+    num = strtol(*str, &endptr, DECIMAL_BASE);
+
+    if (num == 0 && *str == endptr)
+    {
+        *result = 0;
+        return 0;
+    }
+
+    if (num > max_num)
+    {
+        *result = 2;
+        return 0;
+    }
+
+    if (num < min_num)
+    {
+        *result = 3;
+        return 0;
+    }
+
+    *str = endptr;
+    *result = 1;
+    return num;
 }
 
-static int validate_numbers(struct string_split split_str, int index, int size, struct ast *ast)
+static int validate_numbers(struct string_split split_str, int size, struct ast *ast)
 {
-    int i;
-    int result;
-    char * concat_str = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
-    int results[size];
+    int i, data_size = 0, flag_comma = 0, flag_number = 0, num, result;
+    char *concat_str = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    int *results = (int *)allocateMemory(RESULT_ARR_SIZE, sizeof(int), CALLOC_ID);
+    int *realloc_results;
 
     /* Concat substring to single string */
-    for(i = index; i < size; i++){
+    for (i = 0; i < size; i++)
+    {
         strcat(concat_str, split_str.string[i]);
-        if(i != size - 1){ /* Adding space between substrings */
+        if (i != size - 1)
+        { /* Adding space between substrings */
             strcat(concat_str, SPACE);
         }
     }
 
     /* If first or last char in .data is comma , */
-    if (concat_str[0] == COMMA_CHAR || concat_str[size] == COMMA_CHAR)
+    if (concat_str[0] == COMMA_CHAR || concat_str[strlen(concat_str) - 1] == COMMA_CHAR)
     {
         strcpy(ast->lineError, "Comma must not be at the start or end of the line");
         return 0;
     }
 
-    for (i = 0; i < size; i++)
+    while (concat_str[0] != '\0')
     {
-        if (concat_str[i] == COMMA_CHAR && (i + 1) < size && concat_str[i + 1] == COMMA_CHAR)
+        if (concat_str[0] == COMMA_CHAR)
         {
-            strcpy(ast->lineError, "Comma must not be one after another");
-            return 0;
+            if (flag_comma == 1)
+            {
+                strcpy(ast->lineError, "Comma must not be one after another");
+                return 0;
+            }
+
+            flag_comma = 1;
+            flag_number = 0;
+
+            concat_str++;
         }
 
-        if (concat_str[i] != COMMA_CHAR)
+        else if (concat_str[0] != COMMA_CHAR && concat_str[0] != SPACE_CHAR)
         {
-            is_number(concat_str, MIN_NUM, MAX_NUM, &result);
+            if (flag_number == 1)
+            {
+                strcpy(ast->lineError, "Number must be separated by comma");
+                return 0;
+            }
+
+            flag_number = 1;
+            flag_comma = 0;
+            num = is_number(&concat_str, MIN_NUM, MAX_NUM, &result);
             switch (result)
             {
             case 0:
                 strcpy(ast->lineError, "Invalid number");
                 return 0;
             case 1:
-                results[i] = result;
+                if (data_size >= RESULT_ARR_SIZE)
+                {
+                    realloc_results = (int *)realloc(results, (data_size + 1) * sizeof(int));
+                    if (realloc_results == NULL)
+                    {
+                        strcpy(ast->lineError, "Memory allocation failed");
+                        return 0;
+                    }
+                    results = realloc_results;
+                }
+                results[data_size++] = num;
                 break;
             case 2:
                 strcpy(ast->lineError, "Number is too big");
@@ -56,9 +110,20 @@ static int validate_numbers(struct string_split split_str, int index, int size, 
                 return 0;
             }
         }
+
+        else
+        {
+            concat_str++;
+        }
     }
 
-    ast->ast_options.dir.dir_options.data = results;
+    ast->ast_options.dir.dir_options.data = (int *)allocateMemory(data_size, sizeof(int), MALLOC_ID);
+    memcpy(ast->ast_options.dir.dir_options.data, results, data_size * sizeof(int));
+    ast->ast_options.dir.dir_options.data_size = data_size;
+
+    free(results);
+    /*free(realloc_results); SHOULD I PLACE IT HERE ???????? */
+
     return 1;
 }
 
@@ -96,13 +161,25 @@ static int is_label(char *str, struct ast *ast)
 
 static int is_register(char *str)
 {
-    /* check if the string is a register */
+    int result;
+    if (str[0] == 'r' && is_number(str[1], 0, 7, &result) && str[2] == '\0')
+    {
+        return 1;
+    }
+    return 0;
 }
 
 static int is_instruction(char *str)
 {
+    int i;
+    for (i = 0; i < INST_SIZE; i++)
+    {
+        if (strcmp(str, inst_table[i].name) == 0)
+        {
+            return 1;
+        }
+    }
     return 0;
-    /* check if the string is an instruction */
 }
 
 static void parse_operand(char *operand, int operand_type, struct ast *ast, struct inst *inst)
@@ -218,12 +295,16 @@ struct ast get_ast_from_line(char *line)
 
 int main()
 {
+    int i;
     char line[100];
-    strcpy(line, "-3 2,1,1");
+    strcpy(line, " -3 ,             2,              1,1");
     struct string_split split_result = split_string(line);
     struct ast ast2 = {0};
-    validate_numbers(split_result, 0, 2, &ast2);
-    int i;
-    struct ast ast = get_ast_from_line(line);
+    validate_numbers(split_result, split_result.size, &ast2);
+    for(i = 0; i < ast2.ast_options.dir.dir_options.data_size; i++)
+    {
+        printf("%d\n", ast2.ast_options.dir.dir_options.data[i]);
+    }
+    /*struct ast ast = get_ast_from_line(line);*/
     return 0;
 }
