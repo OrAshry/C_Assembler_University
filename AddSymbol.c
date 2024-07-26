@@ -1,6 +1,6 @@
 #include "SymbolTable.h"
 
-void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], enum type new_type, int new_address, table_ptr ptr) {
+void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], enum type new_type, int new_address, table_ptr *ptr) {
     
     table_ptr new_symbol = (table_ptr)allocateMemory(1, sizeof(symbol_table), CALLOC_ID);
     strcpy(new_symbol -> symbol_name, new_name);
@@ -8,13 +8,15 @@ void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], enum type new_type, int
     new_symbol -> symbol_address = new_address;
     new_symbol-> next = NULL;
     /* The table is empty */
-    if(ptr == NULL) {
-        ptr = new_symbol;
+    if(*ptr == NULL) {
+        *ptr = new_symbol;
     }
     /* The table is not empty */
     else {
-        table_ptr current = ptr;
-        ptr = new_symbol;
-        current -> next = ptr;
+        table_ptr current = *ptr;
+        while(current -> next != NULL) {
+             current = current -> next;
+        }
+        current -> next = new_symbol;
     }
 }
