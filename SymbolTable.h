@@ -21,6 +21,6 @@ enum type{
 typedef struct symbol_table {
     char symbol_name[MAX_SYMBOL_NAME];
     enum type symbol_type;
-    int address;
+    int symbol_address;
     struct symbol_table *next;
 } symbol_table, * table_ptr;
