@@ -23,6 +23,7 @@ typedef struct symbol {
     int address;
     enum type symbol_type;
 } symbol, * symbol_ptr;
+symbol_ptr p1;
 
 typedef struct symbol_table {
     char name[MAX_SYMBOL_NAME];
