@@ -14,7 +14,7 @@
 #define SPACE " "
 #define INST_SIZE 16
 #define DECIMAL_BASE 10
-#define RESULT_ARR_SIZE 100
+#define RESULT_ARR_SIZE 250
 #define DIRECTIVE_DATA ".data"
 #define DIRECTIVE_STRING ".string"
 #define DIRECTIVE_EXTERN ".extern"
@@ -114,5 +114,5 @@ static int is_register(char *str);
 static void parse_operand(char * operand, int operand_type ,struct ast * ast, struct inst * inst);
 static void parse_operands(char * operands, struct ast * ast);
 struct string_split split_string(char * str);
-static int is_string(char *str, struct ast *ast);
+static int fill_string(struct string_split split_result, int index, struct ast *ast);
 static void fill_directive_ast(struct ast * ast, struct string_split split_result, int index);

@@ -33,14 +33,42 @@ static int is_number(char **str, int min_num, int max_num, int *result)
     return num;
 }
 
-static int is_string(char *str, struct ast *ast)
+static int fill_string(struct string_split split_result, int index, struct ast *ast)
 {
-    int i;
-    if (str[0] != STRING_CHAR || str[strlen(str) - 1] != STRING_CHAR)
+    int i, j, results[RESULT_ARR_SIZE] = {0}, data_size_ = 0;
+
+    if (split_result.size <= index)
     {
-        strcpy(ast->lineError, "String must start and end with \"");
+        strcpy(ast->lineError, "String data is missing");
         return 0;
     }
+
+    for (i = index; i < split_result.size; i++)
+    {
+        for (j = 0; j < strlen(split_result.string[i]); j++)
+        {
+            if ((i == index && j == 0) || (i == split_result.size - 1 && j == strlen(split_result.string[i]) - 1))
+            {
+                if (split_result.string[i][j] != STRING_CHAR)
+                {
+                    strcpy(ast->lineError, "String must start and end with \"");
+                    return 0;
+                }
+            }
+            else
+                results[data_size_++] = split_result.string[i][j];
+        }
+
+        if (i != split_result.size - 1)
+        {
+            results[data_size_++] = SPACE_CHAR;
+        }
+    }
+
+    results[data_size_++] = '\0';
+    memcpy(ast->ast_options.dir.dir_options.data, results, data_size_ * sizeof(int));
+    ast->ast_options.dir.dir_options.data_size = data_size_;
+
     return 1;
 }
 
@@ -200,13 +228,9 @@ static void fill_directive_ast(struct ast *ast, struct string_split split_result
     else if (strcmp(split_result.string[index], DIRECTIVE_STRING) == 0)
     {
         ast->ast_options.dir.dir_type = ast_string;
-        if (!is_string(split_result.string[index + 1], ast))
+        if (!fill_string(split_result, index + 1, ast))
         {
             ast->ast_type = ast_error;
-        }
-        else{
-            ast->ast_options.dir.dir_options.data_size = strlen(split_result.string[index + 1]) - 2;
-            memcpy(ast->ast_options.dir.dir_options.data, split_result.string[index + 1] + 1, ast->ast_options.dir.dir_options.data_size);
         }
     }
     else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0)
@@ -236,40 +260,61 @@ static void fill_directive_ast(struct ast *ast, struct string_split split_result
 
 struct string_split split_string(char *str)
 {
-    int strings_count = 0;
-    char *s;
+        int strings_count = 0;
     struct string_split split_result = {0};
-    while (isspace(*str))
-        str++; /* Skiping leading whitespcaes */
+    int in_quotes = 0;
 
-    if (*str == '\0')
-    { /* If string is empty after remove whitespaces */
+    /** Skip leading whitespaces **/
+    while (isspace((unsigned char)*str))
+        str++;
+
+    /** If the string is empty after removing whitespaces **/
+    if (*str == '\0') {
         return split_result;
     }
 
-    while (str && *str != '\0')
-    {
-        /* Store current string in list */
+    while (str && *str != '\0') {
+        if(*str == '\n'){
+            *str = '\0';
+            break;
+        }
+
+        /** Check for the start or end of a quoted substring **/
+        if (*str == '\"') {
+            in_quotes = !in_quotes; /** Toggle in_quotes flag **/
+        }
+
+        /** Store current string in the list **/
         split_result.string[strings_count++] = str;
 
-        /* Move to next string */
-        str = strpbrk(str, SPACES);
+        if (in_quotes) {
+            /** Find the closing quote **/
+            str = strchr(str + 1, '\"');
+            if (str) {
+                str++; /** Move past the closing quote **/
+            } else {
+                break; /** No closing quote found **/
+            }
+        } else {
+            /** Move to the next string **/
+            str = strpbrk(str, SPACES);
 
-        if (str)
-        {
-            *str = '\0'; /* Null termiante */
-            str++;
-
-            /* Skip additional whitespaces */
-            while (isspace(*str))
-            {
+            if (str) {
+                *str = '\0'; /** Null terminate **/
                 str++;
+
+                /** Skip additional whitespaces **/
+                while (isspace((unsigned char)*str)) {
+                    str++;
+                }
             }
         }
     }
 
-    split_result.size = strings_count; /* Update strings counter in list */
-    return split_result;               /* Return string_split structure */
+    /** Update strings counter in the list **/
+    split_result.size = strings_count;
+    /** Return string_split structure **/
+    return split_result;
 }
 
 struct ast get_ast_from_line(char *line)
@@ -335,16 +380,29 @@ int main()
     int i;
     char line[100];
     strcpy(line, ".string \"hello, world\"");
-    struct ast ast = get_ast_from_line(line);
-    printf("Line type: %d\n", ast.ast_type);
-    printf("Line error: %s\n", ast.lineError);
-    printf("Label name: %s\n", ast.labelName);
-    printf("Directive type: %d\n", ast.ast_options.dir.dir_type);
-    printf("Data size: %d\n", ast.ast_options.dir.dir_options.data_size);
-    printf("Directive label: %s\n", ast.ast_options.dir.dir_options.label);
-    for (i = 0; i < ast.ast_options.dir.dir_options.data_size; i++)
+
+    FILE *file;
+    file = fopen("x.am", "r");
+    if (file == NULL)
     {
-        printf("Data[%d]: %d\n", i, ast.ast_options.dir.dir_options.data[i]);
+        printf("Error: File not found\n");
+        return NULL;
     }
+
+    while (fgets(line, MAX_LINE, file) != NULL)
+    {
+        struct ast ast = get_ast_from_line(line);
+        printf("Line type: %d\n", ast.ast_type);
+        printf("Line error: %s\n", ast.lineError);
+        printf("Label name: %s\n", ast.labelName);
+        printf("Directive type: %d\n", ast.ast_options.dir.dir_type);
+        printf("Data size: %d\n", ast.ast_options.dir.dir_options.data_size);
+        printf("Directive label: %s\n", ast.ast_options.dir.dir_options.label);
+        for (i = 0; i < ast.ast_options.dir.dir_options.data_size; i++)
+        {
+            printf("Data[%d]: %d\n", i, ast.ast_options.dir.dir_options.data[i]);
+        }
+    }
+
     return 0;
 }
