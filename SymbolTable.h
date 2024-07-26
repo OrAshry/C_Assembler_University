@@ -20,13 +20,11 @@ enum type{
 
 typedef struct symbol {
     char symbol_name[MAX_SYMBOL_NAME];
-    int address;
     enum type symbol_type;
 } symbol, * symbol_ptr;
 
 typedef struct symbol_table {
-    char name[MAX_SYMBOL_NAME];
+    symbol;
     int address;
-    enum type the_type;
     struct symbol_table *next;
 } symbol_table, * table_ptr;
