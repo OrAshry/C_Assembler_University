@@ -14,10 +14,10 @@ int firstPass(char * file_name, FILE * file) {
 
     /* Read lines from the am file */
     while(fgets(read_line,sizeof(read_line),am_file)) {
-        answer = front_answer(read_line);
+        answer = get_ast_from_line(read_line);
         
         /* If there is a syntax error*/
-        if(answer.lineError[0] != '\0') {
+        if(answer.ast_type == ast_error) {
             printf("Error: In file %s at line %d there is a sysntax error: %s\n", am_file,line_counter,answer.lineError);
             line_counter++;
             error_flag = 1;
@@ -25,13 +25,13 @@ int firstPass(char * file_name, FILE * file) {
         }
 
         /* If there is a symbol in the line */
-        if((answer.labelName != null) && ((answer.ast_type == data) || answer.ast_type == string)) {
+        if((answer.labelName != '\0') && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
             
             /* If the symbol is already exist in the table */
             if(symbol_search(p1, answer.labelName)) {
                 
                 /* If entry*/
-                if(answer.ast_type == entry) {
+                if(answer.ast_type == ast_entry) {
                     ;
                 }
                 
