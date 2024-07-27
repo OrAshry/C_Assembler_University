@@ -310,14 +310,6 @@ void fill_am_file(FILE *am_file, FILE *as_file)
             macro_ptr = NULL;
             break;
         case REGULAR_LINE:
-            while (*line != '\0' && (*line == ' ' || *line == '\t'))
-            {
-                line++;
-            }
-            if (*line == ';' || *line == '\n')
-            {
-                continue; /* skip comment lines */
-            }
             fputs(line, am_file);
             break;
         case MACRO_BODY:
