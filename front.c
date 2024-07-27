@@ -233,17 +233,9 @@ static void fill_directive_ast(struct ast *ast, struct string_split split_result
             ast->ast_type = ast_error;
         }
     }
-    else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0)
+    else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 || strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0)
     {
-        ast->ast_options.dir.dir_type = ast_entry;
-        if (is_label(split_result.string[index + 1], ast))
-        {
-            ast->ast_options.dir.dir_options.label = split_result.string[index + 1];
-        }
-    }
-    else if (strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0)
-    {
-        ast->ast_options.dir.dir_type = ast_extern;
+        ast->ast_options.dir.dir_type = strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 ? ast_entry : ast_extern;
         if (is_label(split_result.string[index + 1], ast))
         {
             ast->ast_options.dir.dir_options.label = split_result.string[index + 1];
@@ -254,8 +246,6 @@ static void fill_directive_ast(struct ast *ast, struct string_split split_result
         strcpy(ast->lineError, "Invalid directive");
         ast->ast_type = ast_error;
     }
-
-    return;
 }
 
 struct string_split split_string(char *str)
@@ -339,9 +329,9 @@ struct string_split split_string(char *str)
 
 struct ast get_ast_from_line(char *line)
 {
-    struct ast ast = {0}; /* Init ast type */
-    int index = 0;        /* index init */
-    struct string_split split_result = split_string(line);
+    struct ast ast = {0};                                  /* Init ast type */
+    int index = 0;                                         /* index init */
+    struct string_split split_result = split_string(line); /* Split line into substrings */
 
     /* Empty line case */
     if (split_result.size == 0)
@@ -357,46 +347,35 @@ struct ast get_ast_from_line(char *line)
         return ast;
     }
 
-    /* If current line is directive line with . without label at start */
+    /* If current string is a Label and not instruction */
+    if (is_label(split_result.string[index], &ast) && !is_instruction(split_result.string[index]))
+    {
+        ast.labelName = split_result.string[index++];    /* Init label name */
+        ast.labelName[strlen(ast.labelName) - 1] = '\0'; /* Remove the ':' from the label name */
+    }
+
+    /* If current line is directive line with . */
     if (split_result.string[index][0] == DIRECTIVE_CHAR)
     {
         fill_directive_ast(&ast, split_result, index);
         return ast;
     }
 
-    /* If current line is instruction line without a label at start */
+    /* If current line is instruction line */
     if (is_instruction(split_result.string[index]))
     {
         parse_operands(split_result.string[index], &ast);
         return ast;
     }
 
-    /* Directive line case (data, string, entry, extern) */
-    /* OR Instruction line case with label at start */
-    if (is_label(split_result.string[index], &ast))
+    /* Error case */
+    if(ast.lineError != NULL)
     {
-        ast.labelName = split_result.string[index++];    /* Init label name */
-        ast.labelName[strlen(ast.labelName) - 1] = '\0'; /* Remove the ':' from the label name */
-
-        /* If current line is directive line with .*/
-        if (split_result.string[index][0] == DIRECTIVE_CHAR)
-        {
-            fill_directive_ast(&ast, split_result, index);
-            return ast;
-        }
-
-        if (is_instruction(split_result.string[index]))
-        {
-            parse_operands(split_result.string[index], &ast);
-            return ast;
-        }
-
-        strcpy(ast.lineError, "Invalid directive or instruction");
-        ast.ast_type = ast_error;
         return ast;
     }
 
-    /* Error case */
+    /* Second Error case */
+    strcpy(ast.lineError, "Invalid directive or instruction");
     ast.ast_type = ast_error;
     return ast;
 }
@@ -414,6 +393,9 @@ int main()
         printf("Error: File not found\n");
         return 0;
     }
+
+    /* create me a ast with init values */
+    struct ast ast = {"", "", ast_dir, {ast_data, {"", 5, {1,2,3,4,5}}}};
 
     while (fgets(line, MAX_LINE, file) != NULL)
     {
