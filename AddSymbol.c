@@ -1,6 +1,6 @@
 #include "SymbolTable.h"
 
-void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], enum type new_type, int new_address, table_ptr *ptr) {
+void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], int new_type, int new_address, table_ptr *ptr) {
     
     table_ptr new_symbol = (table_ptr)allocateMemory(1, sizeof(symbol_table), CALLOC_ID);
     strcpy(new_symbol -> symbol_name, new_name);
