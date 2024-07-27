@@ -11,6 +11,7 @@ int firstPass(char * file_name, FILE * file) {
     char read_line[MAX_LINE_LENGTH];
     struct ast answer = {0}; /* After front returned answer*/
     table_ptr p1; /* The poiner to the symbol table*/
+    table_ptr found; /* Recive the address of the symbol inside the table*/
 
     /* Read lines from the am file */
     while(fgets(read_line,sizeof(read_line),am_file)) {
@@ -28,11 +29,18 @@ int firstPass(char * file_name, FILE * file) {
         if((answer.labelName != '\0') && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
             
             /* If the symbol is already exist in the table */
-            if(symbol_search(p1, answer.labelName)) {
+            if(found = symbol_search(p1, answer.labelName)) {
                 
                 /* If entry*/
-                if(answer.ast_type == ast_entry) {
-                    ;
+                if(found -> symbol_type == entry_symbol) {
+                    
+                    /* If Inst */
+                    if(answer.dir_type ) {
+                        found -> 
+                    }
+
+                    /* If Dir */
+
                 }
                 
                 /* If its not an entry*/
@@ -46,11 +54,32 @@ int firstPass(char * file_name, FILE * file) {
             /* If the symbol is not in the table*/
             else {
                 
-                /* If its IC */
-                add_symbol_to_table(answer.labelName, answer.ast_type, IC, p1);
+                /* If its an inst */ /*i need to check how to insert, it will instert all at the same DC*/
+                if(answer.ast_type == ast_inst) {
+                    if(IC == 0) {
+                        IC = 100;
+                    }
+                    add_symbol_to_table(answer.labelName, answer.ast_type, IC, p1);
+                    L = strlen(answer.ast_options.inst.operands);
+                    IC += L;
+                }
 
-                /* If its DC*/
-                add_symbol_to_table(answer.labelName, answer.ast_type, DC, p1);
+                /* If its a dir */
+                if(answer.ast_type == ast_dir) {
+
+                    /* If its external variable */
+                    if(answer.ast_options.dir.dir_type == ast_extern) {
+                        add_symbol_to_table(answer.labelName, answer.ast_type, NULL, p1);
+                    }
+
+                    /* If its not external variable */ /*i need to check how to insert, it will instert all at the same DC*/
+                    else {
+                        ++DC;
+                        add_symbol_to_table(answer.labelName, answer.ast_type, DC, p1);
+                        L = answer.ast_options.dir.dir_options.data_size;
+                        DC += L;
+                    }
+                }
             }
         }
 
