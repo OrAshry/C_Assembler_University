@@ -1,52 +1,131 @@
 #include "front.h"
 #include <ctype.h>
+#include <string.h>
 #include "helpingFunction.c"
+#include <stdlib.h>
 
-static int is_number(char *str, int min_num, int max_num, int *result)
+static int is_number(char **str, int min_num, int max_num, int *result)
 {
-    /* using strtol */
+    char *endptr;
+    long int num;
+    num = strtol(*str, &endptr, DECIMAL_BASE);
+
+    if (num == 0 && *str == endptr)
+    {
+        *result = 0;
+        return 0;
+    }
+
+    if (num > max_num)
+    {
+        *result = 2;
+        return 0;
+    }
+
+    if (num < min_num)
+    {
+        *result = 3;
+        return 0;
+    }
+
+    *str = endptr;
+    *result = 1;
+    return num;
 }
 
-static int validate_numbers(struct string_split split_str, int index, int size, struct ast *ast)
+static int fill_string(struct string_split split_result, int index, struct ast *ast)
 {
-    int i;
-    int result;
-    char * concat_str = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
-    int results[size];
+    int i, j, results[RESULT_ARR_SIZE] = {0}, data_size_ = 0;
+
+    if (split_result.size <= index)
+    {
+        strcpy(ast->lineError, "String data is missing");
+        return 0;
+    }
+
+    for (i = index; i < split_result.size; i++)
+    {
+        for (j = 0; j < strlen(split_result.string[i]); j++)
+        {
+            if ((i == index && j == 0) || (i == split_result.size - 1 && j == strlen(split_result.string[i]) - 1))
+            {
+                if (split_result.string[i][j] != STRING_CHAR)
+                {
+                    strcpy(ast->lineError, "String must start and end with \"");
+                    return 0;
+                }
+            }
+            else
+                results[data_size_++] = split_result.string[i][j];
+        }
+
+        if (i != split_result.size - 1)
+        {
+            results[data_size_++] = SPACE_CHAR;
+        }
+    }
+
+    results[data_size_++] = '\0';
+    memcpy(ast->ast_options.dir.dir_options.data, results, data_size_ * sizeof(int));
+    ast->ast_options.dir.dir_options.data_size = data_size_;
+
+    return 1;
+}
+
+static int validate_numbers(struct string_split split_str, int size, struct ast *ast, int index)
+{
+    int i, data_size_ = 0, flag_comma = 0, flag_number = 0, num, result;
+    char *concat_str = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    int results[RESULT_ARR_SIZE] = {0};
 
     /* Concat substring to single string */
-    for(i = index; i < size; i++){
+    for (i = index; i < size; i++)
+    {
         strcat(concat_str, split_str.string[i]);
-        if(i != size - 1){ /* Adding space between substrings */
+        if (i != size - 1)
+        { /* Adding space between substrings */
             strcat(concat_str, SPACE);
         }
     }
 
     /* If first or last char in .data is comma , */
-    if (concat_str[0] == COMMA_CHAR || concat_str[size] == COMMA_CHAR)
+    if (concat_str[0] == COMMA_CHAR || concat_str[strlen(concat_str) - 1] == COMMA_CHAR)
     {
         strcpy(ast->lineError, "Comma must not be at the start or end of the line");
         return 0;
     }
 
-    for (i = 0; i < size; i++)
+    while (concat_str[0] != '\0')
     {
-        if (concat_str[i] == COMMA_CHAR && (i + 1) < size && concat_str[i + 1] == COMMA_CHAR)
+        if (concat_str[0] == COMMA_CHAR)
         {
-            strcpy(ast->lineError, "Comma must not be one after another");
-            return 0;
+            if (flag_comma == 1)
+            {
+                strcpy(ast->lineError, "Comma must not be one after another");
+                return 0;
+            }
+
+            flag_comma = 1, flag_number = 0;
+            concat_str++;
         }
 
-        if (concat_str[i] != COMMA_CHAR)
+        else if (concat_str[0] != COMMA_CHAR && concat_str[0] != SPACE_CHAR)
         {
-            is_number(concat_str, MIN_NUM, MAX_NUM, &result);
+            if (flag_number == 1)
+            {
+                strcpy(ast->lineError, "Number must be separated by comma");
+                return 0;
+            }
+
+            flag_number = 1, flag_comma = 0;
+            num = is_number(&concat_str, MIN_NUM, MAX_NUM, &result);
             switch (result)
             {
             case 0:
                 strcpy(ast->lineError, "Invalid number");
                 return 0;
             case 1:
-                results[i] = result;
+                results[data_size_++] = num;
                 break;
             case 2:
                 strcpy(ast->lineError, "Number is too big");
@@ -56,9 +135,16 @@ static int validate_numbers(struct string_split split_str, int index, int size, 
                 return 0;
             }
         }
+
+        else
+        {
+            concat_str++;
+        }
     }
 
-    ast->ast_options.dir.dir_options.data = results;
+    memcpy(ast->ast_options.dir.dir_options.data, results, data_size_ * sizeof(int));
+    ast->ast_options.dir.dir_options.data_size = data_size_;
+
     return 1;
 }
 
@@ -96,13 +182,25 @@ static int is_label(char *str, struct ast *ast)
 
 static int is_register(char *str)
 {
-    /* check if the string is a register */
+    int result;
+    if (str[0] == 'r' && is_number(str[1], 0, 7, &result) && str[2] == '\0')
+    {
+        return 1;
+    }
+    return 0;
 }
 
 static int is_instruction(char *str)
 {
+    int i;
+    for (i = 0; i < INST_SIZE; i++)
+    {
+        if (strcmp(str, inst_table[i].name) == 0)
+        {
+            return 1;
+        }
+    }
     return 0;
-    /* check if the string is an instruction */
 }
 
 static void parse_operand(char *operand, int operand_type, struct ast *ast, struct inst *inst)
@@ -118,51 +216,122 @@ static void parse_operands(char *operands, struct ast *ast)
 static void fill_directive_ast(struct ast *ast, struct string_split split_result, int index)
 {
     ast->ast_type = ast_dir;
+
+    if (strcmp(split_result.string[index], DIRECTIVE_DATA) == 0)
+    {
+        ast->ast_options.dir.dir_type = ast_data;
+        if (!validate_numbers(split_result, split_result.size, ast, ++index))
+        {
+            ast->ast_type = ast_error;
+        }
+    }
+    else if (strcmp(split_result.string[index], DIRECTIVE_STRING) == 0)
+    {
+        ast->ast_options.dir.dir_type = ast_string;
+        if (!fill_string(split_result, index + 1, ast))
+        {
+            ast->ast_type = ast_error;
+        }
+    }
+    else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 || strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0)
+    {
+        ast->ast_options.dir.dir_type = strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 ? ast_entry : ast_extern;
+        if (is_label(split_result.string[index + 1], ast))
+        {
+            ast->ast_options.dir.dir_options.label = split_result.string[index + 1];
+        }
+    }
+    else
+    {
+        strcpy(ast->lineError, "Invalid directive");
+        ast->ast_type = ast_error;
+    }
 }
 
 struct string_split split_string(char *str)
 {
     int strings_count = 0;
-    char *s;
     struct string_split split_result = {0};
-    while (isspace(*str))
-        str++; /* Skiping leading whitespcaes */
+    int in_quotes = 0;
 
+    /** Skip leading whitespaces **/
+    while (isspace((unsigned char)*str))
+        str++;
+
+    /** If the string is empty after removing whitespaces **/
     if (*str == '\0')
-    { /* If string is empty after remove whitespaces */
+    {
         return split_result;
     }
 
     while (str && *str != '\0')
     {
-        /* Store current string in list */
+        /** If string final char is enter **/
+        if (*str == '\n')
+        {
+            *str = '\0';
+            break;
+        }
+
+        /** Check for the start or end of a quoted substring **/
+        if (*str == '\"')
+        {
+            in_quotes = !in_quotes; /** Toggle in_quotes flag **/
+        }
+
+        /** Store current string in the list **/
         split_result.string[strings_count++] = str;
 
-        /* Move to next string */
-        str = strpbrk(str, SPACES);
-
-        if (str)
+        if (in_quotes)
         {
-            *str = '\0'; /* Null termiante */
-            str++;
-
-            /* Skip additional whitespaces */
-            while (isspace(*str))
+            /** Find the closing quote **/
+            str = strchr(str + 1, '\"');
+            if (str)
             {
+                str++; /** Move past the closing quote **/
+            }
+            else
+            {
+                break; /** No closing quote found **/
+            }
+        }
+        else
+        {
+            /** Move to the next string **/
+            str = strpbrk(str, SPACES);
+
+            if (str)
+            {
+                *str = '\0'; /** Null terminate **/
                 str++;
+
+                /** Skip additional whitespaces **/
+                while (isspace((unsigned char)*str))
+                {
+                    str++;
+                }
             }
         }
     }
 
-    split_result.size = strings_count; /* Update strings counter in list */
-    return split_result;               /* Return string_split structure */
+    /** Update strings counter in the list **/
+    split_result.size = strings_count;
+
+    /* Remove '\n' from end of string if exists */
+    if (split_result.string[strings_count - 1][strlen(split_result.string[strings_count - 1]) - 1] == '\n')
+    {
+        split_result.string[strings_count - 1][strlen(split_result.string[strings_count - 1]) - 1] = '\0';
+    }
+
+    /** Return string_split structure **/
+    return split_result;
 }
 
 struct ast get_ast_from_line(char *line)
 {
-    struct ast ast = {0}; /* Init ast type */
-    int index = 0;        /* index init */
-    struct string_split split_result = split_string(line);
+    struct ast ast = {0};                                  /* Init ast type */
+    int index = 0;                                         /* index init */
+    struct string_split split_result = split_string(line); /* Split line into substrings */
 
     /* Empty line case */
     if (split_result.size == 0)
@@ -178,52 +347,70 @@ struct ast get_ast_from_line(char *line)
         return ast;
     }
 
-    /* If current line is directive line with . without label at start */
+    /* If current string is a Label and not instruction */
+    if (is_label(split_result.string[index], &ast) && !is_instruction(split_result.string[index]))
+    {
+        ast.labelName = split_result.string[index++];    /* Init label name */
+        ast.labelName[strlen(ast.labelName) - 1] = '\0'; /* Remove the ':' from the label name */
+    }
+
+    /* If current line is directive line with . */
     if (split_result.string[index][0] == DIRECTIVE_CHAR)
     {
         fill_directive_ast(&ast, split_result, index);
         return ast;
     }
 
-    /* If current line is instruction line without a label at start */
+    /* If current line is instruction line */
     if (is_instruction(split_result.string[index]))
     {
         parse_operands(split_result.string[index], &ast);
         return ast;
     }
 
-    /* Directive line case (data, string, entry, extern) */
-    /* OR Instruction line case with label at start */
-    if (is_label(split_result.string[index], &ast))
+    /* Error case */
+    if(ast.lineError != NULL)
     {
-        ast.labelName = split_result.string[index++];    /* Init label name */
-        ast.labelName[strlen(ast.labelName) - 1] = '\0'; /* Remove the ':' from the label name */
-
-        /* If current line is directive line with .*/
-        if (split_result.string[index][0] == DIRECTIVE_CHAR)
-        {
-            fill_directive_ast(&ast, split_result, index);
-            return ast;
-        }
-
-        /* If current line is instruction line */
-        parse_operands(split_result.string[index], &ast);
         return ast;
     }
 
-    /* Error case */
+    /* Second Error case */
+    strcpy(ast.lineError, "Invalid directive or instruction");
     ast.ast_type = ast_error;
     return ast;
 }
 
 int main()
 {
-    char line[100];
-    strcpy(line, "-3 2,1,1");
-    struct string_split split_result = split_string(line);
-    struct ast ast2 = {0};
-    validate_numbers(split_result, 0, 2, &ast2);
     int i;
-    struct ast ast = get_ast_from_line(line);
+    char line[100];
+    strcpy(line, ".string \"hello, world\"");
+
+    FILE *file;
+    file = fopen("x.am", "r");
+    if (file == NULL)
+    {
+        printf("Error: File not found\n");
+        return 0;
+    }
+
+    /* create me a ast with init values */
+    struct ast ast = {"", "", ast_dir, {ast_data, {"", 5, {1,2,3,4,5}}}};
+
+    while (fgets(line, MAX_LINE, file) != NULL)
+    {
+        struct ast ast = get_ast_from_line(line);
+        printf("Line type: %d\n", ast.ast_type);
+        printf("Line error: %s\n", ast.lineError);
+        printf("Label name: %s\n", ast.labelName);
+        printf("Directive type: %d\n", ast.ast_options.dir.dir_type);
+        printf("Data size: %d\n", ast.ast_options.dir.dir_options.data_size);
+        printf("Directive label: %s\n", ast.ast_options.dir.dir_options.label);
+        for (i = 0; i < ast.ast_options.dir.dir_options.data_size; i++)
+        {
+            printf("Data[%d]: %d\n", i, ast.ast_options.dir.dir_options.data[i]);
+        }
+    }
+
     return 0;
 }
