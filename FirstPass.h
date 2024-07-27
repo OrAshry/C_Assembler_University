@@ -4,4 +4,4 @@
 #include "MacroProcessing.c"
 
 /* Prototypes */
-int firstPass(char * file_name, FILE * file, table_ptr p);
+int firstPass(char * file_name, FILE * file);
