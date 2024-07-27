@@ -2,12 +2,12 @@
 #include "SymbolTable.h"
 
 /* Search symbols inside the symbol table*/
-int symbol_search(table_ptr p, const char search_name[MAX_SYMBOL_NAME]) {
-    int found = 0;
+table_ptr symbol_search(table_ptr p, const char search_name[MAX_SYMBOL_NAME]) {
+    table_ptr found = NULL;
 
     while(p != NULL) {
             if(strcmp(search_name ,p -> symbol_name) == 0) {
-                found = 1; 
+                found = p; 
             }
             else {
                 p = p -> next;
