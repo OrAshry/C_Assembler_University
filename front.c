@@ -260,7 +260,7 @@ static void fill_directive_ast(struct ast *ast, struct string_split split_result
 
 struct string_split split_string(char *str)
 {
-        int strings_count = 0;
+    int strings_count = 0;
     struct string_split split_result = {0};
     int in_quotes = 0;
 
@@ -269,42 +269,55 @@ struct string_split split_string(char *str)
         str++;
 
     /** If the string is empty after removing whitespaces **/
-    if (*str == '\0') {
+    if (*str == '\0')
+    {
         return split_result;
     }
 
-    while (str && *str != '\0') {
-        if(*str == '\n'){
+    while (str && *str != '\0')
+    {
+        /** If string final char is enter **/
+        if (*str == '\n')
+        {
             *str = '\0';
             break;
         }
 
         /** Check for the start or end of a quoted substring **/
-        if (*str == '\"') {
+        if (*str == '\"')
+        {
             in_quotes = !in_quotes; /** Toggle in_quotes flag **/
         }
 
         /** Store current string in the list **/
         split_result.string[strings_count++] = str;
 
-        if (in_quotes) {
+        if (in_quotes)
+        {
             /** Find the closing quote **/
             str = strchr(str + 1, '\"');
-            if (str) {
+            if (str)
+            {
                 str++; /** Move past the closing quote **/
-            } else {
+            }
+            else
+            {
                 break; /** No closing quote found **/
             }
-        } else {
+        }
+        else
+        {
             /** Move to the next string **/
             str = strpbrk(str, SPACES);
 
-            if (str) {
+            if (str)
+            {
                 *str = '\0'; /** Null terminate **/
                 str++;
 
                 /** Skip additional whitespaces **/
-                while (isspace((unsigned char)*str)) {
+                while (isspace((unsigned char)*str))
+                {
                     str++;
                 }
             }
@@ -313,6 +326,13 @@ struct string_split split_string(char *str)
 
     /** Update strings counter in the list **/
     split_result.size = strings_count;
+
+    /* Remove '\n' from end of string if exists */
+    if (split_result.string[strings_count - 1][strlen(split_result.string[strings_count - 1]) - 1] == '\n')
+    {
+        split_result.string[strings_count - 1][strlen(split_result.string[strings_count - 1]) - 1] = '\0';
+    }
+
     /** Return string_split structure **/
     return split_result;
 }
@@ -365,8 +385,14 @@ struct ast get_ast_from_line(char *line)
             return ast;
         }
 
-        /* If current line is instruction line */
-        parse_operands(split_result.string[index], &ast);
+        if (is_instruction(split_result.string[index]))
+        {
+            parse_operands(split_result.string[index], &ast);
+            return ast;
+        }
+
+        strcpy(ast.lineError, "Invalid directive or instruction");
+        ast.ast_type = ast_error;
         return ast;
     }
 
@@ -386,7 +412,7 @@ int main()
     if (file == NULL)
     {
         printf("Error: File not found\n");
-        return NULL;
+        return 0;
     }
 
     while (fgets(line, MAX_LINE, file) != NULL)

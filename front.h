@@ -66,6 +66,7 @@ struct ast{
 
         struct{
             enum{
+                ast_none,
                 ast_extern,
                 ast_entry,
                 ast_string,
