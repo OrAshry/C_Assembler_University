@@ -6,7 +6,7 @@
 #define MAX_SYMBOL_NAME 32
 
 /* Prototypes */
-void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], enum type new_type, int new_address, table_ptr *ptr);
+void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], int new_type, int new_address, table_ptr *ptr);
 int symbol_search(table_ptr p, const char search_name[MAX_SYMBOL_NAME]);
 
 enum type{
