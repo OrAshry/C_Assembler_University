@@ -1,3 +1,4 @@
 TOMER: .string "hello tomer "            shein"
+3OMER: .string "hello tomer "            shein"
 TOMER: .data        1,2,3,4,5,6,7,     3444, -4, 4
-mov r1,r1
+mov r1,r2
