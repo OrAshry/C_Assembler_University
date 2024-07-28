@@ -14,12 +14,12 @@ int firstPass(char * file_name, FILE * file) {
     table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
 
     /* Read lines from the am file */
-    while(fgets(read_line,sizeof(read_line),am_file)) {
+    while(fgets(read_line,sizeof(read_line),file)) {
         answer = get_ast_from_line(read_line);
         
         /* If there is a syntax error*/
         if(answer.ast_type == ast_error) {
-            printf("Error: In file %s at line %d there is a sysntax error: %s\n", am_file,line_counter,answer.lineError);
+            printf("Error: In file %s at line %d there is a sysntax error: %s\n", file_name,line_counter,answer.lineError);
             line_counter++;
             error_flag = 1;
             continue;
@@ -49,14 +49,14 @@ int firstPass(char * file_name, FILE * file) {
                         
                         /* If its entry or extern */
                         else if((answer.ast_options.dir.dir_type == ast_entry) || answer.ast_options.dir.dir_type == ast_extern) {
-                            printf("Error: In file %s at line %d the symbol %s has been redefined.\n", am_file,line_counter, answer.labelName);
+                            printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name,line_counter, answer.labelName);
                             error_flag = 1;
                         }
                     }
                 
                 /* If the symbol in the table is not entry*/
                 else {
-                    printf("Error: In file %s at line %d the symbol %s has been redefined.\n", am_file,line_counter, answer.labelName);
+                    printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name,line_counter, answer.labelName);
                     error_flag = 1;
                 }
             }
