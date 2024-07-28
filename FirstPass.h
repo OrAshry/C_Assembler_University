@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "SymbolTable.h"
 #include "SymbolSearch.c"
+#include "AddSymbol.c"
 #include "front.h"
 
 /* Prototypes */
