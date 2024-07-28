@@ -12,6 +12,7 @@ int firstPass(char * file_name, FILE * file) {
     struct ast answer = {0}; /* After front returned answer*/
     table_ptr p1 = NULL; /* The poiner to the symbol table*/
     table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
+    int i;
 
     /* Read lines from the am file */
     while(fgets(read_line,sizeof(read_line),file)) {
@@ -71,7 +72,12 @@ int firstPass(char * file_name, FILE * file) {
                         IC = 100;
                     }
                     add_symbol_to_table(answer.labelName, answer.ast_type, IC, &p1);
-                    L = strlen(answer.ast_options.inst.operands);
+
+                    /* Calculate how many arguments there is */
+                    L = 0;
+                    for(i = 0;answer.ast_options.inst.operands != NULL;i++) {
+                        L++;
+                    }
                     IC += L;
                 }
 
