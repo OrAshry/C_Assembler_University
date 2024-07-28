@@ -43,12 +43,12 @@ int firstPass(char * file_name, FILE * file) {
                     else if(answer.ast_type == ast_dir) {
                         
                         /* If its data or string */
-                        if(answer.ast_options.dir.dir_type == ast_data || ast_string) {
+                        if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
                             found -> symbol_type = entry_data;
                         }
                         
                         /* If its entry or extern */
-                        else if(answer.ast_options.dir.dir_type == ast_entry || ast_extern) {
+                        else if((answer.ast_options.dir.dir_type == ast_entry) || answer.ast_options.dir.dir_type == ast_extern) {
                             printf("Error: In file %s at line %d the symbol %s has been redefined.\n", am_file,line_counter, answer.labelName);
                             error_flag = 1;
                         }
