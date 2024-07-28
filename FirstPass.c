@@ -92,7 +92,7 @@ int firstPass(char * file_name, FILE * file) {
                 }
             }
         }
-
+        ++line_counter;
     }
 
     return error_flag;
