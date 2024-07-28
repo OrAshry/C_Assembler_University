@@ -75,8 +75,10 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* Calculate how many arguments there is */
                     L = 0;
-                    for(i = 0;answer.ast_options.inst.operands != NULL;i++) {
-                        L++;
+                    for (i = 0; i < 2; i++) {
+                        if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
+                            L++;
+                        }
                     }
                     IC += L;
                 }
