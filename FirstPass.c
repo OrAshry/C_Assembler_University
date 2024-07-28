@@ -77,9 +77,9 @@ int firstPass(char * file_name, FILE * file) {
                 /* If its a dir */
                 if(answer.ast_type == ast_dir) {
 
-                    /* If its external variable */
+                    /* If its external variable */ /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
-                        add_symbol_to_table(answer.labelName, answer.ast_type, NULL, p1);
+                        add_symbol_to_table(answer.labelName, answer.ast_type, 0, p1);
                     }
 
                     /* If its not external variable */ /*i need to check how to insert, it will instert all at the same DC*/
