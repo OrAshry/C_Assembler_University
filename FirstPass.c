@@ -53,6 +53,7 @@ int firstPass(char * file_name, FILE * file) {
                             error_flag = 1;
                         }
                     }
+                }
                 
                 /* If the symbol in the table is not entry*/
                 else {

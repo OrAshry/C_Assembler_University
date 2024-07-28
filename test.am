@@ -1,0 +1,38 @@
+; This is a comment line
+
+LABEL1: .data 5, 10, -3
+
+LABEL2: .string "Hello, World!"
+
+; Another comment
+LABEL3: .extern EXTERN_LABEL
+
+LABEL4: .entry ENTRY_LABEL
+
+; Comment before instructions
+mov r1, r2
+cmp #5, r3
+
+add r4, r5
+
+sub r6, LABEL5
+lea LABEL6, r7
+
+clr r8
+not r9
+
+inc r10
+
+dec r11
+jmp LABEL7
+
+bne LABEL8
+
+red r12
+prn #3
+
+jsr LABEL9
+rts
+stop
+
+LABEL10: .data 1, 2, 3, 4, 5
