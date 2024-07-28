@@ -104,3 +104,25 @@ int firstPass(char * file_name, FILE * file) {
 
     return error_flag;
 }
+
+int main(void) {
+    char *file_name = "test.am";
+    FILE *file = fopen(file_name, "r");
+    
+    if (file == NULL) {
+        printf("Error: Could not open file %s\n", file_name);
+        return 1;
+    }
+
+    int result = firstPass(file_name, file);
+    
+    fclose(file);
+
+    if (result == 0) {
+        printf("First pass completed successfully with no errors.\n");
+    } else {
+        printf("First pass completed with errors.\n");
+    }
+
+    return result;
+}
