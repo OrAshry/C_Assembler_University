@@ -69,7 +69,7 @@ int firstPass(char * file_name, FILE * file) {
                     if(IC == 0) {
                         IC = 100;
                     }
-                    add_symbol_to_table(answer.labelName, answer.ast_type, IC, p1);
+                    add_symbol_to_table(answer.labelName, answer.ast_type, IC, &p1);
                     L = strlen(answer.ast_options.inst.operands);
                     IC += L;
                 }
@@ -79,13 +79,13 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its external variable */ /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
-                        add_symbol_to_table(answer.labelName, answer.ast_type, 0, p1);
+                        add_symbol_to_table(answer.labelName, answer.ast_type, 0, &p1);
                     }
 
                     /* If its not external variable */ /*i need to check how to insert, it will instert all at the same DC*/
                     else {
                         ++DC;
-                        add_symbol_to_table(answer.labelName, answer.ast_type, DC, p1);
+                        add_symbol_to_table(answer.labelName, answer.ast_type, DC, &p1);
                         L = answer.ast_options.dir.dir_options.data_size;
                         DC += L;
                     }
