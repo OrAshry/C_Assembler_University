@@ -29,7 +29,7 @@ int firstPass(char * file_name, FILE * file) {
         if((answer.labelName != NULL) && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
             
             /* If the symbol is already exist in the table */
-            if(found = symbol_search(p1, answer.labelName)) {
+            if((found = symbol_search(p1, answer.labelName))) {
                 
                 /* If the symbol in the table is entry*/
                 if(found -> symbol_type == entry_symbol) {
@@ -54,7 +54,7 @@ int firstPass(char * file_name, FILE * file) {
                         }
                     }
                 }
-                
+
                 /* If the symbol in the table is not entry*/
                 else {
                     printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name,line_counter, answer.labelName);
