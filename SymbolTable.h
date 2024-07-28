@@ -6,6 +6,7 @@
 #include "helpingFunction.c"
 
 #define MAX_LINE_LENGTH 81
+#define MAX_TEMP_LENGTH 82
 #define MAX_SYMBOL_NAME 32
 
 enum type{
