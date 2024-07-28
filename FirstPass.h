@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "SymbolTable.h"
 #include "SymbolSearch.c"
 #include "front.c"
 #include "MacroProcessing.c"

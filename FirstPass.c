@@ -10,8 +10,8 @@ int firstPass(char * file_name, FILE * file) {
     int line_counter = 1; /* The number of line i just read from (am file) */
     char read_line[MAX_LINE_LENGTH];
     struct ast answer = {0}; /* After front returned answer*/
-    table_ptr p1; /* The poiner to the symbol table*/
-    table_ptr found; /* Recive the address of the symbol inside the table*/
+    table_ptr p1 = NULL; /* The poiner to the symbol table*/
+    table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
 
     /* Read lines from the am file */
     while(fgets(read_line,sizeof(read_line),am_file)) {
