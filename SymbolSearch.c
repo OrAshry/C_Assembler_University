@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "SymbolTable.h"
 
 /* Search symbols inside the symbol table*/
