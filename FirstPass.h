@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include "SymbolTable.h"
 #include "SymbolSearch.c"
-#include "front.c"
-#include "MacroProcessing.c"
+#include "front.h"
 
 /* Prototypes */
 int firstPass(char * file_name, FILE * file);
