@@ -9,17 +9,23 @@ int firstPass(char * file_name, FILE * file) {
     int L = 0; /* Number of words that the current instruction takes */
     int line_counter = 1; /* The number of line i just read from (am file) */
     char read_line[MAX_LINE_LENGTH];
-    char temp_line[MAX_TEMP_LENGTH]; 
+    char buffer_line[MAX_BUFFER_LENGTH]; 
     struct ast answer = {0}; /* After front returned answer*/
     table_ptr p1 = NULL; /* The poiner to the symbol table*/
     table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
     int i;
 
     /* Read lines from the am file */
-    while(fgets(temp_line,sizeof(read_line),file)) {
+    while(fgets(buffer_line,sizeof(buffer_line),file)) {
 
-        /* Checks if the line from source code is shorter than 80 */
-
+        /* Checks if the line from source code is longer than 80 */
+        if((strlen(buffer_line) > MAX_LINE_LENGTH - 1) && (buffer_line[MAX_LINE_LENGTH - 1] != '\n')) {
+            printf("Error: In file %s at line %d, the line exceeds 80 characters.\n", file_name, line_counter);
+            line_counter++;
+            error_flag = 1;
+            continue;
+        }
+        strcpy(read_line, buffer_line);
         
         /* If there is a syntax error*/
         if(answer.ast_type == ast_error) {

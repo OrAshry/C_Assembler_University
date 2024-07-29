@@ -5,8 +5,8 @@
 #include <string.h>
 #include "helpingFunction.c"
 
-#define MAX_LINE_LENGTH 81
-#define MAX_TEMP_LENGTH 82
+#define MAX_LINE_LENGTH 82 /* 82 for 80 chars and '\n' and '\0'*/
+#define MAX_BUFFER_LENGTH 83 /* 83 for 80 chars and '\n' and '\0' and if there another char*/
 #define MAX_SYMBOL_NAME 32
 
 enum type{
