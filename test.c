@@ -121,5 +121,5 @@ int firstPass(char *file_name, FILE *file) {
 
     return error_flag;
     print_symbol_table(p1);
-    printf(error_flag);
+    printf("%i", error_flag);
 }
