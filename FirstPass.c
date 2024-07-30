@@ -26,6 +26,7 @@ int firstPass(char * file_name, FILE * file) {
             continue;
         }
         strcpy(read_line, buffer_line);
+        answer = get_ast_from_line(read_line);
         
         /* If there is a syntax error*/
         if(answer.ast_type == ast_error) {
@@ -116,24 +117,6 @@ int firstPass(char * file_name, FILE * file) {
     return error_flag;
 }
 
-int main(void) {
-    char *file_name = "test.am";
-    FILE *file = fopen(file_name, "r");
-    
-    if (file == NULL) {
-        printf("Error: Could not open file %s\n", file_name);
-        return 1;
-    }
+/* This is a Test*/
+struct ast node = {.lineError = "No error", .labelName = "myLabel", .ast_type = ast_inst, .ast_options = {.inst = {.inst_type = ast_add,.operands = {{.operand_type = ast_immidiate, .operand_option = {.immed = 10}}, {.operand_type = ast_register_direct,.operand_option = {.reg = 2}}}}}};
 
-    int result = firstPass(file_name, file);
-    
-    fclose(file);
-
-    if (result == 0) {
-        printf("First pass completed successfully with no errors.\n");
-    } else {
-        printf("First pass completed with errors.\n");
-    }
-
-    return result;
-}
