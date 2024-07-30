@@ -118,8 +118,13 @@ int firstPass(char *file_name, FILE *file) {
             }
         }
     }
-
-    return error_flag;
     print_symbol_table(p1);
     printf("%i", error_flag);
+
+    return error_flag;
+}
+
+int main(void) {
+    /* Your test code here */
+    return 0;
 }
