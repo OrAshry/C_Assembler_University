@@ -119,26 +119,25 @@ int firstPass(char *file_name, FILE *file) {
         }
     }
     print_symbol_table(p1);
-    printf("%i", error_flag);
 
     return error_flag;
 }
 
 int main(void) {
-    // Initialize a test file and FILE pointer
+    /* Initialize a test file and FILE pointer */
     FILE *file = fopen("test.am", "r");
     if (file == NULL) {
         perror("Failed to open file");
         return 1;
     }
 
-    // Call firstPass function with a test file name and the file pointer
+    /* Call firstPass function with a test file name and the file pointer */
     int result = firstPass("test.am", file);
 
-    // Close the file
+    /* Close the file */
     fclose(file);
 
-    // Print result (or any other output you expect)
+    /* Print result (or any other output you expect) */
     printf("Result: %d\n", result);
 
     return 0;
