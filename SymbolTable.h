@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "helpingFunction.c"
+#include "helpingFunction.h"
 
 #define MAX_LINE_LENGTH 82 /* 82 for 80 chars and '\n' and '\0'*/
 #define MAX_BUFFER_LENGTH 83 /* 83 for 80 chars and '\n' and '\0' and if there another char*/
