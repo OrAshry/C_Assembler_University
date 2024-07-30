@@ -1,6 +1,6 @@
 #include "FirstPass.h"
 
-int firstPass(char *file_name, FILE *file) {
+int firstPass() {
 
     /* Declarations */
     int error_flag = 0;
@@ -14,7 +14,7 @@ int firstPass(char *file_name, FILE *file) {
 
     /* This is a Test */
     struct ast node = {
-        .lineError = "No error",
+        .lineError = "",
         .labelName = "myLabel",
         .ast_type = ast_inst,
         .ast_options = {
@@ -39,7 +39,7 @@ int firstPass(char *file_name, FILE *file) {
 
     /* If there is a syntax error */
     if(answer.ast_type == ast_error) {
-        printf("Error: In file %s at line %d there is a syntax error: %s\n", file_name, line_counter, answer.lineError);
+        printf("Error:at line %d there is a syntax error: %s\n", line_counter, answer.lineError);
         error_flag = 1;
     }
 
@@ -67,7 +67,7 @@ int firstPass(char *file_name, FILE *file) {
 
                     /* If it's entry or extern */
                     else if((answer.ast_options.dir.dir_type == ast_entry) || answer.ast_options.dir.dir_type == ast_extern) {
-                        printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name, line_counter, answer.labelName);
+                        printf("Error: at line %d the symbol %s has been redefined.\n", line_counter, answer.labelName);
                         error_flag = 1;
                     }
                 }
@@ -75,7 +75,7 @@ int firstPass(char *file_name, FILE *file) {
 
             /* If the symbol in the table is not entry */
             else {
-                printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name, line_counter, answer.labelName);
+                printf("Error: at line %d the symbol %s has been redefined.\n", line_counter, answer.labelName);
                 error_flag = 1;
             }
         }
@@ -125,6 +125,6 @@ int firstPass(char *file_name, FILE *file) {
 }
 
 int main(void) {
-    /* Your test code here */
+    firstPass();
     return 0;
 }
