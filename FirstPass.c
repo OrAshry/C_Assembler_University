@@ -37,7 +37,7 @@ int firstPass(char * file_name, FILE * file) {
         }
 
         /* If there is a symbol in the line */
-        if((answer.labelName != NULL) && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
+        if((answer.labelName != '\0') && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
             
             /* If the symbol is already exist in the table */
             if((found = symbol_search(head_ptr, answer.labelName))) {
