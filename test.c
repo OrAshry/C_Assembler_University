@@ -73,6 +73,16 @@ int firstPass(char *file_name, FILE *file) {
                 }
             }
 
+            /* If the symbol in the table is daclared and they cange it to entry after that*/
+            else if((answer.ast_type == ast_dir) && (answer.ast_options.dir.dir_type == ast_entry)) {
+                if(found -> symbol_type == code_symbol) {
+                    found -> symbol_type = entry_code;
+                }
+                else if(found -> symbol_type == data_symbol) {
+                    found -> symbol_type = entry_data;
+                }
+            }
+
             /* If the symbol in the table is not entry */
             else {
                 printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name, line_counter, answer.labelName);
