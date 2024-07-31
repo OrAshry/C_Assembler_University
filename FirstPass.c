@@ -11,7 +11,7 @@ int firstPass(char * file_name, FILE * file) {
     char read_line[MAX_LINE_LENGTH];
     char buffer_line[MAX_BUFFER_LENGTH]; 
     struct ast answer = {0}; /* After front returned answer*/
-    table_ptr p1 = NULL; /* The poiner to the symbol table*/
+    table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
     table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
     int i;
 
@@ -40,7 +40,7 @@ int firstPass(char * file_name, FILE * file) {
         if((answer.labelName != NULL) && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
             
             /* If the symbol is already exist in the table */
-            if((found = symbol_search(p1, answer.labelName))) {
+            if((found = symbol_search(head_ptr, answer.labelName))) {
                 
                 /* If the symbol in the table is entry*/
                 if(found -> symbol_type == entry_symbol) {
@@ -81,7 +81,7 @@ int firstPass(char * file_name, FILE * file) {
                     if(IC == 0) {
                         IC = 100;
                     }
-                    add_symbol_to_table(answer.labelName, answer.ast_type, IC, &p1);
+                    add_symbol_to_table(answer.labelName, answer.ast_type, IC, &head_ptr);
 
                     /* Calculate how many arguments there is */
                     L = 0;
@@ -98,13 +98,13 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its external variable */ /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
-                        add_symbol_to_table(answer.labelName, answer.ast_type, 0, &p1);
+                        add_symbol_to_table(answer.labelName, answer.ast_type, 0, &head_ptr);
                     }
 
                     /* If its not external variable */ /*i need to check how to insert, it will instert all at the same DC*/
                     else {
                         ++DC;
-                        add_symbol_to_table(answer.labelName, answer.ast_type, DC, &p1);
+                        add_symbol_to_table(answer.labelName, answer.ast_type, DC, &head_ptr);
                         L = answer.ast_options.dir.dir_options.data_size;
                         DC += L;
                     }
@@ -115,12 +115,13 @@ int firstPass(char * file_name, FILE * file) {
     }
 
     /* Check if there is entry without defeniton */
-    while(p1) {
-        if(p1 -> symbol_type == entry_symbol) {
-            printf("Error: In file %s symbol %s declared as entry but never defined", file_name, p1 -> symbol_name);
+    found = head_ptr;
+    while(found) {
+        if(found -> symbol_type == entry_symbol) {
+            printf("Error: In file %s symbol %s declared as entry but never defined.\n", file_name, found -> symbol_name);
             error_flag = 1;
         }
-        p1++;
+        found = found -> next;
     }
 
     return error_flag;
