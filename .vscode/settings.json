@@ -3,7 +3,9 @@
         "string.h": "c",
         "stdio.h": "c",
         "constants.h": "c",
-        "ctype.h": "c"
+        "ctype.h": "c",
+        "front.h": "c",
+        "helpingfunction.h": "c"
     },
     "editor.mouseWheelZoom": true
 }
