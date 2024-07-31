@@ -132,11 +132,15 @@ int firstPass(char * file_name, FILE * file) {
             error_flag = 1;
         }
         found = found -> next;
-
-        /* Relocate all DC variables after IC variables*/
+    }
+    
+    /* Relocate all DC variables after IC variables*/
+    found = head_ptr;
+    while(found) {
         if((found -> symbol_type == data_symbol) || (found -> symbol_type == entry_data)) {
             found -> symbol_address += IC;
         }
+        found = found -> next;
     }
 
     return error_flag;
