@@ -8,7 +8,7 @@ int firstPass(char *file_name, FILE *file) {
     int DC = 0; /* need to check if it starts from 0 or 100 */
     int L = 0; /* Number of words that the current instruction takes */
     int line_counter = 1; /* The number of line i just read from (am file) */
-    table_ptr p1 = NULL; /* The pointer to the symbol table */
+    table_ptr head_ptr = NULL; /* The pointer to the symbol table */
     table_ptr found = NULL; /* Receive the address of the symbol inside the table */
     int i;
 
@@ -44,10 +44,10 @@ int firstPass(char *file_name, FILE *file) {
     }
 
     /* If there is a symbol in the line */
-    if((answer.labelName != NULL) && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
+    if((answer.labelName[0] != '\0') && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
 
         /* If the symbol already exists in the table */
-        if((found = symbol_search(p1, answer.labelName))) {
+        if((found = symbol_search(head_ptr, answer.labelName))) {
 
             /* If the symbol in the table is entry */
             if(found->symbol_type == entry_symbol) {
@@ -88,7 +88,7 @@ int firstPass(char *file_name, FILE *file) {
                 if(IC == 0) {
                     IC = 100;
                 }
-                add_symbol_to_table(answer.labelName, answer.ast_type, IC, &p1);
+                add_symbol_to_table(answer.labelName, answer.ast_type, IC, &head_ptr);
 
                 /* Calculate how many arguments there are */
                 L = 0;
@@ -105,20 +105,20 @@ int firstPass(char *file_name, FILE *file) {
 
                 /* If it's an external variable */ /* Need to check if it's zero or NULL */
                 if(answer.ast_options.dir.dir_type == ast_extern) {
-                    add_symbol_to_table(answer.labelName, answer.ast_type, 0, &p1);
+                    add_symbol_to_table(answer.labelName, answer.ast_type, 0, &head_ptr);
                 }
 
                 /* If it's not an external variable */ /* I need to check how to insert, it will insert all at the same DC */
                 else {
                     ++DC;
-                    add_symbol_to_table(answer.labelName, answer.ast_type, DC, &p1);
+                    add_symbol_to_table(answer.labelName, answer.ast_type, DC, &head_ptr);
                     L = answer.ast_options.dir.dir_options.data_size;
                     DC += L;
                 }
             }
         }
     }
-    print_symbol_table(p1);
+    print_symbol_table(head_ptr);
 
     return error_flag;
 }
