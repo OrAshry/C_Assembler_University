@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "helpingFunction.h"
+#include <stdlib.h>
 
 void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
 {

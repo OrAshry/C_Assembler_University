@@ -3,6 +3,7 @@
 
 #define ERROR_LINE 200
 #define SPACES " \t\v\f"
+#define COMMA ","
 #define COMMENT_CHAR ';'
 #define DIRECTIVE_CHAR '.'
 #define LABEL_CHAR ':'
@@ -20,6 +21,9 @@
 #define DIRECTIVE_EXTERN ".extern"
 #define DIRECTIVE_ENTRY ".entry"
 #define STRING_CHAR '"'
+#define REGISTER_MIN 1
+#define REGISTER_MAX 7
+#define REGISTER_CHAR 'r'
 
 struct string_split{
     char * string[MAX_LINE];
@@ -37,24 +41,24 @@ struct inst inst_table[INST_SIZE] = {
     {"mov", 0, "0123", "123"},
     {"cmp", 1, "0123", "0123"},
     {"add", 2, "0123", "123"},
-    {"sub", 2, "0123", "123"},
+    {"sub", 3, "0123", "123"},
     {"lea", 4, "1", "123"},
     {"clr", 5, "", "123"},
-    {"not", 5, "", "123"},
-    {"inc", 5, "", "123"},
-    {"dec", 5, "", "123"},
+    {"not", 6, "", "123"},
+    {"inc", 7, "", "123"},
+    {"dec", 8, "", "123"},
     {"jmp", 9, "", "12"},
-    {"bne", 9, "", "12"},
-    {"red", 12, "", "123"},
-    {"prn", 13, "", "0123"},
-    {"jsr", 14, "", "12"},
-    {"rts", 15, "", ""},
+    {"bne", 10, "", "12"},
+    {"red", 11, "", "123"},
+    {"prn", 12, "", "0123"},
+    {"jsr", 13, "", "12"},
+    {"rts", 14, "", ""},
     {"stop", 15, "", ""}
 };
 
 struct ast{
     char lineError[ERROR_LINE];
-    char * labelName; 
+    char labelName[MAX_LABEL_SIZE]; 
     enum{
         ast_inst,
         ast_dir,
@@ -72,7 +76,7 @@ struct ast{
                 ast_data
             }dir_type;
             struct{
-                char * label;
+                char label[MAX_LABEL_SIZE];
                 int data_size;
                 int data[RESULT_ARR_SIZE];
             }dir_options;
@@ -89,15 +93,15 @@ struct ast{
             }inst_type;
             struct{
                 enum{
-                    ast_none,
                     ast_immidiate,
                     ast_label,      
+                    ast_register_address,
                     ast_register_direct,
-                    ast_register_address
+                    ast_none
                 }operand_type;
                 union{
                     int immed;
-                    char * label;
+                    char label[MAX_LABEL_SIZE];
                     int reg;
                 }operand_option;
             }operands[2];
@@ -107,12 +111,15 @@ struct ast{
 };
 
 struct ast get_ast_from_line(char * line);
-static int is_number(char ** str, int min_num, int max_num, int * result);
-static int validate_numbers(struct string_split split_str, int size, struct ast *ast, int index);
-static int is_label(char *str, struct ast *ast);
-static int is_register(char *str);
-static void parse_operand(char * operand, int operand_type ,struct ast * ast, struct inst * inst);
-static void parse_operands(char * operands, struct ast * ast);
-struct string_split split_string(char * str);
-static int fill_string(struct string_split split_result, int index, struct ast *ast);
-static void fill_directive_ast(struct ast * ast, struct string_split split_result, int index);
+int is_number(char * str, int min_num, int max_num, int * result, char ** end_ptr);
+int validate_numbers(struct string_split split_str, int size, struct ast *ast, int index);
+int is_label(char const *str, struct ast *ast);
+int is_register(char const *str);
+int is_instruction(char const *str, struct ast * ast);
+int is_op_valid(int const operand_type, char const * inst_options);
+void parse_operand(char * operand, int operand_type ,struct ast * ast, int operand_index);
+void parse_operands(struct string_split operands, int index, struct ast * ast);
+struct string_split split_string(char * str, const char * delimiter);
+int fill_string(struct string_split split_result, int index, struct ast *ast);
+void fill_directive_ast(struct ast * ast, struct string_split split_result, int index);
+int validate_numbers(struct string_split const split_str, int const size, struct ast *ast, int const index);
