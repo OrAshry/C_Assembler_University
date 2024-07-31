@@ -114,9 +114,14 @@ int firstPass(char * file_name, FILE * file) {
         ++line_counter;
     }
 
+    /* Check if there is entry without defeniton */
+    while(p1) {
+        if(p1 -> symbol_type == entry_symbol) {
+            printf("Error: In file %s symbol %s declared as entry but never defined", file_name, p1 -> symbol_name);
+            error_flag = 1;
+        }
+        p1++;
+    }
+
     return error_flag;
 }
-
-/* This is a Test*/
-struct ast node = {.lineError = "No error", .labelName = "myLabel", .ast_type = ast_inst, .ast_options = {.inst = {.inst_type = ast_add,.operands = {{.operand_type = ast_immidiate, .operand_option = {.immed = 10}}, {.operand_type = ast_register_direct,.operand_option = {.reg = 2}}}}}};
-
