@@ -4,8 +4,8 @@ int firstPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
-    int IC = 0; /* need to check if its starts from 0 or 100*/
-    int DC = 0; /* need to check if it starts from 0 or 100*/
+    int IC = 0; 
+    int DC = 0;
     int L = 0; /* Number of words that the current instruction takes */
     int line_counter = 1; /* The number of line i just read from (am file) */
     char read_line[MAX_LINE_LENGTH];
@@ -76,7 +76,7 @@ int firstPass(char * file_name, FILE * file) {
             /* If the symbol is not in the table*/
             else {
                 
-                /* If its an inst */ /*i need to check how to insert, it will instert all at the same DC*/
+                /* If its an inst */    /*i need to check how to insert, it will instert all at the same DC*/
                 if(answer.ast_type == ast_inst) {
                     if(IC == 0) {
                         IC = 100;
@@ -96,12 +96,12 @@ int firstPass(char * file_name, FILE * file) {
                 /* If its a dir */
                 if(answer.ast_type == ast_dir) {
 
-                    /* If its external variable */ /*need to check if its zero or NULL*/
+                    /* If its external variable */      /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
                         add_symbol_to_table(answer.labelName, answer.ast_type, 0, &head_ptr);
                     }
 
-                    /* If its not external variable */ /*i need to check how to insert, it will instert all at the same DC*/
+                    /* If its not external variable */      /*i need to check how to insert, it will instert all at the same DC*/
                     else {
                         ++DC;
                         add_symbol_to_table(answer.labelName, answer.ast_type, DC, &head_ptr);
@@ -114,6 +114,8 @@ int firstPass(char * file_name, FILE * file) {
         ++line_counter;
     }
 
+    /**/        /*from here until "check if there is entry" im folowing the vidio and booklet*/
+
     /* Check if there is entry without defeniton */
     found = head_ptr;
     while(found) {
@@ -122,6 +124,11 @@ int firstPass(char * file_name, FILE * file) {
             error_flag = 1;
         }
         found = found -> next;
+
+        /* Relocate all DC variables after IC variables*/
+        if((found -> symbol_type == data_symbol) || (found -> symbol_type == entry_data)) {
+            found -> symbol_address += IC;
+        }
     }
 
     return error_flag;
