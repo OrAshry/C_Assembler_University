@@ -1,6 +1,6 @@
 #include "FirstPass.h"
 
-int firstPass(char *file_name, FILE *file, translate_ptr ptr_to_translate) {
+int firstPass(char *file_name, FILE *file) {
 
     /* Declarations */
     int error_flag = 0;
@@ -99,6 +99,15 @@ int firstPass(char *file_name, FILE *file, translate_ptr ptr_to_translate) {
                     IC = 100;
                 }
                 add_symbol_to_table(answer.labelName, answer.ast_type, IC, &head_ptr);
+
+                /* Calculate how many arguments there are */
+                L = 0;
+                for (i = 0; i < 2; i++) {
+                    if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
+                        L++;
+                    }
+                }
+                IC += L;
             }
 
             /* If it's a dir */
@@ -118,25 +127,6 @@ int firstPass(char *file_name, FILE *file, translate_ptr ptr_to_translate) {
                 }
             }
         }
-
-        L = 0;
-        /* Calculate how many words to add if its an inst variable */
-        if(answer.ast_type == ast_inst) {
-            for (i = 0; i < 2; i++) {
-                if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
-                    L++;
-                }
-            }
-            IC += L;
-        }
-
-        /* Code the data inside data_image if its a data vaiable */
-        else if((answer.ast_type == ast_dir) && ((answer.ast_options.dir.dir_type == ast_data) || answer.ast_options.dir.dir_type == ast_string)) {
-            memcpy(ptr_to_translate -> data_image[ptr_to_translate -> DC], answer.ast_options.dir.dir_options.data, answer.ast_options.dir.dir_options.data_size * sizeof(int));
-            L = answer.ast_options.dir.dir_options.data_size;
-            ptr_to_translate -> DC += L;
-        }
-
     }
 
     /* Check if there is entry without defeniton */
@@ -171,16 +161,14 @@ int firstPass(char *file_name, FILE *file, translate_ptr ptr_to_translate) {
         return 1;
     }
 
-    translate translate_prog = {0};
-
     /* Call firstPass function with a test file name and the file pointer */
-    int result = firstPass("test.am", file, &translate_prog);
+    int result = firstPass("test.am", file);
 
     /* Close the file */
     fclose(file);
 
     /* Print result (or any other output you expect) */
     printf("Result: %d\n", result);
-    print_data_image(&translate_prog);
+
     return 0;
 }
