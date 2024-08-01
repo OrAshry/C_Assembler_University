@@ -1,5 +1,5 @@
-#ifndef TRANSLATE.H
-#define TRANSLATE.H
+#ifndef TRANSLATE_H
+#define TRANSLATE_H
 
 #define MAX_MEMORY_SIZE 4096
 
@@ -10,4 +10,4 @@ typedef struct translate{
     int IC;
 } translate, * translate_ptr;
 
-#endif TRANSLATE.H
+#endif TRANSLATE_H
