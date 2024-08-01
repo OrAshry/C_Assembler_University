@@ -13,6 +13,8 @@ int firstPass(char * file_name, FILE * file) {
     struct ast answer = {0}; /* After front returned answer*/
     table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
     table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
+    translation program;
+    translation_ptr program_ptr = &program;
     int i;
 
     /* Read lines from the am file */
@@ -92,15 +94,6 @@ int firstPass(char * file_name, FILE * file) {
                         IC = 100;
                     }
                     add_symbol_to_table(answer.labelName, answer.ast_type, IC, &head_ptr);
-
-                    /* Calculate how many arguments there is */
-                    L = 0;
-                    for (i = 0; i < 2; i++) {
-                        if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
-                            L++;
-                        }
-                    }
-                    IC += L;
                 }
 
                 /* If its a dir */
@@ -115,11 +108,28 @@ int firstPass(char * file_name, FILE * file) {
                     else {
                         ++DC;
                         add_symbol_to_table(answer.labelName, answer.ast_type, DC, &head_ptr);
-                        L = answer.ast_options.dir.dir_options.data_size;
-                        DC += L;
                     }
                 }
             }
+
+            /* Calculate words if its inst*/
+            if(answer.ast_type = ast_inst) {
+                for (i = 0; i < 2; i++) {
+                    if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
+                        L++;
+                    }
+                }
+                IC += L;
+            }
+
+            /* Calculate words and code them into data_image*/
+            else if((answer.ast_type == ast_dir) && ((answer.ast_options.dir.dir_type == ast_data) || answer.ast_options.dir.dir_type == ast_string)) {
+                memcpy(&program_ptr -> data_image[DC], answer.ast_options.dir.dir_options.data, answer.ast_options.dir.dir_options.data_size);
+                L = answer.ast_options.dir.dir_options.data_size;
+                DC += L;
+            }
+
+
         }
         ++line_counter;
     }

@@ -2,6 +2,7 @@
 #define FIRST_PASS_H
 
 #include <stdio.h>
+#include "Translate.h"
 #include "SymbolTable.h"
 #include "front.h"
 

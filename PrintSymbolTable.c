@@ -9,3 +9,12 @@ void print_symbol_table(table_ptr p) {
         p = p->next;
     }
 }
+
+void print_data_image(const translation_ptr p) {
+    printf("Data Image:\n");
+    for (int i = 0; i < MAX_MEM_SIZE; i++) {
+        if (p -> data_image[i] != 0) {  // Print only non-zero values
+            printf("Address %d: %d\n", i, p->data_image[i]);
+        }
+    }
+}
