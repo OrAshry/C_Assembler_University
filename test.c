@@ -181,6 +181,6 @@ int firstPass(char *file_name, FILE *file, translate_ptr ptr_to_translate) {
 
     /* Print result (or any other output you expect) */
     printf("Result: %d\n", result);
-
+    print_data_image(&translate_prog);
     return 0;
 }
