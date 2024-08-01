@@ -1,6 +1,8 @@
 /*for the test*/
-#include "SymbolTable.h"
 #include "FirstPass.h"
+#include "SymbolTable.h"
+
+
 
 void print_symbol_table(table_ptr p) {
     printf("Symbol Table:\n");
@@ -14,7 +16,7 @@ void print_symbol_table(table_ptr p) {
 void print_data_image(const translate *ptr_to_translate) {
     printf("Data Image:\n");
     for (int i = 0; i < MAX_MEMORY_SIZE; i++) {
-        if (ptr_to_translate->data_image[i] != 0) {  // Print only non-zero values
+        if (ptr_to_translate->data_image[i] != '\0') {  /* Print only non-zero values */
             printf("Address %d: %d\n", i, ptr_to_translate->data_image[i]);
         }
     }
