@@ -159,7 +159,7 @@ int firstPass(char *file_name, FILE *file) {
     }
 
     print_symbol_table(head_ptr);
-
+    print_data_image(program_ptr);
     return error_flag;
 }
 
