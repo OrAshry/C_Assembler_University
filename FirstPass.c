@@ -6,7 +6,7 @@ int firstPass(char * file_name, FILE * file) {
     int error_flag = 0;
     int IC = 0; 
     int DC = 0;
-    int L = 0; /* Number of words that the current instruction takes */
+    int L; /* Number of words that the current instruction takes */
     int line_counter = 1; /* The number of line i just read from (am file) */
     char read_line[MAX_LINE_LENGTH];
     char buffer_line[MAX_BUFFER_LENGTH]; 
@@ -19,6 +19,8 @@ int firstPass(char * file_name, FILE * file) {
 
     /* Read lines from the am file */
     while(fgets(buffer_line,sizeof(buffer_line),file)) {
+
+        L = 0;
 
         /* Checks if the line from source code is longer than 80 */
         if((strlen(buffer_line) > MAX_LINE_LENGTH - 1) && (buffer_line[MAX_LINE_LENGTH - 1] != '\n')) {
