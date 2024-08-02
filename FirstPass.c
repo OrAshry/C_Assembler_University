@@ -4,8 +4,6 @@ int firstPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
-    int IC = 0; 
-    int DC = 0;
     int L; /* Number of words that the current instruction takes */
     int line_counter = 1; /* The number of line i just read from (am file) */
     char read_line[MAX_LINE_LENGTH];
@@ -13,7 +11,7 @@ int firstPass(char * file_name, FILE * file) {
     struct ast answer = {0}; /* After front returned answer*/
     table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
     table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
-    translation program;
+    translation program = {0};
     translation_ptr program_ptr = &program;
     int i;
 
@@ -92,10 +90,13 @@ int firstPass(char * file_name, FILE * file) {
                 
                 /* If its an inst */    /*i need to check how to insert, it will instert all at the same DC*/
                 if(answer.ast_type == ast_inst) {
-                    if(IC == 0) {
-                        IC = 100;
+                    if((program_ptr -> IC) == 0) {
+                        (program_ptr -> IC) = 100;
+                        add_symbol_to_table(answer.labelName, answer.ast_type, (program_ptr -> IC), &head_ptr);
                     }
-                    add_symbol_to_table(answer.labelName, answer.ast_type, IC, &head_ptr);
+                    else {
+                        add_symbol_to_table(answer.labelName, answer.ast_type, (program_ptr -> IC), &head_ptr);
+                    }
                 }
 
                 /* If its a dir */
@@ -108,8 +109,8 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its not external variable */      /*i need to check how to insert, it will instert all at the same DC*/
                     else {
-                        ++DC;
-                        add_symbol_to_table(answer.labelName, answer.ast_type, DC, &head_ptr);
+                        ++(program_ptr -> DC);
+                        add_symbol_to_table(answer.labelName, answer.ast_type, program_ptr -> DC, &head_ptr);
                     }
                 }
             }
@@ -121,14 +122,14 @@ int firstPass(char * file_name, FILE * file) {
                         L++;
                     }
                 }
-                IC += L;
+                (program_ptr -> IC) += L;
             }
 
             /* Calculate words and code them into data_image*/
             else if((answer.ast_type == ast_dir) && ((answer.ast_options.dir.dir_type == ast_data) || answer.ast_options.dir.dir_type == ast_string)) {
-                memcpy(&program_ptr -> data_image[DC], answer.ast_options.dir.dir_options.data, answer.ast_options.dir.dir_options.data_size);
+                memcpy(&program_ptr -> data_image[program_ptr ->DC], answer.ast_options.dir.dir_options.data, answer.ast_options.dir.dir_options.data_size);
                 L = answer.ast_options.dir.dir_options.data_size;
-                DC += L;
+                (program_ptr -> DC) += L;
             }
 
 
@@ -150,7 +151,7 @@ int firstPass(char * file_name, FILE * file) {
     found = head_ptr;
     while(found) {
         if((found -> symbol_type == data_symbol) || (found -> symbol_type == entry_data)) {
-            found -> symbol_address += IC;
+            found -> symbol_address += (program_ptr -> IC);
         }
         found = found -> next;
     }

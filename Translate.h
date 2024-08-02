@@ -5,7 +5,9 @@
 
 typedef struct translation {
     int code_image[MAX_MEM_SIZE];
+    int IC;
     int data_image[MAX_MEM_SIZE];
+    int DC;
 } translation, * translation_ptr;
 
 #endif
