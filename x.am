@@ -1,6 +1,18 @@
-TOMER: .string "ello tomer "            shein"
-OMER: .string "hello tomer "            shein
-TOMER: .data        1,2,3,4,5,6,7,     3444, -4, 4
-mov r1,r2
-mov #1,#1
-mov #1,r5
+mov #3,r5
+mov 3,5,r6
+mov #3,r6
+move #3,#3
+mov r1,        r2
+mov r1, LABEL
+mov LABEL, r2
+
+lea label, *r1
+
+not r1, r2
+not        , r1
+not                 #3
+not 3
+
+rts r1,
+rts
+stop
