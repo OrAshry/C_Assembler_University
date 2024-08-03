@@ -1,6 +1,0 @@
-TOMER: .string "ello tomer "            shein"
-OMER: .string "hello tomer "            shein
-TOMER: .data        1,2,3,4,5,6,7,     3444, -4, 4
-mov r1,r2
-mov #1,#1
-mov #1,r5

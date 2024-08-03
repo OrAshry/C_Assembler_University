@@ -9,6 +9,7 @@
 #define LABEL_CHAR ':'
 #define MAX_LABEL_SIZE 31
 #define COMMA_CHAR ','
+#define NULL_BYTE '\0'
 #define MIN_NUM -16384
 #define MAX_NUM 16383
 #define SPACE_CHAR ' '
@@ -24,6 +25,8 @@
 #define REGISTER_MIN 1
 #define REGISTER_MAX 7
 #define REGISTER_CHAR 'r'
+#define DEFINITION_LABEL 1
+#define NOT_DEFINITION_LABEL 0
 
 struct string_split{
     char * string[MAX_LINE];
@@ -113,9 +116,6 @@ struct ast{
 struct ast get_ast_from_line(char * line);
 int is_number(char * str, int min_num, int max_num, int * result, char ** end_ptr);
 int validate_numbers(struct string_split split_str, int size, struct ast *ast, int index);
-int is_label(char const *str, struct ast *ast);
-int is_register(char const *str);
-int is_instruction(char const *str, struct ast * ast);
 int is_op_valid(int const operand_type, char const * inst_options);
 void parse_operand(char * operand, int operand_type ,struct ast * ast, int operand_index);
 void parse_operands(struct string_split operands, int index, struct ast * ast);
