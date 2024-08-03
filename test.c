@@ -4,13 +4,11 @@ int firstPass(char *file_name, FILE *file) {
 
     /* Declarations */
     int error_flag = 0;
-    int L = 0; /* Number of words that the current instruction takes */
     int line_counter = 1; /* The number of line i just read from (am file) */
     table_ptr head_ptr = NULL; /* The pointer to the symbol table */
     table_ptr found = NULL; /* Receive the address of the symbol inside the table */
     translation machine_code = {0};
     translation_ptr machine_code_ptr = &machine_code;
-    int i;
 
     /* This is a Test */
     struct ast node = {
@@ -120,25 +118,6 @@ int firstPass(char *file_name, FILE *file) {
                 }
             }
         }
-
-        /* Calculate words if its inst*/
-        if((answer.ast_type = ast_inst)) {
-
-            for (i = 0; i < 2; i++) {
-                if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
-                    L++;
-                }
-            }
-            (machine_code_ptr -> IC) += L;
-        }
-
-        /* Calculate words and code them into data_image*/
-        else if((answer.ast_type == ast_dir) && ((answer.ast_options.dir.dir_type == ast_data) || answer.ast_options.dir.dir_type == ast_string)) {
-            memcpy(&machine_code_ptr -> data_image[machine_code_ptr -> DC], answer.ast_options.dir.dir_options.data, answer.ast_options.dir.dir_options.data_size);
-            L = answer.ast_options.dir.dir_options.data_size;
-            (machine_code_ptr -> DC) += L;
-        }
-
     }
 
     /* Check if there is entry without defeniton */
