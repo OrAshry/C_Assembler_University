@@ -4,6 +4,7 @@ int secondPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
+    int after_macro_line_counter = 1;
     char line[MAX_LINE_LENGTH]; /* The line muber of the source file after macro */
     struct ast answer_line = {0};
     int L; /* Words counter*/
@@ -32,9 +33,14 @@ int secondPass(char * file_name, FILE * file) {
             }
             (machine_code_ptr -> IC) += L;
 
-            /* Code the code into code_image */
-
+            /* Code the first word inside of code_image */
+            machine_code_ptr -> code_image[machine_code_ptr -> IC] = answer_line.ast_options.inst.operands[0].operand_type << 7; /* Source operand */
+            machine_code_ptr -> code_image[machine_code_ptr -> IC] |= answer_line.ast_options.inst.operands[1].operand_type << 3; /* Destenation operand */
+            machine_code_ptr -> code_image[machine_code_ptr -> IC] |= answer_line.ast_options.inst.inst_type << 11; /* Opecode */
+            (machine_code_ptr -> IC)++;
         }
+
+        after_macro_line_counter++;
     }
 
     return error_flag;

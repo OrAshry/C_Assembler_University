@@ -4,7 +4,7 @@ int firstPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
-    int line_counter = 1; /* The line muber of the source file after macro */
+    int line_counter = 1; /* The line number of the source file after macro */
     char read_line[MAX_LINE_LENGTH];
     char buffer_line[MAX_BUFFER_LENGTH]; 
     struct ast answer = {0}; /* After front returned answer*/
@@ -84,7 +84,7 @@ int firstPass(char * file_name, FILE * file) {
             /* If the symbol is not in the table*/
             else {
                 
-                /* If its an inst */    /*i need to check how to insert, it will instert all at the same DC*/
+                /* If its an inst */
                 if(answer.ast_type == ast_inst) {
                     if((machine_code_ptr -> IC) == 0) {
                         (machine_code_ptr -> IC) = 100;
@@ -103,7 +103,7 @@ int firstPass(char * file_name, FILE * file) {
                         add_symbol_to_table(answer.labelName, answer.ast_type, 0, &head_ptr);
                     }
 
-                    /* If its not external variable */      /*i need to check how to insert, it will instert all at the same DC*/
+                    /* If its not external variable */
                     else {
                         ++(machine_code_ptr -> DC);
                         add_symbol_to_table(answer.labelName, answer.ast_type, machine_code_ptr -> DC, &head_ptr);
