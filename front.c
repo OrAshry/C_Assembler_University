@@ -99,6 +99,12 @@ int validate_numbers(struct string_split const split_str, int const size, struct
         }
     }
 
+    /* Check data is defined in .data */
+    if(concat_str[0] == NULL_BYTE){
+        strcpy(ast->lineError, "Data is missing");
+        return 0;
+    }
+
     /* If first or last char in .data is comma , */
     if (concat_str[0] == COMMA_CHAR || concat_str[strlen(concat_str) - 1] == COMMA_CHAR)
     {
@@ -160,65 +166,6 @@ int validate_numbers(struct string_split const split_str, int const size, struct
     return 1;
 }
 
-int is_label(char const *str, struct ast *ast)
-{
-    int i;
-    int size = strlen(str);
-
-    if (!isalpha(str[0]))
-    {
-        strcpy(ast->lineError, "Label must start with a letter");
-        return 0;
-    }
-
-    if (size > MAX_LABEL_SIZE)
-    {
-        strcpy(ast->lineError, "Label is too long.. Not more than 31 chars.");
-        return 0;
-    }
-
-    for (i = 1; str[i] != '\0'; i++)
-    {
-        if (str[i] == LABEL_CHAR)
-        {
-            return 1;
-        }
-        if (!isalpha(str[i]) && !isdigit(str[i]))
-        {
-            strcpy(ast->lineError, "Label must contain only letters and digits");
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int is_register(char const *str)
-{
-    char *endptr = NULL;
-    char check_str[2] = {str[1], '\0'};
-    int result;
-    if (str[0] == REGISTER_CHAR && is_number(check_str, REGISTER_MIN, REGISTER_MAX, &result, &endptr) && endptr && str[2] == '\0')
-    {
-        return 1;
-    }
-    return 0;
-}
-
-int is_instruction(char const *str, struct ast *ast)
-{
-    int i;
-    for (i = 0; i < INST_SIZE; i++)
-    {
-        if (strcmp(str, inst_table[i].name) == 0)
-        {
-            ast->ast_type = ast_inst;
-            ast->ast_options.inst.inst_type = inst_table[i].opcode;
-            return 1;
-        }
-        return 0;
-    }
-}
-
 int is_op_valid(int const operand_type, char const *inst_options)
 {
     int i;
@@ -239,17 +186,14 @@ void parse_operand(char *operand, int const operand_type, struct ast *ast, int c
 
     if (operand_index > 1)
     {
-        strcat(line_error, "Invalid source operand type in ");
-        strcat(line_error, inst.name);
-        strcat(line_error, " instruction");
-        strcpy(ast->lineError, line_error);
+        strcpy(ast->lineError, "Invalid number of operands");
         ast->ast_type = ast_error;
         return;
     }
 
     if (operand_index == 0 && is_op_valid(operand_type, inst.source) == 0)
     {
-        strcat(line_error, "Invalid dest operand type in ");
+        strcat(line_error, "Invalid source operand type in ");
         strcat(line_error, inst.name);
         strcat(line_error, " instruction");
         strcpy(ast->lineError, line_error);
@@ -293,6 +237,14 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
 {
     struct string_split temp_split_str = {0};
     int i, operand_type, operand_index = 0;
+
+    if (operands.size - index > 2)
+    {
+        strcpy(ast->lineError, "Instruction line syntax error");
+        ast->ast_type = ast_error;
+        return;
+    }
+
     if (strchr(operands.string[index], COMMA_CHAR) != NULL)
     {
         temp_split_str = split_string(operands.string[index], COMMA);
@@ -312,13 +264,13 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
         {
             parse_operand(temp_split_str.string[i], ast_register_direct, ast, operand_index);
         }
-        else if (is_label(temp_split_str.string[i], ast))
+        else if (is_label(temp_split_str.string[i], ast, NOT_DEFINITION_LABEL))
         {
             parse_operand(temp_split_str.string[i], ast_label, ast, operand_index);
         }
         else
         {
-            strcpy(ast->lineError, "Invalid operand");
+            strcpy(ast->lineError, "Instruction line syntax error");
             ast->ast_type = ast_error;
             return;
         }
@@ -349,9 +301,13 @@ void fill_directive_ast(struct ast *ast, struct string_split split_result, int i
     else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 || strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0)
     {
         ast->ast_options.dir.dir_type = strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 ? ast_entry : ast_extern;
-        if (is_label(split_result.string[index + 1], ast))
+        if (is_label(split_result.string[index + 1], ast, NOT_DEFINITION_LABEL))
         {
             strcpy(ast->ast_options.dir.dir_options.label, split_result.string[index + 1]);
+        }
+        else{
+            strcpy(ast->lineError, "Missing label after .entry / .extern");
+            ast->ast_type = ast_error;
         }
     }
     else
@@ -371,7 +327,7 @@ struct string_split split_string(char *str, const char *delimiter)
         str++;
 
     /** If the string is empty after removing whitespaces **/
-    if (*str == '\0')
+    if (*str == NULL_BYTE)
         return split_result;
 
     /*while (str && *str != '\0')*/
@@ -380,7 +336,7 @@ struct string_split split_string(char *str, const char *delimiter)
         /** If string final char is enter **/
         if (*str == '\n')
         {
-            *str = '\0';
+            *str = NULL_BYTE;
             break;
         }
 
@@ -389,7 +345,9 @@ struct string_split split_string(char *str, const char *delimiter)
             in_quotes = !in_quotes; /** Toggle in_quotes flag **/
 
         /** Store current string in the list **/
-        split_result.string[strings_count++] = str;
+        if(*str != NULL_BYTE){
+            split_result.string[strings_count++] = str;
+        }
 
         if (in_quotes)
         {
@@ -411,7 +369,7 @@ struct string_split split_string(char *str, const char *delimiter)
 
             if (str)
             {
-                *str = '\0'; /** Null terminate **/
+                *str = NULL_BYTE; /** Null terminate **/
                 str++;
 
                 /** Skip additional whitespaces **/
@@ -438,6 +396,7 @@ struct ast get_ast_from_line(char *line)
 {
     struct ast ast = {0};                                          /* Init ast type */
     int index = 0, result;                                         /* index init */
+
     struct string_split split_result = split_string(line, SPACES); /* Split line into substrings */
 
     /* Empty line case */
@@ -455,10 +414,18 @@ struct ast get_ast_from_line(char *line)
     }
 
     /* If current string is a Label */
-    if (is_label(split_result.string[index], &ast) && !is_instruction(split_result.string[index], &ast))
+    if (is_label(split_result.string[index], &ast, DEFINITION_LABEL) && !is_instruction(split_result.string[index], &ast))
     {
         strcpy(ast.labelName, split_result.string[index++]); /* Init label name */
-        ast.labelName[strlen(ast.labelName) - 1] = '\0';     /* Remove the ':' from the label name */
+
+        /* Check label syntax is correct - end with : */
+        if(ast.labelName[strlen(ast.labelName) - 1] != LABEL_CHAR){
+            ast.ast_type = ast_error;
+            strcpy(ast.lineError, "Label definition must end with ':'");
+            return ast;
+        }
+
+        ast.labelName[strlen(ast.labelName) - 1] = NULL_BYTE;  /* Remove the ':' from the label name */
     }
 
     /* If current line is directive line with . */
@@ -477,7 +444,7 @@ struct ast get_ast_from_line(char *line)
 
     /* First Error case */
     ast.ast_type = ast_error;
-    if (ast.lineError)
+    if (ast.lineError[0] != NULL_BYTE)
     {
         return ast;
     }
@@ -490,7 +457,7 @@ struct ast get_ast_from_line(char *line)
 int main()
 {
     int i;
-    char line[100];
+    char line[81];
 
     FILE *file;
     file = fopen("x.am", "r");
@@ -505,23 +472,39 @@ int main()
     while (fgets(line, MAX_LINE, file) != NULL)
     {
         struct ast ast = get_ast_from_line(line);
-        printf("Line type: %d\n", ast.ast_type);
-        printf("Line error: %s\n", ast.lineError);
-        printf("Label name: %s\n", ast.labelName);
-        printf("Directive type: %d\n", ast.ast_options.dir.dir_type);
-        printf("Data size: %d\n", ast.ast_options.dir.dir_options.data_size);
-        printf("Directive label: %s\n", ast.ast_options.dir.dir_options.label);
-        for (i = 0; i < ast.ast_options.dir.dir_options.data_size; i++)
-        {
-            printf("Data[%d]: %d\n", i, ast.ast_options.dir.dir_options.data[i]);
+        if(ast.ast_type == ast_empty || ast.ast_type == ast_comment){
+            printf("comment line or empty line\n");
+            continue;
         }
-        printf("Instruction type: %d\n", ast.ast_options.inst.inst_type);
-        for (i = 0; i < 2; i++)
-        {
-            printf("Operand type[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_type);
-            printf("Operand option[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_option.immed);
-            printf("Operand option[%d]: %s\n", i, ast.ast_options.inst.operands[i].operand_option.label);
-            printf("Operand option[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_option.reg);
+
+        else if(ast.ast_type == ast_error){
+            printf("Error: %s\n", ast.lineError);
+            continue;
+        }
+
+        else if(ast.labelName[0] != '\0'){
+            printf("Label name: %s\n", ast.labelName);
+        }
+
+        if(ast.ast_type == ast_dir){
+            printf("Directive type: %d\n", ast.ast_options.dir.dir_type);
+            printf("Directive label: %s\n", ast.ast_options.dir.dir_options.label);
+            printf("Data size: %d\n", ast.ast_options.dir.dir_options.data_size);
+            for (i = 0; i < ast.ast_options.dir.dir_options.data_size; i++)
+            {
+                printf("Data[%d]: %d\n", i, ast.ast_options.dir.dir_options.data[i]);
+            }
+        }
+
+        if(ast.ast_type == ast_inst){
+            printf("Instruction type: %d\n", ast.ast_options.inst.inst_type);
+            for (i = 0; i < 2; i++)
+            {
+                printf("Operand type[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_type);
+                printf("Operand option[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_option.immed);
+                printf("Operand option[%d]: %s\n", i, ast.ast_options.inst.operands[i].operand_option.label);
+                printf("Operand option[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_option.reg);
+            }
         }
     }
 
