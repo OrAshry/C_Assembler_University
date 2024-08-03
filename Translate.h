@@ -10,4 +10,6 @@ typedef struct translation {
     int DC;
 } translation, * translation_ptr;
 
+extern translation machine_code;
+extern translation_ptr machine_code_ptr;
 #endif
