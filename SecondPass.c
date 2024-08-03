@@ -13,7 +13,7 @@ int secondPass(char * file_name, FILE * file) {
         answer_line = get_ast_from_line(line);
         L =0;
 
-        /* Calculate words and code them into data_image*/
+        /* Calculate words and code data into data_image */
         if((answer_line.ast_type == ast_dir) && ((answer_line.ast_options.dir.dir_type == ast_data) || (answer_line.ast_options.dir.dir_type == ast_string))) {
             memcpy(&machine_code_ptr -> data_image[machine_code_ptr -> DC], answer_line.ast_options.dir.dir_options.data, answer_line.ast_options.dir.dir_options.data_size);
             L = answer_line.ast_options.dir.dir_options.data_size;
@@ -21,14 +21,19 @@ int secondPass(char * file_name, FILE * file) {
 
         }
 
-        /* Calculate words if its inst*/
+        /* Calculate words and code the code into code_image */
         if((answer_line.ast_type = ast_inst)) {
+            
+            /* Calculate words */
             for (i = 0; i < 2; i++) {
                 if (answer_line.ast_options.inst.operands[i].operand_type != ast_none) {
                     L++;
                 }
             }
             (machine_code_ptr -> IC) += L;
+
+            /* Code the code into code_image */
+
         }
     }
 

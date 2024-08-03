@@ -3,4 +3,7 @@
 
 #include "FirstPass.h"
 
+/* Prototypes */
+int secondPass(char * file_name, FILE * file);
+
 #endif
