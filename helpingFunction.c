@@ -1,3 +1,7 @@
+#ifndef HELPINGFUNCTION_C
+#define HELPINGFUNCTION_C
+
+#include "front.h"
 #include <stdio.h>
 #include "helpingFunction.h"
 #include <stdlib.h>
@@ -89,3 +93,5 @@ int is_instruction(char const *str, struct ast *ast)
     }
     return 0;
 }
+
+#endif
