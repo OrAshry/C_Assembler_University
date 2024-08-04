@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "MacroProcessing.h"
-#include "helpingFunction.c"
 
 FILE *read_file(char *file_name)
 {
@@ -94,13 +90,15 @@ void update_macro_context(char *line, struct Macro **macro_ptr)
 
 char *get_macro_name(char *token)
 {
+    char *name = NULL;
+
     /* If current row is empty */
     if (strcmp(token, "\n") == 0)
     {
         return NULL;
     }
 
-    char *name = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    name = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
     strcpy(name, token);
 
@@ -123,6 +121,7 @@ char *get_macro_name(char *token)
 void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int macro_counter)
 {
     struct Macro *temp_ptr = NULL;
+    struct Macro *temp_macro = NULL;
 
     if (macro_ptr == NULL)
     {
@@ -141,7 +140,7 @@ void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int
         *macro_table = temp_ptr;
     }
 
-    struct Macro *temp_macro = (struct Macro *)allocateMemory(1, sizeof(struct Macro), CALLOC_ID);
+    temp_macro = (struct Macro *)allocateMemory(1, sizeof(struct Macro), CALLOC_ID);
 
     memcpy(temp_macro, macro_ptr, sizeof(struct Macro));
     macro_table[macro_counter] = temp_macro;
@@ -149,18 +148,20 @@ void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int
 
 int is_macro_def(char *line, struct Macro **macro_ptr)
 {
+    char *token = NULL;
+    char *temp_line = NULL;
+
     if (*macro_ptr != NULL)
     {
         return 0;
     }
 
-    char *token = NULL;
-    char *temp_line = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    temp_line = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
     strcpy(temp_line, line);
 
     token = strtok(temp_line, " ");
-    char *macro_name;
+    
     if (strncmp(token, STARTMACR, strlen(STARTMACR)) == 0)
     {
         token = strtok(NULL, " ");
@@ -317,7 +318,7 @@ void fill_am_file(FILE *am_file, FILE *as_file)
         }
         if (line != NULL)
         {
-            memset(line, 0, sizeof(line)); /* initalize line variable */
+            memset(line, 0, MAX_LINE); /* initalize line variable */
         }
     }
 }
@@ -361,8 +362,10 @@ void macro_processing(char *file_name)
     free(amFileName); /* should we move it to main ?? */
 }
 
+/*
 int main(void)
 {
     macro_processing("x");
     return 0;
 }
+*/
