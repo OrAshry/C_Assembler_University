@@ -1,7 +1,7 @@
 #include "front.h"
 #include <ctype.h>
 #include <string.h>
-#include "helpingFunction.c"
+#include "helpingFunction.h"
 #include <stdlib.h>
 
 int is_number(char *str, int const min_num, int const max_num, int *result, char **end_ptr)
