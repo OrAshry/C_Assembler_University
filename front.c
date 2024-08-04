@@ -1,8 +1,23 @@
 #include "front.h"
-#include <ctype.h>
-#include <string.h>
-#include "helpingFunction.h"
-#include <stdlib.h>
+
+struct inst inst_table[INST_SIZE] = {
+    {"mov", 0, "0123", "123"},
+    {"cmp", 1, "0123", "0123"},
+    {"add", 2, "0123", "123"},
+    {"sub", 3, "0123", "123"},
+    {"lea", 4, "1", "123"},
+    {"clr", 5, "", "123"},
+    {"not", 6, "", "123"},
+    {"inc", 7, "", "123"},
+    {"dec", 8, "", "123"},
+    {"jmp", 9, "", "12"},
+    {"bne", 10, "", "12"},
+    {"red", 11, "", "123"},
+    {"prn", 12, "", "0123"},
+    {"jsr", 13, "", "12"},
+    {"rts", 14, "", ""},
+    {"stop", 15, "", ""}
+};
 
 int is_number(char *str, int const min_num, int const max_num, int *result, char **end_ptr)
 {
@@ -462,7 +477,7 @@ struct string_split split_string(char *str, const char *delimiter)
 struct ast get_ast_from_line(char *line)
 {
     struct ast ast = {0};  /* Init ast type */
-    int index = 0, result; /* index init */
+    int index = 0; /* index init */
 
     struct string_split split_result = split_string(line, SPACES); /* Split line into substrings */
 
@@ -520,66 +535,4 @@ struct ast get_ast_from_line(char *line)
     /* Second Error case */
     strcpy(ast.lineError, "Invalid directive or instruction");
     return ast;
-}
-
-int main()
-{
-    int i;
-    char line[81];
-
-    FILE *file;
-    file = fopen("x.am", "r");
-    if (file == NULL)
-    {
-        printf("Error: File not found\n");
-        return 0;
-    }
-
-    /* create me a ast with init values */
-
-    while (fgets(line, MAX_LINE, file) != NULL)
-    {
-        struct ast ast = get_ast_from_line(line);
-        if (ast.ast_type == ast_empty || ast.ast_type == ast_comment)
-        {
-            printf("comment line or empty line\n");
-            continue;
-        }
-
-        else if (ast.ast_type == ast_error)
-        {
-            printf("Error: %s\n", ast.lineError);
-            continue;
-        }
-
-        else if (ast.labelName[0] != '\0')
-        {
-            printf("Label name: %s\n", ast.labelName);
-        }
-
-        if (ast.ast_type == ast_dir)
-        {
-            printf("Directive type: %d\n", ast.ast_options.dir.dir_type);
-            printf("Directive label: %s\n", ast.ast_options.dir.dir_options.label);
-            printf("Data size: %d\n", ast.ast_options.dir.dir_options.data_size);
-            for (i = 0; i < ast.ast_options.dir.dir_options.data_size; i++)
-            {
-                printf("Data[%d]: %d\n", i, ast.ast_options.dir.dir_options.data[i]);
-            }
-        }
-
-        if (ast.ast_type == ast_inst)
-        {
-            printf("Instruction type: %d\n", ast.ast_options.inst.inst_type);
-            for (i = 0; i < 2; i++)
-            {
-                printf("Operand type[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_type);
-                printf("Operand option[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_option.immed);
-                printf("Operand option[%d]: %s\n", i, ast.ast_options.inst.operands[i].operand_option.label);
-                printf("Operand option[%d]: %d\n", i, ast.ast_options.inst.operands[i].operand_option.reg);
-            }
-        }
-    }
-
-    return 0;
 }

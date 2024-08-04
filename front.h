@@ -1,5 +1,11 @@
+#ifndef FRONT_H
+#define FRONT_H
 
 #include "constants.h"
+#include <ctype.h>
+#include <string.h>
+#include "helpingFunction.h"
+#include <stdlib.h>
 
 #define ERROR_LINE 200
 #define SPACES " \t\v\f"
@@ -40,24 +46,7 @@ struct inst {
     const char *dest;
 };
 
-struct inst inst_table[INST_SIZE] = {
-    {"mov", 0, "0123", "123"},
-    {"cmp", 1, "0123", "0123"},
-    {"add", 2, "0123", "123"},
-    {"sub", 3, "0123", "123"},
-    {"lea", 4, "1", "123"},
-    {"clr", 5, "", "123"},
-    {"not", 6, "", "123"},
-    {"inc", 7, "", "123"},
-    {"dec", 8, "", "123"},
-    {"jmp", 9, "", "12"},
-    {"bne", 10, "", "12"},
-    {"red", 11, "", "123"},
-    {"prn", 12, "", "0123"},
-    {"jsr", 13, "", "12"},
-    {"rts", 14, "", ""},
-    {"stop", 15, "", ""}
-};
+extern struct inst inst_table[INST_SIZE];
 
 struct ast{
     char lineError[ERROR_LINE];
@@ -126,3 +115,5 @@ void set_ast_inst_two_operands(struct ast * ast, struct string_split split_resul
 void set_ast_inst_one_operands(struct ast * ast, struct string_split split_result, int index);
 int get_operand_type(char *operand, struct ast *ast);
 void update_ast_operands(char *value, struct ast * ast, int operand_type, int operand_index);
+
+#endif

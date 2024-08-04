@@ -132,6 +132,19 @@ int firstPass(char * file_name, FILE * file) {
         }
         found = found -> next;
     }
-
+    print_symbol_table(head_ptr);
     return error_flag;
+}
+
+int main() {
+    FILE *file = NULL;
+    int x;
+    /*read my file test.am*/
+    file = fopen("test.am", "r");
+    if(file == NULL) {
+        return 1;
+    }
+    x = firstPass("test.am", file);
+    fclose(file);
+    return x;
 }

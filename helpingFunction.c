@@ -1,10 +1,4 @@
-#ifndef HELPINGFUNCTION_C
-#define HELPINGFUNCTION_C
-
-#include "front.h"
-#include <stdio.h>
 #include "helpingFunction.h"
-#include <stdlib.h>
 
 void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
 {
@@ -70,8 +64,11 @@ int is_label(char const *str, struct ast *ast, int const definition)
 int is_register(char const *str)
 {
     char *endptr = NULL;
-    char check_str[2] = {str[1], '\0'};
     int result;
+    char check_str[2];
+    check_str[0] = str[1];
+    check_str[1] = '\0';
+
     if (str[0] == REGISTER_CHAR && is_number(check_str, REGISTER_MIN, REGISTER_MAX, &result, &endptr) && endptr && str[2] == '\0')
     {
         return 1;
@@ -93,5 +90,3 @@ int is_instruction(char const *str, struct ast *ast)
     }
     return 0;
 }
-
-#endif

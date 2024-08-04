@@ -2,6 +2,12 @@
 #define HELPINGFUNCTION_H
 
 #include <stdio.h>
+#include "front.h"
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+struct ast; /* Forward declaration of struct ast */
 
 enum FunctionId
 {

@@ -5,7 +5,9 @@
         "constants.h": "c",
         "ctype.h": "c",
         "front.h": "c",
-        "helpingfunction.h": "c"
+        "helpingfunction.h": "c",
+        "macroprocessing.h": "c",
+        "firstpass.h": "c"
     },
     "editor.mouseWheelZoom": true
 }
