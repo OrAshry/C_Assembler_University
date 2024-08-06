@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include "helpingFunction.h"
 #include "Translate.h"
 
 #define MAX_LINE_LENGTH 82 /* 82 for 80 chars and '\n' and '\0'*/
