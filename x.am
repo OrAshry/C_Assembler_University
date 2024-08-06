@@ -1,2 +1,5 @@
-.data 1,2,3,4,5,6,7,8,10,1234,123
-.string "tomer tomer tomer tomer tomer"
+LABEL3: .extern EXTERN_LABEL
+
+LABEL4: .entry ENTRY_LABEL
+
+label: .extern reer
