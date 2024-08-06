@@ -1,6 +1,8 @@
 ; This is a comment line
 
-LABEL1: .data 5, 10, -3
+LABEL1: cmp r3, #-6
+
+.entry LABEL1
 
 LABEL2: .string "Hello, World!"
 
@@ -37,4 +39,4 @@ stop
 
 LABEL10: .data 1, 2, 3, 4, 5
 
-LABEL11: add 2, 4
+LABEL11: cmp r3, #-6

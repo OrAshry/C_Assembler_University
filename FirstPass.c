@@ -59,7 +59,7 @@ int firstPass(char * file_name, FILE * file) {
                         }
                         
                         /* If its entry or extern */
-                        else if((answer.ast_options.dir.dir_type == ast_entry) || answer.ast_options.dir.dir_type == ast_extern) {
+                        else {
                             printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name,line_counter, answer.labelName);
                             error_flag = 1;
                         }
@@ -90,10 +90,11 @@ int firstPass(char * file_name, FILE * file) {
                 if(answer.ast_type == ast_inst) {
                     if((machine_code_ptr -> IC) == 0) {
                         (machine_code_ptr -> IC) = 100;
-                        add_symbol_to_table(answer.labelName, answer.ast_type, (machine_code_ptr -> IC), &head_ptr);
+                        add_symbol_to_table(answer.labelName, code_symbol, (machine_code_ptr -> IC), &head_ptr);
                     }
                     else {
-                        add_symbol_to_table(answer.labelName, answer.ast_type, (machine_code_ptr -> IC), &head_ptr);
+                        ++(machine_code_ptr -> IC);
+                        add_symbol_to_table(answer.labelName, code_symbol, (machine_code_ptr -> IC), &head_ptr);
                     }
                 }
 
@@ -102,13 +103,19 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its external variable */      /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
-                        add_symbol_to_table(answer.labelName, answer.ast_type, 0, &head_ptr);
+                        add_symbol_to_table(answer.labelName, extern_symbol, 0, &head_ptr);
                     }
 
-                    /* If its not external variable */
+                    /* If its entery variable */
+                    else if(answer.ast_options.dir.dir_type == ast_entry) {
+                        ++(machine_code_ptr -> DC);
+                        add_symbol_to_table(answer.labelName, entry_symbol,  (machine_code_ptr -> DC), &head_ptr);
+                    }
+
+                    /* If its data or string */
                     else {
                         ++(machine_code_ptr -> DC);
-                        add_symbol_to_table(answer.labelName, answer.ast_type, machine_code_ptr -> DC, &head_ptr);
+                        add_symbol_to_table(answer.labelName, data_symbol, (machine_code_ptr -> DC), &head_ptr);
                     }
                 }
             }
@@ -130,7 +137,7 @@ int firstPass(char * file_name, FILE * file) {
                     L--;
                 }
             }
-            (machine_code_ptr -> IC) += L;
+            (machine_code_ptr -> IC) = (machine_code_ptr -> IC)+ L;
         }
 
         /* Calculate words if its dir variable */
@@ -138,7 +145,7 @@ int firstPass(char * file_name, FILE * file) {
             if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
                 L = answer.ast_options.dir.dir_options.data_size;
             }
-            (machine_code_ptr -> DC) += L;
+            (machine_code_ptr -> DC) =  (machine_code_ptr -> DC) + L;
         }
          
 
@@ -146,25 +153,24 @@ int firstPass(char * file_name, FILE * file) {
         ++line_counter;
     }
 
-    /* Check if there is entry without defeniton */
+    /* Check if there is entry without defeniton */ /* in the assembler example they say that if there is a proble m to exit here*/
     found = head_ptr;
     while(found) {
         if(found -> symbol_type == entry_symbol) {
             printf("Error: In file %s symbol %s declared as entry but never defined.\n", file_name, found -> symbol_name);
             error_flag = 1;
+            return error_flag;
         }
-        found = found -> next;
+
+        /* Relocate all DC variables after IC variables*/
+        else if((found -> symbol_type == data_symbol) || (found -> symbol_type == entry_data)) {
+            (found -> symbol_address) += (machine_code_ptr -> IC);
+        }
+        found = (found -> next);
     }
     
-    /* Relocate all DC variables after IC variables*/
-    found = head_ptr;
-    while(found) {
-        if((found -> symbol_type == data_symbol) || (found -> symbol_type == entry_data)) {
-            found -> symbol_address += (machine_code_ptr -> IC);
-        }
-        found = found -> next;
-    }
     print_symbol_table(head_ptr);
+    
     return error_flag;
 }
 
