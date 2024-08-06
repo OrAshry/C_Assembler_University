@@ -138,21 +138,16 @@ int firstPass(char * file_name, FILE * file) {
                 }
             }
             (machine_code_ptr -> IC) += L;
-            printf("IC is %d\n", machine_code_ptr -> IC);
         }
 
         /* Calculate words if its dir variable */
         else if(answer.ast_type == ast_dir) {
             L = 0;
             if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
-                L = answer.ast_options.dir.dir_options.data_size - 1;/* -1 becasue the first char got storage when declarated */
+                L = answer.ast_options.dir.dir_options.data_size - 1; /* -1 becasue the first char got storage when declarated */
             }
             (machine_code_ptr -> DC) += + L;
-            printf("DC is = %d\n", machine_code_ptr -> DC);
         }
-         
-
-
         ++line_counter;
     }
 
