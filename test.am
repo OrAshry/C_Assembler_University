@@ -36,3 +36,5 @@ rts
 stop
 
 LABEL10: .data 1, 2, 3, 4, 5
+
+LABEL11: add 2, 4

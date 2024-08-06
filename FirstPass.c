@@ -4,6 +4,8 @@ int firstPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
+    int L = 0; /* Number of words that the current instruction takes */
+    int i;
     int line_counter = 1; /* The line number of the source file after macro */
     char read_line[MAX_LINE_LENGTH];
     char buffer_line[MAX_BUFFER_LENGTH]; 
@@ -111,6 +113,36 @@ int firstPass(char * file_name, FILE * file) {
                 }
             }
         }
+
+        /* Calculate words if its inst variable*/
+        if(answer.ast_type = ast_inst) {
+            L = 1; /* Initialize the word counter for inst */
+            for (i = 0; i < 2; i++) {
+                if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
+                    L++;
+                }
+            }
+            
+            /* if there are 2 operands both registers */
+            if(L == 3) {
+                if(((answer.ast_options.inst.operands[0].operand_type == ast_register_direct) || (answer.ast_options.inst.operands[0].operand_type == ast_register_address)) &&
+                 ((answer.ast_options.inst.operands[1].operand_type == ast_register_direct) || (answer.ast_options.inst.operands[1].operand_type == ast_register_address))) {
+                    L--;
+                }
+            }
+            (machine_code_ptr -> IC) += L;
+        }
+
+        /* Calculate words if its dir variable */
+        else if(answer.ast_type == ast_dir) {
+            if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
+                L = answer.ast_options.dir.dir_options.data_size;
+            }
+            (machine_code_ptr -> DC) += L;
+        }
+         
+
+
         ++line_counter;
     }
 
@@ -136,7 +168,7 @@ int firstPass(char * file_name, FILE * file) {
     return error_flag;
 }
 
-int main() {
+int main(void) {
     FILE *file = NULL;
     int x;
     /*read my file test.am*/
@@ -145,6 +177,7 @@ int main() {
         return 1;
     }
     x = firstPass("test.am", file);
+    printf("the error flag is %s\n", x ? "on" : "off");
     fclose(file);
     return x;
 }
