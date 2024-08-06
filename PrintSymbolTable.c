@@ -18,4 +18,5 @@ void print_data_image(const translation_ptr p) {
             printf("Address %d: %d\n", i, p->data_image[i]);
         }
     }
+    putchar('\n');
 }

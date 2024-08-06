@@ -4,7 +4,7 @@ int firstPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
-    int L = 0; /* Number of words that the current instruction takes */
+    int L; /* Number of words that the current instruction takes */
     int i;
     int line_counter = 1; /* The line number of the source file after macro */
     char read_line[MAX_LINE_LENGTH];
@@ -93,7 +93,6 @@ int firstPass(char * file_name, FILE * file) {
                         add_symbol_to_table(answer.labelName, code_symbol, (machine_code_ptr -> IC), &head_ptr);
                     }
                     else {
-                        ++(machine_code_ptr -> IC);
                         add_symbol_to_table(answer.labelName, code_symbol, (machine_code_ptr -> IC), &head_ptr);
                     }
                 }
@@ -122,9 +121,10 @@ int firstPass(char * file_name, FILE * file) {
         }
 
         /* Calculate words if its inst variable*/
-        if(answer.ast_type = ast_inst) {
+        if(answer.ast_type == ast_inst) {
             L = 1; /* Initialize the word counter for inst */
             for (i = 0; i < 2; i++) {
+                printf("Operand %d type: %d\n", i, answer.ast_options.inst.operands[i].operand_type);
                 if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
                     L++;
                 }
@@ -137,15 +137,18 @@ int firstPass(char * file_name, FILE * file) {
                     L--;
                 }
             }
-            (machine_code_ptr -> IC) = (machine_code_ptr -> IC)+ L;
+            (machine_code_ptr -> IC) += L;
+            printf("IC is %d\n", machine_code_ptr -> IC);
         }
 
         /* Calculate words if its dir variable */
         else if(answer.ast_type == ast_dir) {
+            L = 0;
             if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
-                L = answer.ast_options.dir.dir_options.data_size;
+                L = answer.ast_options.dir.dir_options.data_size - 1;/* -1 becasue the first char got storage when declarated */
             }
-            (machine_code_ptr -> DC) =  (machine_code_ptr -> DC) + L;
+            (machine_code_ptr -> DC) += + L;
+            printf("DC is = %d\n", machine_code_ptr -> DC);
         }
          
 
