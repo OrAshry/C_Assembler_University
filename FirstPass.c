@@ -124,7 +124,6 @@ int firstPass(char * file_name, FILE * file) {
         if(answer.ast_type == ast_inst) {
             L = 1; /* Initialize the word counter for inst */
             for (i = 0; i < 2; i++) {
-                printf("Operand %d type: %d\n", i, answer.ast_options.inst.operands[i].operand_type);
                 if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
                     L++;
                 }
