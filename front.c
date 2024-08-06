@@ -387,7 +387,6 @@ void fill_directive_ast(struct ast *ast, struct string_split split_result, int i
         }
         else
         {
-            strcpy(ast->lineError, "Missing label after .entry / .extern");
             ast->ast_type = ast_error;
         }
     }
