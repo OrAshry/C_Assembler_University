@@ -103,14 +103,12 @@ int firstPass(char * file_name, FILE * file) {
                     /* If its external variable */      /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
                         add_symbol_to_table(answer.labelName, extern_symbol, 0, &head_ptr);
-                        printf("Directory Type: %d\n", answer.ast_options.dir.dir_type);
                     }
 
                     /* If its entery variable */
                     else if(answer.ast_options.dir.dir_type == ast_entry) {
                         ++(machine_code_ptr -> DC);
                         add_symbol_to_table(answer.labelName, entry_symbol,  (machine_code_ptr -> DC), &head_ptr);
-                        printf("Directory Type: %d\n", answer.ast_options.dir.dir_type);
                     }
 
                     /* If its data or string */
