@@ -120,8 +120,20 @@ int firstPass(char * file_name, FILE * file) {
             }
         }
 
+        /* Calculate words and code to data_image if its dir variable */
+        if(answer.ast_type == ast_dir) {
+            L = 0;
+            if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
+                L = answer.ast_options.dir.dir_options.data_size;
+                for(i = 0; i < L; i++) {
+                    machine_code_ptr -> data_image[machine_code_ptr->DC] = answer.ast_options.dir.dir_options.data[i];
+                }
+            }
+            (machine_code_ptr -> DC) += + L;
+        }
+
         /* Calculate words if its inst variable*/
-        if(answer.ast_type == ast_inst) {
+        else if(answer.ast_type == ast_inst) {
             L = 1; /* Initialize the word counter for inst */
             for (i = 0; i < 2; i++) {
                 if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
@@ -137,15 +149,6 @@ int firstPass(char * file_name, FILE * file) {
                 }
             }
             (machine_code_ptr -> IC) += L;
-        }
-
-        /* Calculate words if its dir variable */
-        else if(answer.ast_type == ast_dir) {
-            L = 0;
-            if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
-                L = answer.ast_options.dir.dir_options.data_size - 1; /* -1 becasue the first char got storage when declarated */
-            }
-            (machine_code_ptr -> DC) += + L;
         }
         ++line_counter;
     }
@@ -167,6 +170,7 @@ int firstPass(char * file_name, FILE * file) {
     }
     
     print_symbol_table(head_ptr);
+    print_data_image(machine_code_ptr);
     
     return error_flag;
 }

@@ -19,7 +19,6 @@ int secondPass(char * file_name, FILE * file) {
             memcpy(&machine_code_ptr -> data_image[machine_code_ptr -> DC], answer_line.ast_options.dir.dir_options.data, answer_line.ast_options.dir.dir_options.data_size);
             L = answer_line.ast_options.dir.dir_options.data_size;
             (machine_code_ptr -> DC) += L;
-
         }
 
         /* Calculate words and code the code into code_image */
@@ -42,6 +41,6 @@ int secondPass(char * file_name, FILE * file) {
 
         after_macro_line_counter++;
     }
-
+    
     return error_flag;
 }
