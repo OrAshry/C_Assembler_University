@@ -4,6 +4,8 @@ int firstPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
+    int L; /* Number of words that the current instruction takes */
+    int i;
     int line_counter = 1; /* The line number of the source file after macro */
     char read_line[MAX_LINE_LENGTH];
     char buffer_line[MAX_BUFFER_LENGTH]; 
@@ -57,7 +59,7 @@ int firstPass(char * file_name, FILE * file) {
                         }
                         
                         /* If its entry or extern */
-                        else if((answer.ast_options.dir.dir_type == ast_entry) || answer.ast_options.dir.dir_type == ast_extern) {
+                        else {
                             printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name,line_counter, answer.labelName);
                             error_flag = 1;
                         }
@@ -88,10 +90,10 @@ int firstPass(char * file_name, FILE * file) {
                 if(answer.ast_type == ast_inst) {
                     if((machine_code_ptr -> IC) == 0) {
                         (machine_code_ptr -> IC) = 100;
-                        add_symbol_to_table(answer.labelName, answer.ast_type, (machine_code_ptr -> IC), &head_ptr);
+                        add_symbol_to_table(answer.labelName, code_symbol, (machine_code_ptr -> IC), &head_ptr);
                     }
                     else {
-                        add_symbol_to_table(answer.labelName, answer.ast_type, (machine_code_ptr -> IC), &head_ptr);
+                        add_symbol_to_table(answer.labelName, code_symbol, (machine_code_ptr -> IC), &head_ptr);
                     }
                 }
 
@@ -100,43 +102,76 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its external variable */      /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
-                        add_symbol_to_table(answer.labelName, answer.ast_type, 0, &head_ptr);
+                        add_symbol_to_table(answer.labelName, extern_symbol, 0, &head_ptr);
                     }
 
-                    /* If its not external variable */
+                    /* If its entery variable */
+                    else if(answer.ast_options.dir.dir_type == ast_entry) {
+                        ++(machine_code_ptr -> DC);
+                        add_symbol_to_table(answer.labelName, entry_symbol,  (machine_code_ptr -> DC), &head_ptr);
+                    }
+
+                    /* If its data or string */
                     else {
                         ++(machine_code_ptr -> DC);
-                        add_symbol_to_table(answer.labelName, answer.ast_type, machine_code_ptr -> DC, &head_ptr);
+                        add_symbol_to_table(answer.labelName, data_symbol, (machine_code_ptr -> DC), &head_ptr);
                     }
                 }
             }
         }
+
+        /* Calculate words if its inst variable*/
+        if(answer.ast_type == ast_inst) {
+            L = 1; /* Initialize the word counter for inst */
+            for (i = 0; i < 2; i++) {
+                if (answer.ast_options.inst.operands[i].operand_type != ast_none) {
+                    L++;
+                }
+            }
+            
+            /* if there are 2 operands both registers */
+            if(L == 3) {
+                if(((answer.ast_options.inst.operands[0].operand_type == ast_register_direct) || (answer.ast_options.inst.operands[0].operand_type == ast_register_address)) &&
+                 ((answer.ast_options.inst.operands[1].operand_type == ast_register_direct) || (answer.ast_options.inst.operands[1].operand_type == ast_register_address))) {
+                    L--;
+                }
+            }
+            (machine_code_ptr -> IC) += L;
+        }
+
+        /* Calculate words if its dir variable */
+        else if(answer.ast_type == ast_dir) {
+            L = 0;
+            if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
+                L = answer.ast_options.dir.dir_options.data_size - 1; /* -1 becasue the first char got storage when declarated */
+            }
+            (machine_code_ptr -> DC) += + L;
+        }
         ++line_counter;
     }
 
-    /* Check if there is entry without defeniton */
+    /* Check if there is entry without defeniton */ /* in the assembler example they say that if there is a proble m to exit here*/
     found = head_ptr;
     while(found) {
         if(found -> symbol_type == entry_symbol) {
             printf("Error: In file %s symbol %s declared as entry but never defined.\n", file_name, found -> symbol_name);
             error_flag = 1;
+            return error_flag;
         }
-        found = found -> next;
+
+        /* Relocate all DC variables after IC variables*/
+        else if((found -> symbol_type == data_symbol) || (found -> symbol_type == entry_data)) {
+            (found -> symbol_address) += (machine_code_ptr -> IC);
+        }
+        found = (found -> next);
     }
     
-    /* Relocate all DC variables after IC variables*/
-    found = head_ptr;
-    while(found) {
-        if((found -> symbol_type == data_symbol) || (found -> symbol_type == entry_data)) {
-            found -> symbol_address += (machine_code_ptr -> IC);
-        }
-        found = found -> next;
-    }
     print_symbol_table(head_ptr);
+    
     return error_flag;
 }
 
-int main() {
+int main(void) {
     FILE *file = NULL;
     int x;
     /*read my file test.am*/
@@ -145,6 +180,7 @@ int main() {
         return 1;
     }
     x = firstPass("test.am", file);
+    printf("the error flag is %s\n", x ? "on" : "off");
     fclose(file);
     return x;
 }

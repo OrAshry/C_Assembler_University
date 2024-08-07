@@ -2,7 +2,7 @@
 
 void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], int new_type, int new_address, table_ptr *ptr) {
     
-    table_ptr new_symbol = (table_ptr)malloc(sizeof(symbol_table));
+    table_ptr new_symbol = (table_ptr)allocateMemory(1, sizeof(symbol_table), MALLOC_ID);
     strcpy(new_symbol -> symbol_name, new_name);
     new_symbol -> symbol_type = (enum type)new_type;
     new_symbol -> symbol_address = new_address;
