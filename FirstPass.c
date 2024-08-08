@@ -9,6 +9,7 @@ int firstPass(char * file_name, FILE * file) {
     int line_counter = 1; /* The line number of the source file after macro */
     char read_line[MAX_LINE_LENGTH];
     char buffer_line[MAX_BUFFER_LENGTH]; 
+    char label[MAX_LABEL_SIZE]; /* Label name init */
     struct ast answer = {0}; /* After front returned answer*/
     table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
     table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
@@ -37,10 +38,17 @@ int firstPass(char * file_name, FILE * file) {
         }
 
         /* If there is a symbol in the line */
-        if(((answer.labelName[0] != '\0')) && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
+        if(((answer.labelName[0] != NULL_BYTE) && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) ||
+           ((answer.ast_type == ast_dir) && (answer.ast_options.dir.dir_options.label[0] != NULL_BYTE) && ((answer.ast_options.dir.dir_type == ast_entry) || (answer.ast_options.dir.dir_type == ast_extern)))) {
             
+            if(answer.ast_options.dir.dir_options.label[0] != NULL_BYTE){
+                strcpy(label, answer.ast_options.dir.dir_options.label);
+            }else{
+                strcpy(label, answer.labelName);
+            }
+
             /* If the symbol is already exist in the table */
-            if((found = symbol_search(head_ptr, answer.labelName))) {
+            if((found = symbol_search(head_ptr, label))) {
                 
                 /* If the symbol in the table is entry*/
                 if(found -> symbol_type == entry_symbol) {
@@ -124,7 +132,7 @@ int firstPass(char * file_name, FILE * file) {
         if(answer.ast_type == ast_dir) {
             L = 1;
             if(answer.ast_options.dir.dir_type == ast_string) {
-                L = answer.ast_options.dir.dir_options.data_size + 1; // +1 for the null terminator
+                L = answer.ast_options.dir.dir_options.data_size + 1;
                 for(i = 0; i < L; i++) {
                     machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
                     (machine_code_ptr -> DC)++;
@@ -169,7 +177,7 @@ int firstPass(char * file_name, FILE * file) {
         if(found -> symbol_type == entry_symbol) {
             printf("Error: In file %s symbol %s declared as entry but never defined.\n", file_name, found -> symbol_name);
             error_flag = 1;
-            return error_flag;
+            /*return error_flag;*/
         }
 
         /* Relocate all DC variables after IC variables*/

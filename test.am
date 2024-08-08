@@ -1,13 +1,12 @@
 ; This is a comment line
 
-LABEL1: cmp r3, #-6
-
 .entry LABEL1
-
+LABEL1: mov r1,r2
 LABEL2: .string "Hello, World!"
 
 ; Another comment
 LABEL3: .extern EXTERN_LABEL
+LABEL1: tomer
 
 LABEL4: .entry ENTRY_LABEL
 
