@@ -132,7 +132,7 @@ int firstPass(char * file_name, FILE * file) {
         if(answer.ast_type == ast_dir) {
             L = 1;
             if(answer.ast_options.dir.dir_type == ast_string) {
-                L = answer.ast_options.dir.dir_options.data_size + 1;
+                L = answer.ast_options.dir.dir_options.data_size;
                 for(i = 0; i < L; i++) {
                     machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
                     (machine_code_ptr -> DC)++;
@@ -142,8 +142,11 @@ int firstPass(char * file_name, FILE * file) {
             else if(answer.ast_options.dir.dir_type == ast_data) {
                 L = answer.ast_options.dir.dir_options.data_size;
                 for(i = 0; i < L; i++) {
-                    machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
-                    (machine_code_ptr -> DC)++;
+                    machine_code_ptr -> data_image[(machine_code_ptr -> DC)] = answer.ast_options.dir.dir_options.data[i];
+                    if(i < L - 1) {
+                        (machine_code_ptr -> DC)++;
+                    }
+                    
                 }
             }
 
