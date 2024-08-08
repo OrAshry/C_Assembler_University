@@ -37,7 +37,7 @@ int firstPass(char * file_name, FILE * file) {
         }
 
         /* If there is a symbol in the line */
-        if((answer.labelName[0] != '\0') && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
+        if(((answer.labelName[0] != '\0')) && ((answer.ast_type == ast_inst) || answer.ast_type == ast_dir)) {
             
             /* If the symbol is already exist in the table */
             if((found = symbol_search(head_ptr, answer.labelName))) {
@@ -102,13 +102,13 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its external variable */      /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
-                        add_symbol_to_table(answer.labelName, extern_symbol, 0, &head_ptr);
+                        add_symbol_to_table(answer.ast_options.dir.dir_options.label, extern_symbol, 0, &head_ptr);
                     }
 
                     /* If its entery variable */
                     else if(answer.ast_options.dir.dir_type == ast_entry) {
                         ++(machine_code_ptr -> DC);
-                        add_symbol_to_table(answer.labelName, entry_symbol,  (machine_code_ptr -> DC), &head_ptr);
+                        add_symbol_to_table(answer.ast_options.dir.dir_options.label, entry_symbol,  (machine_code_ptr -> DC), &head_ptr);
                     }
 
                     /* If its data or string */
@@ -122,15 +122,25 @@ int firstPass(char * file_name, FILE * file) {
 
         /* Calculate words and code to data_image if its dir variable */
         if(answer.ast_type == ast_dir) {
-            L = 0;
-            if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
-                L = answer.ast_options.dir.dir_options.data_size;
+            L = 1;
+            if(answer.ast_options.dir.dir_type == ast_string) {
+                L = answer.ast_options.dir.dir_options.data_size + 1; // +1 for the null terminator
                 for(i = 0; i < L; i++) {
-                    machine_code_ptr -> data_image[machine_code_ptr->DC] = answer.ast_options.dir.dir_options.data[i];
+                    machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
+                    (machine_code_ptr -> DC)++;
                 }
             }
-            (machine_code_ptr -> DC) += + L;
-        }
+    
+            else if(answer.ast_options.dir.dir_type == ast_data) {
+                L = answer.ast_options.dir.dir_options.data_size;
+                for(i = 0; i < L; i++) {
+                    machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
+                    (machine_code_ptr -> DC)++;
+                }
+            }
+
+
+        }    
 
         /* Calculate words if its inst variable*/
         else if(answer.ast_type == ast_inst) {
