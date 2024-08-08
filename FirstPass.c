@@ -135,7 +135,9 @@ int firstPass(char * file_name, FILE * file) {
                 for(i = 0; i < L; i++) {
                     machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
                     printf("Writing to Address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
-                    (machine_code_ptr -> DC)++;
+                    if(i < L - 1) {
+                        (machine_code_ptr -> DC)++;
+                    }
                 }
             }
             else if(answer.ast_options.dir.dir_type == ast_data) {
