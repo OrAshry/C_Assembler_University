@@ -43,12 +43,13 @@ int firstPass(char * file_name, FILE * file) {
             
             if(answer.ast_options.dir.dir_options.label[0] != NULL_BYTE){
                 strcpy(label, answer.ast_options.dir.dir_options.label);
-            }else{
+            }
+            else{
                 strcpy(label, answer.labelName);
             }
 
             /* If the symbol is already exist in the table */
-            if((found = symbol_search(head_ptr, label))) {
+            if((found = symbol_search(head_ptr, answer.labelName))|| (found = symbol_search(head_ptr, label))) {
                 
                 /* If the symbol in the table is entry*/
                 if(found -> symbol_type == entry_symbol) {
@@ -56,6 +57,10 @@ int firstPass(char * file_name, FILE * file) {
                     /* If the symbol in the line is inst */
                     if(answer.ast_type == ast_inst) {
                         found -> symbol_type = entry_code;
+                        if((machine_code_ptr -> IC) == 0) {
+                            (machine_code_ptr -> IC) = 100;
+                        }
+                        found -> symbol_address = (machine_code_ptr -> IC);
                     }
                     
                     /* If the symbol in the line is dir */
@@ -64,6 +69,7 @@ int firstPass(char * file_name, FILE * file) {
                         /* If its data or string */
                         if((answer.ast_options.dir.dir_type == ast_data) || (answer.ast_options.dir.dir_type == ast_string)) {
                             found -> symbol_type = entry_data;
+                            found -> symbol_address = (machine_code_ptr -> DC);
                         }
                         
                         /* If its entry or extern */
@@ -106,7 +112,7 @@ int firstPass(char * file_name, FILE * file) {
                 }
 
                 /* If its a dir */
-                if(answer.ast_type == ast_dir) {
+                else if(answer.ast_type == ast_dir) {
 
                     /* If its external variable */      /*need to check if its zero or NULL*/
                     if(answer.ast_options.dir.dir_type == ast_extern) {
@@ -115,8 +121,7 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its entery variable */
                     else if(answer.ast_options.dir.dir_type == ast_entry) {
-                        ++(machine_code_ptr -> DC);
-                        add_symbol_to_table(answer.ast_options.dir.dir_options.label, entry_symbol,  (machine_code_ptr -> DC), &head_ptr);
+                        add_symbol_to_table(answer.ast_options.dir.dir_options.label, entry_symbol,  0, &head_ptr);
                     }
 
                     /* If its data or string */
@@ -130,20 +135,25 @@ int firstPass(char * file_name, FILE * file) {
 
         /* Calculate words and code to data_image if its dir variable */
         if(answer.ast_type == ast_dir) {
-            L = 1;
-            if(answer.ast_options.dir.dir_type == ast_string) {
-                L = answer.ast_options.dir.dir_options.data_size + 1;
-                for(i = 0; i < L; i++) {
-                    machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
-                    (machine_code_ptr -> DC)++;
-                }
-            }
-    
-            else if(answer.ast_options.dir.dir_type == ast_data) {
+            if((answer.ast_options.dir.dir_type == ast_string)) {
                 L = answer.ast_options.dir.dir_options.data_size;
                 for(i = 0; i < L; i++) {
                     machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
-                    (machine_code_ptr -> DC)++;
+                    printf("Writing to Address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
+                    if(i < L - 1) {
+                        (machine_code_ptr -> DC)++;
+                    }
+                }
+            }
+            else if(answer.ast_options.dir.dir_type == ast_data) {
+                L = answer.ast_options.dir.dir_options.data_size;
+                for(i = 0; i < L; i++) {
+                    machine_code_ptr -> data_image[(machine_code_ptr -> DC)] = answer.ast_options.dir.dir_options.data[i];
+                    printf("Writing to Address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
+                    if(i < L - 1) {
+                        (machine_code_ptr -> DC)++;
+                    }
+                    
                 }
             }
 
