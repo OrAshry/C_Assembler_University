@@ -80,7 +80,7 @@ int firstPass(char * file_name, FILE * file) {
                     }
                 }
 
-                /* If the symbol in the table is daclared and they cange it to entry after that*/
+                /* If the symbol in the table is daclared and they change it to entry after that*/
                 else if((answer.ast_type == ast_dir) && (answer.ast_options.dir.dir_type == ast_entry)) {
                     if(found -> symbol_type == code_symbol) {
                         found -> symbol_type = entry_code;
@@ -121,7 +121,7 @@ int firstPass(char * file_name, FILE * file) {
 
                     /* If its entery variable */
                     else if(answer.ast_options.dir.dir_type == ast_entry) {
-                        add_symbol_to_table(answer.ast_options.dir.dir_options.label, entry_symbol,  0, &head_ptr);
+                        add_symbol_to_table(answer.ast_options.dir.dir_options.label, entry_symbol,  line_counter, &head_ptr);
                     }
 
                     /* If its data or string */
@@ -156,8 +156,6 @@ int firstPass(char * file_name, FILE * file) {
                     
                 }
             }
-
-
         }    
 
         /* Calculate words if its inst variable*/
@@ -185,7 +183,7 @@ int firstPass(char * file_name, FILE * file) {
     found = head_ptr;
     while(found) {
         if(found -> symbol_type == entry_symbol) {
-            printf("Error: In file %s symbol %s declared as entry but never defined.\n", file_name, found -> symbol_name);
+            printf("Error: In file %s at line %d symbol %s declared as entry but never defined.\n", file_name, found -> symbol_address, found -> symbol_name);
             error_flag = 1;
             /*return error_flag;*/
         }
