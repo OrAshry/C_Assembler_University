@@ -6,7 +6,7 @@ LABEL2: .string "Hello, World!"
 
 ; Another comment
 LABEL3: .extern EXTERN_LABEL
-LABEL1: tomer
+LABEL1: mov r2,r4
 
 LABEL4: .entry ENTRY_LABEL
 
