@@ -1,6 +1,6 @@
 #include "SecondPass.h"
 
-int secondPass(char * file_name, FILE * file, table_ptr head_pointer, ) {
+int secondPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
@@ -73,11 +73,13 @@ int secondPass(char * file_name, FILE * file, table_ptr head_pointer, ) {
                 codeWords(L, answer_line, A, R, E);
             }            
             else if(L == 2) { /* If there is only one operand or two register operands */
+                /* Two register operands*/
                 if(two_op_reg) {
                     machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << A;
                     machine_code_ptr -> code_image[machine_code_ptr -> IC] |= answer_line.ast_options.inst.operands[1].operand_option.reg << 3; /* Destination reg num*/
                     machine_code_ptr -> code_image[machine_code_ptr -> IC] |= answer_line.ast_options.inst.operands[1].operand_option.reg << 6; /* Source reg num*/
                 }
+                /* Only destination operand*/
                 else {
                     codeWords(L, answer_line, A, R, E);
                 }
@@ -113,19 +115,17 @@ void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatabl
             } 
             machine_code_ptr -> code_image[machine_code_ptr -> IC] |= found -> symbol_address << 3; /*Address of the label*/
             }
-            else if(a.ast_options.inst.operands[i].operand_type == ast_register_address) {
-                machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
-                if(i == 0) { /* First operand */
-                    machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 6; /* Register number */
-                }
-                else if(i == 1) /* Second operand */
-                {
-                    machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 3; /* Register number */
-                }
+        else if((a.ast_options.inst.operands[i].operand_type == ast_register_address) || (a.ast_options.inst.operands[i].operand_type == ast_register_direct)) {
+            machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
+            if(i == 0) { /* First operand (source)*/
+                machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 6; /* Register number */
             }
-            else if(a.ast_options.inst.operands[i].operand_type == ast_register_direct) {
-                machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
+            else if(i == 1) /* Second operand (destination)*/
+            {
+                machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 3; /* Register number */
             }
+        }
+            
     }
 }
 

@@ -12,4 +12,5 @@ int firstPass(char * file_name, FILE * file);
 
 extern table_ptr head_ptr;
 extern table_ptr found;
+
 #endif
