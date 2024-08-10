@@ -70,7 +70,7 @@ int secondPass(char * file_name, FILE * file) {
 
             /* Code the second and third word*/
             if(L == 3) { /* If there are 2 operands and at least one of them is not registar */
-                codeWords(L, answer_line, A, R, E);
+                codeWords(L, answer_line, A, R, E, &error_flag, file_name, am_line_counter);
             }            
             else if(L == 2) { /* If there is only one operand or two register operands */
                 /* Two register operands*/
@@ -81,7 +81,7 @@ int secondPass(char * file_name, FILE * file) {
                 }
                 /* Only destination operand*/
                 else {
-                    codeWords(L, answer_line, A, R, E);
+                    codeWords(L, answer_line, A, R, E, &error_flag, file_name, am_line_counter);
                 }
             }
         }
@@ -93,7 +93,7 @@ int secondPass(char * file_name, FILE * file) {
 }
 
 /* This function will code the second and third words */
-void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatable_word, int external_word) {
+void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatable_word, int external_word, int *flag, const char *name_of_file, int current_am_line) {
     int i;
 
     for(i = 0; i < num_of_words - 1; i++, (machine_code_ptr -> IC)++) {
@@ -104,7 +104,8 @@ void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatabl
         else if(a.ast_options.inst.operands[i].operand_type == ast_label) {
             found = symbol_search(head_ptr, a.ast_options.inst.operands[i].operand_option.label);
             if(!found) {
-                printf("Error: Label %s was not defined\n", a.ast_options.inst.operands[i].operand_option.label);
+                printf("Error: In file %s at line %d the symbol %s has been never defined.\n", name_of_file, current_am_line, a.ast_options.inst.operands[i].operand_option.label);
+                *flag = 1;
                 return;
             }
             else if(found -> symbol_type == extern_symbol) {

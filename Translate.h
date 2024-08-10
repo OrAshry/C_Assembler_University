@@ -12,4 +12,5 @@ typedef struct translation {
 
 extern translation machine_code;
 extern translation_ptr machine_code_ptr;
+
 #endif
