@@ -1,24 +1,27 @@
 #include "SecondPass.h"
 
-int secondPass(char * file_name, FILE * file) {
+int secondPass(char * file_name, FILE * file, table_ptr head_pointer, ) {
     
     /* Declarations */
     int error_flag = 0;
     int am_line_counter = 1; /* After macro line counter */
-    char line[MAX_LINE_LENGTH]; /* The line muber of the source file after macro */
-    struct ast answer_line = {0};
-    machine_code_ptr -> IC = 0; /* Restart inst counter */
     int L; /* Words counter */
     int i;
     int two_op_reg; /* Flag that indicates if the there are 2 operands of type register*/
     int A = 2;
     int R = 1;
     int E = 0;
+    char line[MAX_LINE_LENGTH]; /* The line muber of the source file after macro */
+    struct ast answer_line = {0};
+    machine_code_ptr -> IC = 0; /* Restart inst counter */
 
     while(fgets(line, MAX_LINE_LENGTH, file)) {
         answer_line = get_ast_from_line(line);
         two_op_reg = 0;
         L = 1;
+
+        /* Check for the use of label that wasnt defined */
+
 
         /* Calculate words and code the code into code_image */
         if((answer_line.ast_type = ast_inst)) {
@@ -98,7 +101,11 @@ void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatabl
         }
         else if(a.ast_options.inst.operands[i].operand_type == ast_label) {
             found = symbol_search(head_ptr, a.ast_options.inst.operands[i].operand_option.label);
-            if(found -> symbol_type == extern_symbol) {
+            if(!found) {
+                printf("Error: Label %s was not defined\n", a.ast_options.inst.operands[i].operand_option.label);
+                return;
+            }
+            else if(found -> symbol_type == extern_symbol) {
                 machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << external_word; /* A,R,E */
             }
             else {
@@ -108,11 +115,36 @@ void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatabl
             }
             else if(a.ast_options.inst.operands[i].operand_type == ast_register_address) {
                 machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
-
+                if(i == 0) { /* First operand */
+                    machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 6; /* Register number */
+                }
+                else if(i == 1) /* Second operand */
+                {
+                    machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 3; /* Register number */
+                }
             }
             else if(a.ast_options.inst.operands[i].operand_type == ast_register_direct) {
                 machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
             }
     }
-            
+}
+
+int main(void) {
+    FILE *file = NULL;
+    int x, y;
+    /*read my file test.am*/
+    file = fopen("test.am", "r");
+    if(file == NULL) {
+        return 1;
+    }
+    x = firstPass("test.am", file);
+    if(!x){
+        y = secondPass("test.am", file);
+        printf("the error flag is %s\n", y ? "on" : "off");
+        fclose(file);
+        return y;
+    }
+    printf("the error flag is %s\n", x ? "on" : "off");
+    fclose(file);
+    return x;
 }

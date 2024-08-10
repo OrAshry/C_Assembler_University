@@ -80,7 +80,7 @@ int firstPass(char * file_name, FILE * file) {
                     }
                 }
 
-                /* If the symbol in the table is daclared and they change it to entry after that*/
+                /* If the symbol in the table is declared and they change it to entry after that*/
                 else if((answer.ast_type == ast_dir) && (answer.ast_options.dir.dir_type == ast_entry)) {
                     if(found -> symbol_type == code_symbol) {
                         found -> symbol_type = entry_code;
@@ -119,15 +119,15 @@ int firstPass(char * file_name, FILE * file) {
                         add_symbol_to_table(answer.ast_options.dir.dir_options.label, extern_symbol, 0, &head_ptr);
                     }
 
-                    /* If its entery variable */
+                    /* If its entry variable */
                     else if(answer.ast_options.dir.dir_type == ast_entry) {
                         add_symbol_to_table(answer.ast_options.dir.dir_options.label, entry_symbol,  line_counter, &head_ptr);
                     }
 
                     /* If its data or string */
                     else {
-                        ++(machine_code_ptr -> DC);
                         add_symbol_to_table(answer.labelName, data_symbol, (machine_code_ptr -> DC), &head_ptr);
+                        ++(machine_code_ptr -> DC);
                     }
                 }
             }
@@ -153,7 +153,6 @@ int firstPass(char * file_name, FILE * file) {
                     if(i < L - 1) {
                         (machine_code_ptr -> DC)++;
                     }
-                    
                 }
             }
         }    
@@ -174,6 +173,13 @@ int firstPass(char * file_name, FILE * file) {
                     L--;
                 }
             }
+
+            /* Initialize IC if needed */
+            if((machine_code_ptr -> IC) == 0) {
+                (machine_code_ptr -> IC) = 100;
+            }
+            
+            /* Increase IC */
             (machine_code_ptr -> IC) += L;
         }
         ++line_counter;
@@ -199,18 +205,4 @@ int firstPass(char * file_name, FILE * file) {
     print_data_image(machine_code_ptr);
     
     return error_flag;
-}
-
-int main(void) {
-    FILE *file = NULL;
-    int x;
-    /*read my file test.am*/
-    file = fopen("test.am", "r");
-    if(file == NULL) {
-        return 1;
-    }
-    x = firstPass("test.am", file);
-    printf("the error flag is %s\n", x ? "on" : "off");
-    fclose(file);
-    return x;
 }
