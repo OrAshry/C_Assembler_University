@@ -85,6 +85,8 @@ int is_instruction(char const *str, struct ast *ast)
         {
             ast->ast_type = ast_inst;
             ast->ast_options.inst.inst_type = inst_table[i].opcode;
+            ast->ast_options.inst.operands[0].operand_type = ast_none;
+            ast->ast_options.inst.operands[1].operand_type = ast_none;
             return 1;
         }
     }

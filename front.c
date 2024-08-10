@@ -179,8 +179,6 @@ int validate_numbers(struct string_split const split_str, int const size, struct
     memcpy(ast->ast_options.dir.dir_options.data, results, data_size_ * sizeof(int));
     ast->ast_options.dir.dir_options.data_size = data_size_;
 
-    free(concat_str);
-
     return 1;
 }
 
