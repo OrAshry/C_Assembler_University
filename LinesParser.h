@@ -1,5 +1,5 @@
-#ifndef FRONT_H
-#define FRONT_H
+#ifndef LINESPARSER_H
+#define LINESPARSER_H
 
 #include "constants.h"
 #include <ctype.h>

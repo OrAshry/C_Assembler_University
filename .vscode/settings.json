@@ -7,7 +7,9 @@
         "front.h": "c",
         "helpingfunction.h": "c",
         "macroprocessing.h": "c",
-        "firstpass.h": "c"
+        "firstpass.h": "c",
+        "linesparser.h": "c",
+        "secondpass.h": "c"
     },
     "editor.mouseWheelZoom": true
 }

@@ -1,4 +1,4 @@
-#include "front.h"
+#include "LinesParser.h"
 
 struct inst inst_table[INST_SIZE] = {
     {"mov", 0, "0123", "123"},
@@ -495,7 +495,8 @@ struct ast get_ast_from_line(char *line)
     }
 
     /* If current string is a Label */
-    if (is_label(split_result.string[index], &ast, DEFINITION_LABEL) && !is_instruction(split_result.string[index], &ast))
+    if (is_label(split_result.string[index], &ast, DEFINITION_LABEL) && 
+        !is_instruction(split_result.string[index], &ast))
     {
         strcpy(ast.labelName, split_result.string[index++]); /* Init label name */
 
@@ -511,14 +512,14 @@ struct ast get_ast_from_line(char *line)
     }
 
     /* If current line is directive line with . */
-    if (split_result.string[index][0] == DIRECTIVE_CHAR)
+    if (ast.lineError[0] != NULL_BYTE && split_result.string[index][0] == DIRECTIVE_CHAR)
     {
         fill_directive_ast(&ast, split_result, index);
         return ast;
     }
 
     /* If current line is instruction line */
-    if (is_instruction(split_result.string[index++], &ast))
+    if (ast.lineError[0] != NULL_BYTE && is_instruction(split_result.string[index++], &ast))
     {
         parse_operands(split_result, index, &ast);
         return ast;
