@@ -1,5 +1,10 @@
 #include "FirstPass.h"
 
+table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
+translation machine_code = {0};
+table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
+translation_ptr machine_code_ptr = &machine_code;
+
 int firstPass(char * file_name, FILE * file) {
     
     /* Declarations */
@@ -11,10 +16,6 @@ int firstPass(char * file_name, FILE * file) {
     char buffer_line[MAX_BUFFER_LENGTH]; 
     char label[MAX_LABEL_SIZE]; /* Label name init */
     struct ast answer = {0}; /* After front returned answer*/
-    table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
-    table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
-    translation machine_code = {0};
-    translation_ptr machine_code_ptr = &machine_code;
 
     /* Read lines from the am file */
     while(fgets(buffer_line, MAX_BUFFER_LENGTH, file)) {

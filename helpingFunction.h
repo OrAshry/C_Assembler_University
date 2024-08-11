@@ -2,7 +2,7 @@
 #define HELPINGFUNCTION_H
 
 #include <stdio.h>
-#include "front.h"
+#include "LinesParser.h"
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>

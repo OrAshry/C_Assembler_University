@@ -334,7 +334,6 @@ void macro_processing(char *file_name)
     char *amFileName;
 
     /* Allocate data memory */
-
     asFileName = (char *)allocateMemory(strlen(file_name) + SIZE_EOF, sizeof(char), CALLOC_ID);
     amFileName = (char *)allocateMemory(strlen(file_name) + SIZE_EOF, sizeof(char), CALLOC_ID);
 
