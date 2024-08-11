@@ -135,16 +135,27 @@ int firstPass(char * file_name, FILE * file) {
 
         /* Calculate words and code to data_image if its dir variable */
         if(answer.ast_type == ast_dir) {
-            if((answer.ast_options.dir.dir_type == ast_string)) {
-                L = answer.ast_options.dir.dir_options.data_size; /* Calculate how much words*/
-                
-                /* Check that the progrem has not reached maximum memmory size */
-                if((strlen(machine_code_ptr -> data_image)) + (strlen(machine_code_ptr -> code_image)) + L > MAX_MEM_SIZE) {
+            L = answer.ast_options.dir.dir_options.data_size; /* Calculate how much words*/
+            
+            /* Check that the progrem has not reached maximum memmory size */
+            if((machine_code_ptr -> IC) != 0) {
+                if(((machine_code_ptr -> DC) + (machine_code_ptr -> IC) + L - 100) > MAX_MEM_SIZE){
                     error_flag = 1;
                     printf("Error: the program has reached maximum memmory size allowed.\n ");
                     return error_flag;
                 }
+            }
+            
+            /* If IC is 0*/
+            else {
+                if((machine_code_ptr -> DC) + L > MAX_MEM_SIZE){
+                    error_flag = 1;
+                    printf("Error: the program has reached maximum memmory size allowed.\n ");
+                    return error_flag;
+                }
+            }
 
+            if((answer.ast_options.dir.dir_type == ast_string)) {
                 for(i = 0; i < L; i++) {
                     machine_code_ptr -> data_image[machine_code_ptr -> DC] = answer.ast_options.dir.dir_options.data[i];
                     printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
@@ -153,8 +164,8 @@ int firstPass(char * file_name, FILE * file) {
                     }
                 }
             }
+
             else if(answer.ast_options.dir.dir_type == ast_data) {
-                L = answer.ast_options.dir.dir_options.data_size;
                 for(i = 0; i < L; i++) {
                     machine_code_ptr -> data_image[(machine_code_ptr -> DC)] = answer.ast_options.dir.dir_options.data[i];
                     printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
@@ -213,18 +224,4 @@ int firstPass(char * file_name, FILE * file) {
     print_data_image(machine_code_ptr);
     
     return error_flag;
-}
-
-int main(void) {
-    FILE *file = NULL;
-    int x;
-    /*read my file test.am*/
-    file = fopen("test.am", "r");
-    if(file == NULL) {
-        return 1;
-    }
-    x = firstPass("test.am", file);
-    printf("the error flag is %s\n", x ? "on" : "off");
-    fclose(file);
-    return x;
 }

@@ -42,7 +42,7 @@ int secondPass(char * file_name, FILE * file) {
             }
 
             /* Check that the progrem has not reached maximum memmory size */
-            if((strlen(machine_code_ptr -> data_image)) + (strlen(machine_code_ptr -> code_image)) + L > MAX_MEM_SIZE) {
+            if(((machine_code_ptr -> DC) + (machine_code_ptr -> IC) + L - 100) > MAX_MEM_SIZE) {
                 error_flag = 1;
                 printf("Error: the program has reached maximum memmory size allowed.\n ");
                 return error_flag;
@@ -135,4 +135,24 @@ void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatabl
         }
             
     }
+}
+
+int main(void) {
+    FILE *file = NULL;
+    int x, y;
+    /*read my file test.am*/
+    file = fopen("test.am", "r");
+    if(file == NULL) {
+        return 1;
+    }
+    x = firstPass("test.am", file);
+    if(!x) {
+        y = secondPass("test.am", file);
+        printf("the error flag is %s\n", x ? "on" : "off");
+        fclose(file);
+        return y;
+    }
+    printf("the error flag is %s\n", x ? "on" : "off");
+    fclose(file);
+    return x;
 }
