@@ -21,3 +21,26 @@ void print_data_image(const translation_ptr p) {
     }
     putchar('\n');
 }
+
+void intToBinaryString(int n, char *binaryStr, int size) {
+    int i;
+    binaryStr[size] = '\0';  
+    for (i = size - 1; i >= 0; i--) {
+        binaryStr[i] = (n & 1) ? '1' : '0';
+        n >>= 1;
+    }
+}
+
+void print_code_image(const translation_ptr p) {
+    int i;
+    char binaryStr[15]; 
+
+    printf("Code Image:\n");
+    for (i = 0; i < MAX_MEM_SIZE; i++) {
+        if (p->code_image[i] != '\0') {
+            intToBinaryString(p->code_image[i], binaryStr, 15);
+            printf("Address %d: %d (Binary: %s)\n", i, p->code_image[i], binaryStr);
+        }
+    }
+    putchar('\n');
+}

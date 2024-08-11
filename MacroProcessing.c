@@ -1,5 +1,7 @@
 #include "MacroProcessing.h"
 
+struct Macro **macro_table;
+
 FILE *read_file(char *file_name)
 {
     FILE *file;
@@ -283,7 +285,6 @@ int determine_line_type(char *line, struct Macro **macro_table, struct Macro **m
 
 void fill_am_file(FILE *am_file, FILE *as_file)
 {
-    struct Macro **macro_table;
     struct Macro *macro_ptr = NULL;
     char *line;
     int macro_counter = 0;
