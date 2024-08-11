@@ -1,6 +1,6 @@
 #include "SecondPass.h"
 
-int secondPass(char * file_name, FILE * file, table_ptr head_pointer, ) {
+int secondPass(char * file_name, FILE * file) {
     
     /* Declarations */
     int error_flag = 0;
@@ -40,6 +40,13 @@ int secondPass(char * file_name, FILE * file, table_ptr head_pointer, ) {
                     }
                 }
             }
+
+            /* Check that the progrem has not reached maximum memmory size */
+            if(((machine_code_ptr -> DC) + (machine_code_ptr -> IC) + L - 100) > MAX_MEM_SIZE) {
+                error_flag = 1;
+                printf("Error: the program has reached maximum memmory size allowed.\n ");
+                return error_flag;
+            }
                 
             /* Initialize IC if needed */
             if(machine_code_ptr -> IC == 0) {
@@ -70,16 +77,18 @@ int secondPass(char * file_name, FILE * file, table_ptr head_pointer, ) {
 
             /* Code the second and third word*/
             if(L == 3) { /* If there are 2 operands and at least one of them is not registar */
-                codeWords(L, answer_line, A, R, E);
+                codeWords(L, answer_line, A, R, E, &error_flag, file_name, am_line_counter);
             }            
             else if(L == 2) { /* If there is only one operand or two register operands */
+                /* Two register operands*/
                 if(two_op_reg) {
                     machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << A;
                     machine_code_ptr -> code_image[machine_code_ptr -> IC] |= answer_line.ast_options.inst.operands[1].operand_option.reg << 3; /* Destination reg num*/
                     machine_code_ptr -> code_image[machine_code_ptr -> IC] |= answer_line.ast_options.inst.operands[1].operand_option.reg << 6; /* Source reg num*/
                 }
+                /* Only destination operand*/
                 else {
-                    codeWords(L, answer_line, A, R, E);
+                    codeWords(L, answer_line, A, R, E, &error_flag, file_name, am_line_counter);
                 }
             }
         }
@@ -91,7 +100,7 @@ int secondPass(char * file_name, FILE * file, table_ptr head_pointer, ) {
 }
 
 /* This function will code the second and third words */
-void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatable_word, int external_word) {
+void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatable_word, int external_word, int *flag, const char *name_of_file, int current_am_line) {
     int i;
 
     for(i = 0; i < num_of_words - 1; i++, (machine_code_ptr -> IC)++) {
@@ -102,7 +111,8 @@ void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatabl
         else if(a.ast_options.inst.operands[i].operand_type == ast_label) {
             found = symbol_search(head_ptr, a.ast_options.inst.operands[i].operand_option.label);
             if(!found) {
-                printf("Error: Label %s was not defined\n", a.ast_options.inst.operands[i].operand_option.label);
+                printf("Error: In file %s at line %d the symbol %s has been never defined.\n", name_of_file, current_am_line, a.ast_options.inst.operands[i].operand_option.label);
+                *flag = 1;
                 return;
             }
             else if(found -> symbol_type == extern_symbol) {
@@ -113,19 +123,17 @@ void codeWords(int num_of_words, struct ast a, int absolute_word, int relocatabl
             } 
             machine_code_ptr -> code_image[machine_code_ptr -> IC] |= found -> symbol_address << 3; /*Address of the label*/
             }
-            else if(a.ast_options.inst.operands[i].operand_type == ast_register_address) {
-                machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
-                if(i == 0) { /* First operand */
-                    machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 6; /* Register number */
-                }
-                else if(i == 1) /* Second operand */
-                {
-                    machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 3; /* Register number */
-                }
+        else if((a.ast_options.inst.operands[i].operand_type == ast_register_address) || (a.ast_options.inst.operands[i].operand_type == ast_register_direct)) {
+            machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
+            if(i == 0) { /* First operand (source)*/
+                machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 6; /* Register number */
             }
-            else if(a.ast_options.inst.operands[i].operand_type == ast_register_direct) {
-                machine_code_ptr -> code_image[machine_code_ptr -> IC] = 1 << absolute_word; /* A,R,E */
+            else if(i == 1) /* Second operand (destination)*/
+            {
+                machine_code_ptr -> code_image[machine_code_ptr -> IC] |= a.ast_options.inst.operands[i].operand_option.reg << 3; /* Register number */
             }
+        }
+            
     }
 }
 
@@ -138,9 +146,9 @@ int main(void) {
         return 1;
     }
     x = firstPass("test.am", file);
-    if(!x){
+    if(!x) {
         y = secondPass("test.am", file);
-        printf("the error flag is %s\n", y ? "on" : "off");
+        printf("the error flag is %s\n", x ? "on" : "off");
         fclose(file);
         return y;
     }
