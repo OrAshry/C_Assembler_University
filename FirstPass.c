@@ -71,6 +71,11 @@ int firstPass(char * file_name, FILE * file) {
                             found -> symbol_type = entry_data;
                             found -> symbol_address = (machine_code_ptr -> DC);
                         }
+
+                        /* If the symbol is declared as entry and in the table it is entry */
+                        else if(answer.ast_options.dir.dir_type == ast_entry) {
+                            continue;
+                        }
                         
                         /* If its entry or extern */
                         else {
@@ -79,6 +84,13 @@ int firstPass(char * file_name, FILE * file) {
                         }
                     }
                 }
+
+                /* If the symbol is extern */ 
+                else if(found -> symbol_type == extern_symbol) {
+                    if(answer.ast_options.dir.dir_type == ast_extern)
+                    continue;
+                }
+                
 
                 /* If the symbol in the table is declared and they change it to entry after that*/
                 else if((answer.ast_type == ast_dir) && (answer.ast_options.dir.dir_type == ast_entry)) {
@@ -224,4 +236,22 @@ int firstPass(char * file_name, FILE * file) {
     print_data_image(machine_code_ptr);
     
     return error_flag;
+}
+
+int main(void) {
+    FILE *file = NULL;
+    int x;
+    
+    /*read my file test.am*/
+    file = fopen("test.am", "r");
+    if(file == NULL) {
+        return 1;
+    }
+
+    x = firstPass("test.am", file);
+    
+    printf("the error flag is %s\n", x ? "on" : "off");
+    fclose(file);
+    
+    return x;
 }
