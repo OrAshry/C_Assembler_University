@@ -180,7 +180,7 @@ int firstPass(char * file_name, FILE * file) {
             else if(answer.ast_options.dir.dir_type == ast_data) {
                 for(i = 0; i < L; i++) {
                     machine_code_ptr -> data_image[(machine_code_ptr -> DC)] = answer.ast_options.dir.dir_options.data[i];
-                    printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
+                    printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr -> data_image[machine_code_ptr->DC]);
                     if(i < L - 1) {
                         (machine_code_ptr -> DC)++;
                     }
@@ -238,12 +238,12 @@ int firstPass(char * file_name, FILE * file) {
     return error_flag;
 }
 
-int main(void) {
+/* int main(void) {
     FILE *file = NULL;
     int x;
     
     /*read my file test.am*/
-    file = fopen("test.am", "r");
+    /*file = fopen("test.am", "r");
     if(file == NULL) {
         return 1;
     }
@@ -254,4 +254,5 @@ int main(void) {
     fclose(file);
     
     return x;
-}
+} 
+*/
