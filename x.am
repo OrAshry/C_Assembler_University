@@ -1,5 +1,0 @@
-LABEL3: .extern EXTERN_LABEL
-
-LABEL4: .entry ENTRY_LABEL
-
-label: .extern reer
