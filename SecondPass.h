@@ -6,6 +6,7 @@
 #define A 2
 #define R 1
 #define E 0
+#define ADDRESS_BIT_LOCATION 3
 
 /* Prototypes */
 int secondPass(char * file_name, FILE * file);
