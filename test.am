@@ -1,6 +1,1 @@
-HELL: .data 29
-
-HELL: .data 29
-
-S: .string "abcd"
-S: .string "abcd"
+lea STR, r6

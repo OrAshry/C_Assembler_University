@@ -23,8 +23,15 @@ typedef struct symbol_table {
     char symbol_name[MAX_SYMBOL_NAME];
     enum type symbol_type;
     int symbol_address;
-    struct symbol_table *next;
+    struct symbol_table * next;
 } symbol_table, * table_ptr;
+
+typedef struct extern_used {
+    char name[MAX_SYMBOL_NAME];
+    int used_addresses[MAX_BUFFER_LENGTH];
+    int used_counter;
+    struct extern_used *next;
+} extern_used, * extern_used_ptr;
 
 /* Prototypes */
 void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], int new_type, int new_address, table_ptr *ptr);
