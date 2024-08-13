@@ -124,7 +124,6 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
     int i;
     int val;
 
-
     for (i = 0; i < num_of_words - 1; i++, (machine_code_ptr->IC)++) 
     {
         
@@ -149,22 +148,6 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
         {
             found = symbol_search(head_ptr, a.ast_options.inst.operands[i].operand_option.label);
             if (!found) {
-
-    for (i = 0; i < num_of_words - 1; i++, (machine_code_ptr->IC)++)
-    {
-        val = (i == 0) ? 3 : 7; /* If it's the first operand then 3 else 7 */
-
-        if (a.ast_options.inst.operands[i].operand_type == ast_immidiate)
-        {
-            machine_code_ptr->code_image[machine_code_ptr->IC] = 1 << A;                                                      /* A,R,E */
-            machine_code_ptr->code_image[machine_code_ptr->IC] |= a.ast_options.inst.operands[i].operand_option.immed << val; /* Operand */
-        }
-        else if (a.ast_options.inst.operands[i].operand_type == ast_label)
-        {
-            found = symbol_search(head_ptr, a.ast_options.inst.operands[i].operand_option.label);
-            if (!found)
-            {
-
                 printf("Error: In file %s at line %d the symbol %s has been never defined.\n", name_of_file, current_am_line, a.ast_options.inst.operands[i].operand_option.label);
                 *flag = 1;
                 return;
@@ -172,30 +155,10 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
             else if (found->symbol_type == extern_symbol)
             {
                 machine_code_ptr->code_image[machine_code_ptr->IC] = 1 << E; /* A,R,E */
-
             }
             else
             {
                 machine_code_ptr -> code_image[machine_code_ptr->IC] = 1 << R; /* A,R,E */
-
-            }
-            else
-            {
-                machine_code_ptr->code_image[machine_code_ptr->IC] = 1 << R; /* A,R,E */
-            }
-            machine_code_ptr->code_image[machine_code_ptr->IC] |= found->symbol_address << val; /*Address of the label*/
-        }
-        else if ((a.ast_options.inst.operands[i].operand_type == ast_register_address) || (a.ast_options.inst.operands[i].operand_type == ast_register_direct))
-        {
-            machine_code_ptr->code_image[machine_code_ptr->IC] = 1 << A; /* A,R,E */
-            if (i == 0)
-            {                                                                                                                 /* First operand (source)*/
-                machine_code_ptr->code_image[machine_code_ptr->IC] |= a.ast_options.inst.operands[i].operand_option.reg << val; /* Register number */
-            }
-            else if (i == 1) /* Second operand (destination)*/
-            {
-                machine_code_ptr->code_image[machine_code_ptr->IC] |= a.ast_options.inst.operands[i].operand_option.reg << val; /* Register number */
-
             }
             machine_code_ptr -> code_image[machine_code_ptr->IC] |= found -> symbol_address << ADDRESS_BIT_LOCATION; /*Address of the label*/
         }
