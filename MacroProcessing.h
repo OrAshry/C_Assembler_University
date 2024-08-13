@@ -8,7 +8,7 @@
 #include "helpingFunction.h"
 
 #define DEF_MAT_SIZE 3
-#define MACRO_TABLE_SIZE 2
+#define MACRO_TABLE_SIZE 200
 #define SIZE_EOF 3
 #define STARTMACR "macr"
 #define ENDMACR "endmacr"
@@ -31,7 +31,7 @@ enum MacroState
 
 FILE *read_file(char *file_name);
 FILE *create_file(char *file_name);
-void fill_am_file(FILE *am_file, FILE *as_file);
+int fill_am_file(FILE *am_file, FILE *as_file);
 void macro_processing(char *file_name);
 int determine_line_type(char *line, struct Macro **macro_table,struct Macro **macro_ptr);
 int is_macro_def(char *line, struct Macro **macro_ptr);

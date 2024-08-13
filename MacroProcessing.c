@@ -44,12 +44,17 @@ struct Macro *create_macro(char *token)
         /* need to finish and move to next file according to unviersity task.. */
         /******************************/
 
-        return 0;
+        return NULL;
     }
 
     macro_ptr->context = (char **)allocateMemory(DEF_MAT_SIZE, sizeof(char *), CALLOC_ID);
 
     strcpy(macro_ptr->name, macro_name);
+
+    if (macro_name != NULL)
+    {
+        free(macro_name);
+    }
 
     return macro_ptr;
 }
@@ -77,16 +82,16 @@ void update_macro_context(char *line, struct Macro **macro_ptr)
 
     (*macro_ptr)->context[(*macro_ptr)->lines_counter] = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
-    while (*line != '\0' && (*line == ' ' || *line == '\t'))
+    while (isspace(*line))
     {
         line++;
     }
     strcpy((*macro_ptr)->context[(*macro_ptr)->lines_counter++], line);
 }
 
-char * get_macro_name(char *token)
+char *get_macro_name(char *token)
 {
-    char * name = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    char *name = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
     /* If current row is empty */
     if (strcmp(token, "\n") == 0)
@@ -127,7 +132,6 @@ void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int
         if (temp_ptr == NULL)
         {
             printf("Error: Unable to reallocate memory for macro table\n");
-            free(temp_ptr);
             exit(1); /*need to continue to next file*/
         }
         *macro_table = temp_ptr;
@@ -152,14 +156,14 @@ int is_macro_def(char *line, struct Macro **macro_ptr)
     strcpy(temp_line, line);
 
     token = strtok(temp_line, " ");
-    
+
     if (strncmp(token, STARTMACR, strlen(STARTMACR)) == 0)
     {
         token = strtok(NULL, " ");
         (*macro_ptr) = create_macro(token);
         if ((*macro_ptr) == NULL)
         {
-            return 0;
+            return -1;
         }
         return 1;
     }
@@ -215,7 +219,7 @@ int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_p
 int is_macro_end(char *line, struct Macro **macro_ptr)
 {
     char *token = NULL;
-    char temp_line[MAX_LINE] = {0}; 
+    char temp_line[MAX_LINE] = {0};
 
     strcpy(temp_line, line);
 
@@ -243,21 +247,26 @@ int is_macro_end(char *line, struct Macro **macro_ptr)
 
 int determine_line_type(char *line, struct Macro **macro_table, struct Macro **macro_ptr)
 {
-    if (is_macro_def(line, macro_ptr))
+    int def_result, body_result, call_result, end_result;
+    if ((def_result = is_macro_def(line, macro_ptr)) == 1)
     {
         return MACRO_DEF;
     }
-    else if (is_macro_end(line, macro_ptr))
+    else if ((end_result = is_macro_end(line, macro_ptr)) == 1)
     {
         return MACRO_END;
     }
-    else if (is_macro_call(line, macro_table, macro_ptr))
+    else if ((call_result = is_macro_call(line, macro_table, macro_ptr)) == 1)
     {
         return MACRO_CALL;
     }
-    else if (is_macro_body(line, macro_ptr))
+    else if ((body_result = is_macro_body(line, macro_ptr)) == 1)
     {
         return MACRO_BODY;
+    }
+    else if (def_result == -1 || body_result == -1 || call_result == -1 || end_result == -1)
+    {
+        return -1;
     }
     else
     {
@@ -265,7 +274,7 @@ int determine_line_type(char *line, struct Macro **macro_table, struct Macro **m
     }
 }
 
-void fill_am_file(FILE *am_file, FILE *as_file)
+int fill_am_file(FILE *am_file, FILE *as_file)
 {
     struct Macro *macro_ptr = NULL;
     char line[MAX_LINE] = {0};
@@ -285,6 +294,7 @@ void fill_am_file(FILE *am_file, FILE *as_file)
             {
                 fputs(macro_ptr->context[i], am_file);
             }
+            macro_ptr = NULL;
             break;
         case MACRO_END:
             append_macro_table(macro_table, macro_ptr, macro_counter);
@@ -296,16 +306,29 @@ void fill_am_file(FILE *am_file, FILE *as_file)
             break;
         case MACRO_BODY:
             break;
+        case -1:
+            printf("Continue to next file because of error!\n");
+            return -1;
+            break;
         }
         if (line != NULL)
         {
             memset(line, 0, MAX_LINE); /* initalize line variable */
         }
     }
+
+    if (macro_ptr != NULL)
+    {
+        free(macro_ptr);
+    }
+
+    return 0;
 }
 
 void macro_processing(char *file_name)
 {
+    int result;
+
     /* Files define */
     FILE *as_file;
     FILE *am_file;
@@ -315,8 +338,8 @@ void macro_processing(char *file_name)
     char *amFileName;
 
     /* Allocate data memory */
-    asFileName = (char *)allocateMemory(strlen(file_name) + SIZE_EOF, sizeof(char), CALLOC_ID);
-    amFileName = (char *)allocateMemory(strlen(file_name) + SIZE_EOF, sizeof(char), CALLOC_ID);
+    asFileName = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    amFileName = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
 
     /* Copy read file name with ending */
     strcpy(asFileName, file_name);
@@ -331,13 +354,30 @@ void macro_processing(char *file_name)
     am_file = create_file(amFileName);
 
     /* Creating new am file */
-    fill_am_file(am_file, as_file);
+    result = fill_am_file(am_file, as_file);
+
+    /* Check for error - delete file */
+    if (result == -1)
+    {
+        if (remove(amFileName) == 0)
+        {
+            printf("File deleted successfully\n");
+        }
+    }
 
     /* Close files */
-    if(as_file != NULL) fclose(as_file);
-    if(am_file != NULL) fclose(am_file);
+    if (as_file != NULL)
+        fclose(as_file);
+    if (am_file != NULL)
+        fclose(am_file);
 
     /* Free memory */
     free(asFileName);
-    free(amFileName); /* should we move it to main ?? */
+    free(amFileName);
+}
+
+int main()
+{
+    macro_processing("test_tomer");
+    return 0;
 }
