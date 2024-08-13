@@ -274,9 +274,12 @@ int firstPass(char *file_name, FILE *file)
     }
 
     putchar('\n');
+
     print_symbol_table(head_ptr);
     putchar('\n');
     print_data_image(machine_code_ptr);
+
     putchar('\n');
+
     return error_flag;
 }
