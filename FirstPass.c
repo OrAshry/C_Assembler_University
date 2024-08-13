@@ -104,8 +104,10 @@ int firstPass(char *file_name, FILE *file)
                 /* If the symbol is extern */
                 else if (found->symbol_type == extern_symbol)
                 {
-                    if (answer.ast_options.dir.dir_type == ast_extern)
+                    if (answer.ast_options.dir.dir_type == ast_extern) 
+                    {
                         continue;
+                    }
                 }
 
                 /* If the symbol in the table is declared and they change it to entry after that*/
@@ -126,6 +128,7 @@ int firstPass(char *file_name, FILE *file)
                 {
                     printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name, line_counter, answer.labelName);
                     error_flag = 1;
+                    continue;
                 }
             }
 
@@ -210,12 +213,6 @@ int firstPass(char *file_name, FILE *file)
                     {
                         (machine_code_ptr->DC)++;
                     }
-                }
-
-                /* If there's no label - we need to increase DC by one */
-                if (answer.labelName[0] == NULL_BYTE)
-                {
-                    (machine_code_ptr->DC)++;
                 }
             }
         }

@@ -1,5 +1,6 @@
-.data 29
+HELL: .data 29
 
+HELL: .data 29
 
-HELLO: .data 46, 82
-GAY: .string "abcd"
+S: .string "abcd"
+S: .string "abcd"
