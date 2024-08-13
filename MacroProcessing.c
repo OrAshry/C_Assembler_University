@@ -362,10 +362,8 @@ void macro_processing(char *file_name)
     free(amFileName); /* should we move it to main ?? */
 }
 
-/*
 int main(void)
 {
     macro_processing("x");
     return 0;
 }
-*/
