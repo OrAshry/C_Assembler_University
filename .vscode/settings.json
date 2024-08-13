@@ -9,7 +9,9 @@
         "macroprocessing.h": "c",
         "firstpass.h": "c",
         "linesparser.h": "c",
-        "secondpass.h": "c"
+        "secondpass.h": "c",
+        "stringsplit.h": "c",
+        "stdlib.h": "c"
     },
     "editor.mouseWheelZoom": true
 }

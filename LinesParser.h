@@ -1,6 +1,7 @@
 #ifndef LINESPARSER_H
 #define LINESPARSER_H
 
+#include "stringSplit.h"
 #include "constants.h"
 #include <ctype.h>
 #include <string.h>
@@ -15,7 +16,6 @@
 #define LABEL_CHAR ':'
 #define MAX_LABEL_SIZE 31
 #define COMMA_CHAR ','
-#define NULL_BYTE '\0'
 #define MIN_NUM -16384
 #define MAX_NUM 16383
 #define SPACE_CHAR ' '
@@ -33,11 +33,6 @@
 #define REGISTER_CHAR 'r'
 #define DEFINITION_LABEL 1
 #define NOT_DEFINITION_LABEL 0
-
-struct string_split{
-    char * string[MAX_LINE];
-    int size;
-};
 
 struct inst {
     char * name;
@@ -104,10 +99,8 @@ struct ast{
 
 struct ast get_ast_from_line(char * line);
 int is_number(char * str, int min_num, int max_num, int * result, char ** end_ptr);
-int validate_numbers(struct string_split split_str, int size, struct ast *ast, int index);
 int is_op_valid(int const operand_type, char const * inst_options);
 void parse_operands(struct string_split operands, int index, struct ast * ast);
-struct string_split split_string(char * str, const char * delimiter);
 int fill_string(struct string_split split_result, int index, struct ast *ast);
 void fill_directive_ast(struct ast * ast, struct string_split split_result, int index);
 int validate_numbers(struct string_split const split_str, int const size, struct ast *ast, int const index);
