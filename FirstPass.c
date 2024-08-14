@@ -286,9 +286,6 @@ int firstPass(char *file_name, FILE *file)
     putchar('\n');
     print_data_image(machine_code_ptr);
     putchar('\n');
-    printf("the real data is %d", machine_code_ptr -> data_image[0]);
-
-    putchar('\n');
-
+    
     return error_flag;
 }
