@@ -170,7 +170,7 @@ int firstPass(char *file_name, FILE *file)
                     else
                     {
                         add_symbol_to_table(answer.labelName, data_symbol, (machine_code_ptr->DC), &head_ptr);
-                        ++(machine_code_ptr->DC);
+                        (machine_code_ptr->DC)++;
                     }
                 }
             }
@@ -251,7 +251,7 @@ int firstPass(char *file_name, FILE *file)
         ++line_counter;
     }
 
-    /* Check if there is entry without defeniton */ /* in the assembler example they say that if there is a proble m to exit here*/
+    /* Check if there is entry without defeniton */
     found = head_ptr;
     while (found)
     {
@@ -259,13 +259,20 @@ int firstPass(char *file_name, FILE *file)
         {
             printf("Error: In file %s at line %d symbol %s declared as entry but never defined.\n", file_name, found->symbol_address, found->symbol_name);
             error_flag = 1;
-            /*return error_flag;*/
+            return error_flag;
         }
 
         /* Relocate all DC variables after IC variables*/
         else if ((found->symbol_type == data_symbol) || (found->symbol_type == entry_data))
         {
-            (found->symbol_address) += (machine_code_ptr->IC);
+            if(machine_code_ptr->IC != 0)
+            {
+                (found->symbol_address) += (machine_code_ptr->IC);
+            }
+            else 
+            {
+                (found->symbol_address) += 100;
+            }
         }
         found = (found->next);
     }
