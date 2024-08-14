@@ -153,7 +153,6 @@ int firstPass(char *file_name, FILE *file)
                 /* If its a dir */
                 else if (answer.ast_type == ast_dir)
                 {
-
                     /* If its external variable */ /*need to check if its zero or NULL*/
                     if (answer.ast_options.dir.dir_type == ast_extern)
                     {
@@ -170,7 +169,9 @@ int firstPass(char *file_name, FILE *file)
                     else
                     {
                         add_symbol_to_table(answer.labelName, data_symbol, (machine_code_ptr->DC), &head_ptr);
-                        (machine_code_ptr->DC)++;
+                        if(answer.labelName[0] == NULL_BYTE) {
+                            (machine_code_ptr->DC)++;
+                        }
                     }
                 }
             }
@@ -204,12 +205,14 @@ int firstPass(char *file_name, FILE *file)
             }
 
             if ((answer.ast_options.dir.dir_type == ast_string) || (answer.ast_options.dir.dir_type == ast_data))
-            {
+            {   
+                
+                /* If its a variable with a label with a label it needs to be reduced by*/
                 for (i = 0; i < L; i++)
                 {
                     machine_code_ptr->data_image[machine_code_ptr->DC] = answer.ast_options.dir.dir_options.data[i];
                     printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
-                    if (i < L - 1)
+                    if ((i < L - 1) || (L == 1))
                     {
                         (machine_code_ptr->DC)++;
                     }
@@ -282,6 +285,8 @@ int firstPass(char *file_name, FILE *file)
     print_symbol_table(head_ptr);
     putchar('\n');
     print_data_image(machine_code_ptr);
+    putchar('\n');
+    printf("the real data is %d", machine_code_ptr -> data_image[0]);
 
     putchar('\n');
 
