@@ -1,1 +1,9 @@
-lea STR, r6
+.extern STR
+
+.extern GGG
+
+lea r4, STR
+
+lea STR, r5
+
+add GGG, r5

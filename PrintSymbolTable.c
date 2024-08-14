@@ -44,3 +44,25 @@ void print_code_image(const translation_ptr p) {
     }
     putchar('\n');
 }
+
+void print_extern_usage(extern_addresses_ptr head) {
+    extern_addresses_ptr current = head;
+    printf("External Symbols Usage:\n");
+
+    while (current != NULL) {
+        printf("Name: %-15s Usage Counter: %-5d Addresses: ", 
+               current->name, current->used_counter);
+
+        for (int i = 0; i < current->used_counter; i++) {
+            printf("%-5d", current->used_addresses[i]);
+            if (i < current->used_counter - 1) {
+                printf(", ");
+            }
+        }
+
+        printf("\n");
+        current = current->next;
+    }
+
+    printf("\n");
+}

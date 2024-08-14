@@ -2,8 +2,9 @@
 #define OUTPUT_H
 
 #include <stdio.h>
-#include "FirstPass.c"
+#include "FirstPass.h"
+#include "SecondPass.h"
 
 void createEntFile(const char *input_file_name);
-
+void createExtFile(const char *input_file_name);
 #endif

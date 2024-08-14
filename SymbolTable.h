@@ -26,21 +26,23 @@ typedef struct symbol_table {
     struct symbol_table * next;
 } symbol_table, * table_ptr;
 
-typedef struct extern_used {
+typedef struct extern_adresses {
     char name[MAX_SYMBOL_NAME];
     int used_addresses[MAX_BUFFER_LENGTH];
     int used_counter;
-    struct extern_used *next;
-} extern_used, * extern_used_ptr;
+    struct extern_adresses * next;
+} extern_addresses, * extern_addresses_ptr;
 
 /* Prototypes */
 void add_symbol_to_table(char new_name[MAX_SYMBOL_NAME], int new_type, int new_address, table_ptr *ptr);
+void add_symbol_to_extern_usage(char new_name[MAX_SYMBOL_NAME], int new_address, extern_addresses_ptr * ptr);
 table_ptr symbol_search(table_ptr ptr, const char search_name[MAX_SYMBOL_NAME]);
-table_ptr find_extern(table_ptr ptr);
+table_ptr find_extern_in_symbol_table(table_ptr ptr);
+extern_addresses_ptr find_extern(extern_addresses_ptr ptr, const char search_name[MAX_SYMBOL_NAME]);
 table_ptr find_entry(table_ptr ptr);
-int symbol_counter(table_ptr ptr);
 void print_symbol_table(table_ptr p); /*for the test*/
 void print_data_image(const translation_ptr p);
 void print_code_image(const translation_ptr p);
+void print_extern_usage(extern_addresses_ptr head);
 
 #endif 

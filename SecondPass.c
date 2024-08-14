@@ -1,18 +1,23 @@
 #include "SecondPass.h"
 
+extern_addresses extern_usage = {0};
+extern_addresses_ptr extern_usage_head_ptr = NULL;
+
 int secondPass(char *file_name, FILE *file)
 {
 
     /* Declarations */
     int error_flag = 0;
     int am_line_counter = 1; /* After macro line counter */
-    int L;                   /* Words counter */
+    int L; /* Words counter */
     int i;
-    int two_op_reg;                   /* Flag that indicates if the there are 2 operands of type register*/
+    int two_op_reg; /* Flag that indicates if the there are 2 operands of type register*/
     char line[MAX_LINE_LENGTH] = {0}; /* The line muber of the source file after macro */
     struct ast answer_line = {0};
     machine_code_ptr->IC = 0; /* Restart inst counter */
-
+    extern_addresses_ptr extern_ptr;
+    
+    
     while (fgets(line, MAX_LINE_LENGTH, file))
     {
         answer_line = get_ast_from_line(line);
@@ -55,6 +60,39 @@ int secondPass(char *file_name, FILE *file)
             if (machine_code_ptr->IC == 0)
             {
                 machine_code_ptr->IC = 100;
+            }
+
+            /* Initialzie the extern_usage struct and checks if there is a label that been used without a declaration*/
+            if((L == 3) || ((L == 2) && (two_op_reg == 0))) /* Two operands*/
+            {
+                for(i = 0; i < L - 1; i++)
+                {
+                    if(answer_line.ast_options.inst.operands[i].operand_type == ast_label) 
+                    {
+                        found = symbol_search(head_ptr, answer_line.ast_options.inst.operands[i].operand_option.label);
+                        if(found) 
+                        {
+                            if(found->symbol_type == extern_symbol) 
+                            {
+                                extern_ptr = find_extern(extern_usage_head_ptr, answer_line.ast_options.inst.operands[i].operand_option.label);
+                                if(extern_ptr)
+                                {
+                                    (extern_ptr->used_counter)++;
+                                    extern_ptr->used_addresses[extern_ptr->used_counter] = machine_code_ptr->IC;
+                                }
+                                else {
+                                    add_symbol_to_extern_usage(answer_line.ast_options.inst.operands[i].operand_option.label, machine_code_ptr->IC,&extern_usage_head_ptr);
+                                }
+                            }
+                            else /* there is a usage of a label and it is not defiend*/
+                            {
+                                printf("Error: In file %s at line %d the external symbol %s has been never defined.\n", file_name, am_line_counter, answer_line.ast_options.inst.operands[i].operand_option.label);
+                                error_flag = 1;
+                                continue;
+                            }
+                        }
+                    }
+                }
             }
 
             /* Code the first word inside of code_image */
@@ -113,7 +151,7 @@ int secondPass(char *file_name, FILE *file)
         am_line_counter++;
     }
 
-    print_code_image(machine_code_ptr);
+    print_extern_usage(extern_usage_head_ptr);
 
     return error_flag;
 }
@@ -187,11 +225,11 @@ int main(void)
     {
         rewind(file);
         y = secondPass("test.am", file);
-        printf("the error flag is %s\n", x ? "on" : "off");
+        printf("the error flag in secondPass.c is %s\n", x ? "on" : "off");
         fclose(file);
         return y;
     }
-    printf("the error flag is %s\n", x ? "on" : "off");
+    printf("the error flag in firstPass.c is %s\n", x ? "on" : "off");
     fclose(file);
 
     return x;

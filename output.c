@@ -35,19 +35,19 @@ void createEntFile(const char *input_file_name) {
     fclose(ent_file);
     free(ent_file_name);
 }
-
 /* Extern output file */
 void createExtFile(const char *input_file_name) {
-    char * ext_file_name;
-    FILE * ext_file;
+    char *ext_file_name;
+    FILE *ext_file;
     table_ptr find = head_ptr;
+    extern_addresses_ptr current_extern = extern_usage_head_ptr;
 
     /* Check if there are extern symbols */
-    if(find_extern(find) == NULL) {
+    if (!find_extern_in_symbol_table(find)) {
         return;
     }
 
-    /* allocate memory for the .ext file */
+    /* Allocate memory for the .ext file name */
     ext_file_name = (char *)allocateMemory(1, strlen(input_file_name) + 5, MALLOC_ID);
 
     /* Create the .ext file name */
@@ -55,20 +55,23 @@ void createExtFile(const char *input_file_name) {
     strcat(ext_file_name, ".ext");
 
     /* Open .ext file for writing */
-    ext_file = fopen("ext_file_name", "w");
-    if(!ext_file) {
+    ext_file = fopen(ext_file_name, "w");
+    if (!ext_file) {
         fprintf(stderr, "Could not open the file %s for writing\n", ext_file_name);
-        free(ext_file);
+        free(ext_file_name);
         return;
     }
 
-    /* Writing the symbol names and addresses they been used */
-    while(find) {
-        if(find->symbol_type == extern_symbol) {
-            extern_used_ptr usage = find->
+    /* Writing the symbol names and the addresses they have been used */
+    while (current_extern != NULL) {
+        /* Write each address on a new line */
+        for (int i = 0; i < current_extern->used_counter; i++) {
+            fprintf(ext_file, "%s\t%d\n", current_extern->name, current_extern->used_addresses[i]);
         }
+        current_extern = current_extern->next;
     }
 
+    /* Clean up */
     fclose(ext_file);
     free(ext_file_name);
 }
