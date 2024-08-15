@@ -206,16 +206,21 @@ int firstPass(char *file_name, FILE *file)
 
             if ((answer.ast_options.dir.dir_type == ast_string) || (answer.ast_options.dir.dir_type == ast_data))
             {   
-                
-                /* If its a variable with a label with a label it needs to be reduced by*/
                 for (i = 0; i < L; i++)
                 {
                     machine_code_ptr->data_image[machine_code_ptr->DC] = answer.ast_options.dir.dir_options.data[i];
                     printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
-                    if ((i < L - 1) || (L == 1))
+                    /* Increment DC after each data entry to ensure proper placement in data image */
+                    if ((i < L - 1) || answer.ast_options.dir.dir_type == ast_data)
                     {
                         (machine_code_ptr->DC)++;
                     }
+                }
+
+                /* Ensure DC is incremented after the last entry if it's a string */
+                if(answer.ast_options.dir.dir_type == ast_string)
+                {
+                    (machine_code_ptr->DC)++;
                 }
             }
         }
