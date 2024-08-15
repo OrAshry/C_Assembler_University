@@ -7,4 +7,5 @@
 
 void createEntFile(const char *input_file_name);
 void createExtFile(const char *input_file_name);
+
 #endif

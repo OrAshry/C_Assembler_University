@@ -1,7 +1,7 @@
 #ifndef LINESPARSER_H
 #define LINESPARSER_H
 
-#include "constants.h"
+#include "Constants.h"
 #include <ctype.h>
 #include <string.h>
 #include "helpingFunction.h"

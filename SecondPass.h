@@ -12,6 +12,7 @@
 
 extern extern_addresses extern_usage;
 extern extern_addresses_ptr extern_usage_head_ptr;
+extern extern_addresses_ptr extern_ptr;
 
 /* Prototypes */
 int secondPass(char * file_name, FILE * file);

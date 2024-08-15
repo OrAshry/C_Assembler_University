@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "constants.h"
+#include "Constants.h"
 #include "helpingFunction.h"
 
 #define DEF_MAT_SIZE 3

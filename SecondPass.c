@@ -2,6 +2,7 @@
 
 extern_addresses extern_usage = {0};
 extern_addresses_ptr extern_usage_head_ptr = NULL;
+extern_addresses_ptr extern_ptr;
 
 int secondPass(char *file_name, FILE *file)
 {
@@ -16,8 +17,6 @@ int secondPass(char *file_name, FILE *file)
     char line[MAX_LINE_LENGTH] = {0}; /* The line muber of the source file after macro */
     struct ast answer_line = {0};
     machine_code_ptr->IC = 0; /* Restart inst counter */
-    extern_addresses_ptr extern_ptr;
-    
     
     while (fgets(line, MAX_LINE_LENGTH, file))
     {
@@ -248,6 +247,12 @@ int main(void)
     {
         rewind(file);
         y = secondPass("test.am", file);
+        if(!y)
+        {
+            createEntFile("test.am");
+            createExtFile("test.am");
+        }
+        
         printf("the error flag in secondPass.c is %s\n", y ? "on" : "off");
         fclose(file);
         return y;

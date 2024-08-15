@@ -41,6 +41,7 @@ void createExtFile(const char *input_file_name) {
     FILE *ext_file;
     table_ptr find = head_ptr;
     extern_addresses_ptr current_extern = extern_usage_head_ptr;
+    int i;
 
     /* Check if there are extern symbols */
     if (!find_extern_in_symbol_table(find)) {
@@ -65,7 +66,7 @@ void createExtFile(const char *input_file_name) {
     /* Writing the symbol names and the addresses they have been used */
     while (current_extern != NULL) {
         /* Write each address on a new line */
-        for (int i = 0; i < current_extern->used_counter; i++) {
+        for (i = 0; i < current_extern->used_counter; i++) {
             fprintf(ext_file, "%s\t%d\n", current_extern->name, current_extern->used_addresses[i]);
         }
         current_extern = current_extern->next;
