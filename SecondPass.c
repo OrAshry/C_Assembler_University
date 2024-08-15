@@ -8,6 +8,7 @@ int secondPass(char *file_name, FILE *file)
 
     /* Declarations */
     int error_flag = 0;
+    int skip_to_next_line;
     int am_line_counter = 1; /* After macro line counter */
     int L; /* Words counter */
     int i;
@@ -23,6 +24,7 @@ int secondPass(char *file_name, FILE *file)
         answer_line = get_ast_from_line(line);
         two_op_reg = 0;
         L = 1;
+        skip_to_next_line = 0;
 
         /* Check for the use of label that wasnt defined */
 
@@ -72,27 +74,52 @@ int secondPass(char *file_name, FILE *file)
                         found = symbol_search(head_ptr, answer_line.ast_options.inst.operands[i].operand_option.label);
                         if(found) 
                         {
-                            if(found->symbol_type == extern_symbol) 
+                            if (found->symbol_type == extern_symbol) 
                             {
                                 extern_ptr = find_extern(extern_usage_head_ptr, answer_line.ast_options.inst.operands[i].operand_option.label);
-                                if(extern_ptr)
+                                if (extern_ptr)
                                 {
+                                    /* Assign addresses */
+                                    if (i == 0) 
+                                    {
+                                        extern_ptr->used_addresses[extern_ptr->used_counter] = (machine_code_ptr->IC) + 1;
+                                    }
+                                    else 
+                                    {
+                                        extern_ptr->used_addresses[extern_ptr->used_counter] = (machine_code_ptr->IC) + 2;
+                                    }
+                                    /* Increasing the used counter */
                                     (extern_ptr->used_counter)++;
-                                    extern_ptr->used_addresses[extern_ptr->used_counter] = machine_code_ptr->IC;
                                 }
-                                else {
-                                    add_symbol_to_extern_usage(answer_line.ast_options.inst.operands[i].operand_option.label, machine_code_ptr->IC,&extern_usage_head_ptr);
+
+                                /* Adding a new extern symbol for a symbol that has been used for the first time */
+                                else 
+                                {
+                                    if(i == 0)
+                                    {
+                                        add_symbol_to_extern_usage(answer_line.ast_options.inst.operands[i].operand_option.label, (machine_code_ptr->IC) + 1, &extern_usage_head_ptr);
+                                    }
+                                    else 
+                                    {
+                                        add_symbol_to_extern_usage(answer_line.ast_options.inst.operands[i].operand_option.label, (machine_code_ptr->IC) + 2, &extern_usage_head_ptr);
+
+                                    }
                                 }
                             }
-                            else /* there is a usage of a label and it is not defiend*/
-                            {
-                                printf("Error: In file %s at line %d the external symbol %s has been never defined.\n", file_name, am_line_counter, answer_line.ast_options.inst.operands[i].operand_option.label);
-                                error_flag = 1;
-                                continue;
-                            }
+
+                        }
+                        else /* there is a usage of a label and it is not defiend */
+                        {
+                            printf("Error: In file %s at line %d the symbol %s has been never defined.\n", file_name, am_line_counter, answer_line.ast_options.inst.operands[i].operand_option.label);
+                            error_flag = 1;
+                            skip_to_next_line = 1; 
                         }
                     }
                 }
+            }
+
+            if(skip_to_next_line) {
+                continue;
             }
 
             /* Code the first word inside of code_image */
@@ -152,6 +179,7 @@ int secondPass(char *file_name, FILE *file)
     }
 
     print_extern_usage(extern_usage_head_ptr);
+    print_code_image(machine_code_ptr);
 
     return error_flag;
 }
@@ -185,12 +213,7 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
         else if (a.ast_options.inst.operands[i].operand_type == ast_label)
         {
             found = symbol_search(head_ptr, a.ast_options.inst.operands[i].operand_option.label);
-            if (!found) {
-                printf("Error: In file %s at line %d the symbol %s has been never defined.\n", name_of_file, current_am_line, a.ast_options.inst.operands[i].operand_option.label);
-                *flag = 1;
-                return;
-            }
-            else if (found->symbol_type == extern_symbol)
+            if (found->symbol_type == extern_symbol)
             {
                 machine_code_ptr->code_image[machine_code_ptr->IC] = 1 << E; /* A,R,E */
             }
@@ -225,7 +248,7 @@ int main(void)
     {
         rewind(file);
         y = secondPass("test.am", file);
-        printf("the error flag in secondPass.c is %s\n", x ? "on" : "off");
+        printf("the error flag in secondPass.c is %s\n", y ? "on" : "off");
         fclose(file);
         return y;
     }
