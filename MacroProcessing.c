@@ -11,7 +11,20 @@ FILE *open_file(char *file_name, char *mode)
     return file;
 }
 
-struct Macro *create_macro(char *token)
+int check_duplicate_macro(const char *macro_name, struct Macro **macro_table, const int macro_counter)
+{
+    int i;
+    for (i = 0; i < macro_counter; i++)
+    {
+        if (macro_table[i] != NULL && strcmp(macro_table[i]->name, macro_name) == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+struct Macro *create_macro(char *token, int *result, struct Macro **macro_table, const int macro_counter)
 {
     char *macro_name = NULL;
     struct Macro *macro_ptr = (struct Macro *)allocateMemory(1, sizeof(struct Macro), CALLOC_ID);
@@ -23,6 +36,12 @@ struct Macro *create_macro(char *token)
         macro_ptr = NULL;
         printf("Error: Unable to create macro because of additional data\n");
         printf("Moving to the next file\n");
+        *result = -1;
+        return NULL;
+    }
+
+    if(check_duplicate_macro(macro_name, macro_table, macro_counter) == 1){
+        *result = -2;
         return NULL;
     }
 
@@ -32,6 +51,8 @@ struct Macro *create_macro(char *token)
     {
         free(macro_name);
     }
+
+    *result = 1;
     return macro_ptr;
 }
 
@@ -116,8 +137,10 @@ void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int
     macro_table[macro_counter] = temp_macro;
 }
 
-int is_macro_def(char *line, struct Macro **macro_ptr)
+int is_macro_def(char *line, struct Macro **macro_ptr, struct Macro **macro_table, const int macro_counter)
 {
+    int result;
+
     char *token = NULL, temp_line[MAX_LINE] = {0};
     if (*macro_ptr != NULL)
     {
@@ -129,12 +152,8 @@ int is_macro_def(char *line, struct Macro **macro_ptr)
     if (strncmp(token, STARTMACR, strlen(STARTMACR)) == 0)
     {
         token = strtok(NULL, " ");
-        (*macro_ptr) = create_macro(token);
-        if ((*macro_ptr) == NULL)
-        {
-            return -1;
-        }
-        return 1;
+        (*macro_ptr) = create_macro(token, &result, macro_table, macro_counter);
+        return result;
     }
     return 0;
 }
@@ -214,10 +233,10 @@ int is_macro_end(char *line, struct Macro **macro_ptr)
     return 0;
 }
 
-int determine_line_type(char *line, struct Macro **macro_table, struct Macro **macro_ptr)
+int determine_line_type(char *line, struct Macro **macro_table, struct Macro **macro_ptr, const int macro_counter)
 {
     int def_result, body_result, call_result, end_result;
-    if ((def_result = is_macro_def(line, macro_ptr)) == 1)
+    if ((def_result = is_macro_def(line, macro_ptr, macro_table, macro_counter)) == 1)
     {
         return MACRO_DEF;
     }
@@ -237,22 +256,27 @@ int determine_line_type(char *line, struct Macro **macro_table, struct Macro **m
     {
         return -1;
     }
+    else if (def_result == -2)
+    {
+        return -2;
+    }
     else
     {
         return REGULAR_LINE;
     }
 }
 
-struct Macro **fill_am_file(FILE *am_file, FILE *as_file, int *result, int *macro_counter)
+struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int *macro_counter)
 {
     struct Macro *macro_ptr = NULL;
+    struct MacroContext macro_context = {NULL, 0};
     char line[MAX_LINE] = {0};
     int mcr_counter = 0, i;
     struct Macro **macro_table = (struct Macro **)allocateMemory(MACRO_TABLE_SIZE, sizeof(struct Macro *), CALLOC_ID);
 
     while (fgets(line, MAX_LINE, as_file) != NULL)
     {
-        switch (determine_line_type(line, macro_table, &macro_ptr))
+        switch (determine_line_type(line, macro_table, &macro_ptr, mcr_counter))
         {
         case MACRO_DEF:
             break;
@@ -278,7 +302,14 @@ struct Macro **fill_am_file(FILE *am_file, FILE *as_file, int *result, int *macr
             *result = -1;
             mcr_counter--;
             *macro_counter = mcr_counter;
-            return NULL;
+            return macro_context;
+            break;
+        case -2:
+            printf("Continue to next file because of error!\n");
+            *result = -2;
+            mcr_counter--;
+            *macro_counter = mcr_counter;
+            return macro_context;
             break;
         }
         if (line != NULL)
@@ -293,33 +324,34 @@ struct Macro **fill_am_file(FILE *am_file, FILE *as_file, int *result, int *macr
     }
 
     *result = 0;
-    *macro_counter = mcr_counter;
-    return macro_table; 
+    macro_context.macro_table = macro_table;
+    macro_context.macro_counter = mcr_counter;
+    return macro_context; 
 }
 
-void free_macro_table(struct Macro **macro_table, int macro_counter) {
+void free_macro_table(struct MacroContext *macro_table) {
     int i, j;
-    for (i = 0; i < macro_counter; i++) {
-        for (j = 0; j < macro_table[i]->lines_counter; j++) {
-            free(macro_table[i]->context[j]);
+    for (i = 0; i < macro_table->macro_counter; i++) {
+        for (j = 0; j < macro_table->macro_table[i]->lines_counter; j++) {
+            free(macro_table->macro_table[i]->context[j]);
         }
-        free(macro_table[i]->context);
-        free(macro_table[i]);
+        free(macro_table->macro_table[i]->context);
+        free(macro_table->macro_table[i]);
     }
-    free(macro_table);
+    free(macro_table->macro_table);
 }
 
-void print_macro_table(struct Macro **macro_table, int macro_counter) {
+void print_macro_table(struct MacroContext *macro_table) {
     int i, j;
-    for (i = 0; i < macro_counter; i++) {
-        printf("Macro name: %s\n", macro_table[i]->name);
-        for (j = 0; j < macro_table[i]->lines_counter; j++) {
-            printf("Macro context: %s\n", macro_table[i]->context[j]);
+    for (i = 0; i < macro_table->macro_counter; i++) {
+        printf("Macro name: %s\n", macro_table->macro_table[i]->name);
+        for (j = 0; j < macro_table->macro_table[i]->lines_counter; j++) {
+            printf("Macro context: %s\n", macro_table->macro_table[i]->context[j]);
         }
     }
 }
 
-void macro_processing(char *file_name, struct Macro ***macro_table)
+void macro_processing(char *file_name, struct MacroContext *macro_table)
 {
     int result, macro_counter = 0;
 
@@ -357,11 +389,13 @@ void macro_processing(char *file_name, struct Macro ***macro_table)
         {
             printf("File deleted successfully\n");
         }
+    }else if(result == -2){
+        printf("Error: Duplicate in macro defining with same name!\n");
     }
 
     /* Free macro table */
-    print_macro_table(*macro_table, macro_counter);
-    free_macro_table(*macro_table, macro_counter);
+    print_macro_table(macro_table);
+    free_macro_table(macro_table);
 
     /* Close files */
     if (as_file != NULL)
@@ -376,7 +410,7 @@ void macro_processing(char *file_name, struct Macro ***macro_table)
 
 int main()
 {
-    struct Macro **macro_table = NULL;
+    struct MacroContext macro_table;
     macro_processing("test_tomer", &macro_table);
     return 0;
 }
