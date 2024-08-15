@@ -11,7 +11,7 @@ void createEntFile(const char *input_file_name) {
         return;
     }
 
-    /* allocate memory for the .ent file */
+    /* Allocate memory for the .ent file name */
     ent_file_name = (char *)allocateMemory(1, strlen(input_file_name) + 5, MALLOC_ID);
 
     /* Create the .ent file name */
@@ -19,14 +19,14 @@ void createEntFile(const char *input_file_name) {
     strcat(ent_file_name, ".ent");
 
     /* Open .ent file for writing */
-    ent_file = fopen("ent_file_name", "w");
+    ent_file = fopen(ent_file_name, "w");
     if(!ent_file) {
         fprintf(stderr, "Could not open the file %s for writing\n", ent_file_name);
-        free(ent_file);
+        free(ent_file_name);
         return;
     }
 
-    /* Writing the symbol names and addresses*/
+    /* Writing the symbol names and addresses */
     while((find = find_entry(find)) != NULL) {
         fprintf(ent_file, "%s %d\n", find -> symbol_name, find -> symbol_address);
         find = find -> next;
@@ -35,6 +35,7 @@ void createEntFile(const char *input_file_name) {
     fclose(ent_file);
     free(ent_file_name);
 }
+
 /* Extern output file */
 void createExtFile(const char *input_file_name) {
     char *ext_file_name;
@@ -76,4 +77,3 @@ void createExtFile(const char *input_file_name) {
     fclose(ext_file);
     free(ext_file_name);
 }
-

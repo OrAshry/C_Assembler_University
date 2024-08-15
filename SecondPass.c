@@ -236,28 +236,33 @@ int main(void)
 {
     FILE *file = NULL;
     int x, y;
-    /*read my file test.am*/
+
+    /* Read the file test.am */
     file = fopen("test.am", "r");
     if (file == NULL)
     {
         return 1;
     }
+
     x = firstPass("test.am", file);
     if (!x)
     {
         rewind(file);
         y = secondPass("test.am", file);
-        if(!y)
-        {
-            createEntFile("test.am");
-            createExtFile("test.am");
-        }
         
-        printf("the error flag in secondPass.c is %s\n", y ? "on" : "off");
+        printf("The error flag in secondPass.c is %s\n", y ? "on" : "off");
+
+        if (!y)
+        {
+            createEntFile("test");
+            createExtFile("test");
+        }
+
         fclose(file);
         return y;
     }
-    printf("the error flag in firstPass.c is %s\n", x ? "on" : "off");
+
+    printf("The error flag in firstPass.c is %s\n", x ? "on" : "off");
     fclose(file);
 
     return x;

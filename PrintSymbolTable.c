@@ -33,7 +33,7 @@ void intToBinaryString(int n, char *binaryStr, int size) {
 
 void print_code_image(const translation_ptr p) {
     int i;
-    char binaryStr[15]; 
+    char binaryStr[16]; 
 
     printf("Code Image:\n");
     for (i = 0; i < MAX_MEM_SIZE; i++) {
