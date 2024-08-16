@@ -91,7 +91,6 @@ void createExtFile(const char *input_file_name)
 void createObFile(const char *input_file_name) {
     char *ob_file_name;
     FILE *ob_file;
-    int i;
 
     /* Check if there is any code  */
     if((machine_code_ptr->DC == 0) && (machine_code_ptr->IC == 0))
@@ -120,6 +119,7 @@ void createObFile(const char *input_file_name) {
 
     /* Writing the code_image */
     fprint_code_image(machine_code_ptr, ob_file);
+    fprint_data_image(machine_code_ptr, ob_file);
     
     /* Clean up */
     fclose(ob_file);
