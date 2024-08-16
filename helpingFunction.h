@@ -21,5 +21,6 @@ int is_instruction(char const *str, struct ast *ast);
 int is_label(char const *str, struct ast *ast, int const definition);
 int is_register(char const *str);
 struct string_split split_string(char * str, const char * delimiter);
+void failureExit(char *message);
 
 #endif

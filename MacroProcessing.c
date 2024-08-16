@@ -5,8 +5,7 @@ FILE *open_file(char *file_name, char *mode)
     FILE *file = fopen(file_name, mode);
     if (file == NULL)
     {
-        printf("%s\n", "Error: Unable to open / create file");
-        exit(1);
+        failureExit("Unable to open / create file");
     }
     return file;
 }
@@ -67,9 +66,8 @@ void update_macro_context(char *line, struct Macro **macro_ptr)
         temp_ptr = (char **)realloc((*macro_ptr)->context, ((*macro_ptr)->lines_counter + 1) * sizeof(char *));
         if (*temp_ptr == NULL)
         {
-            printf("Error: Unable to reallocate memory for macro context\n");
             *macro_ptr = NULL;
-            exit(0);
+            failureExit("Unable to allocate memory");
         }
         (*macro_ptr)->context = temp_ptr;
     }
@@ -125,8 +123,7 @@ void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int
         temp_ptr = (struct Macro *)realloc(*macro_table, (macro_counter + 1) * sizeof(struct Macro *));
         if (temp_ptr == NULL)
         {
-            printf("Error: Unable to reallocate memory for macro table\n");
-            exit(1); /*need to continue to next file*/
+            failureExit("Unable to allocate memory");
         }
         *macro_table = temp_ptr;
     }

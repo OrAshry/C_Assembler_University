@@ -15,9 +15,7 @@ void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
 
     if (ptr == NULL)
     {
-        printf("Error: Unable to allocate memory\n");
-        exit(1);
-        /*continue to next file*/
+        failureExit("Memory allocation failed");
     }
     return ptr;
 }
@@ -91,4 +89,10 @@ int is_instruction(char const *str, struct ast *ast)
         }
     }
     return 0;
+}
+
+void failureExit(char *message)
+{
+    printf("%s\n", message);
+    exit(1);
 }
