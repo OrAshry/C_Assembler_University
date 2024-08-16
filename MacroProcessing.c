@@ -405,9 +405,10 @@ void macro_processing(char *file_name, struct MacroContext *macro_table)
     free(amFileName);
 }
 
+/*
 int main()
 {
     struct MacroContext macro_table;
     macro_processing("test_tomer", &macro_table);
     return 0;
-}
+}*/
