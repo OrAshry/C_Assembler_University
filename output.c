@@ -103,7 +103,7 @@ void createObFile(const char *input_file_name) {
 
     /* Create the .ob file name */
     strcpy(ob_file_name, input_file_name);
-    strcat(ob_file_name, ".ext");
+    strcat(ob_file_name, ".ob");
 
     /* Open .ob file for writing */
     ob_file = fopen(ob_file_name, "w");
