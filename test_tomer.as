@@ -1,21 +1,14 @@
-macr mmacsssteomr
-       cmp r3, #-6
-       bne END
-endmacr
-
-mmacsssteomr
-
 macr mmacsssteomr3
        cmp r3, #-6
        bne END
 endmacr
-
-macr mmacsssteomr2
+macr mmacsssteomr32
        cmp r3, #-6
        bne END
+       aaaa
 endmacr
-
-macr mmacs33ssteomr2
+macr mmacsssteomr35
        cmp r3, #-6
        bne END
+       dasdsdsaddsasd
 endmacr
