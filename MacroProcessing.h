@@ -36,11 +36,11 @@ enum MacroState
 
 FILE *open_file(char *file_name, char *mode);
 struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int *macro_counter);
-void macro_processing(char *file_name, struct MacroContext *macro_table);
+char * macro_processing(char *file_name, struct MacroContext *macro_table);
 int determine_line_type(char *line, struct Macro **macro_table, struct Macro **macro_ptr, const int macro_counter);
 int is_macro_def(char *line, struct Macro **macro_ptr, struct Macro **macro_table, const int macro_counter);
 int is_macro_body(char *line, struct Macro **macro_ptr);
-int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_ptr);
+int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_ptr, const int macro_counter);
 int is_macro_end(char *line, struct Macro **macro_ptr);
 struct Macro *create_macro(char *token, int *result, struct Macro **macro_table, const int macro_counter);
 char *get_macro_name(char *token);

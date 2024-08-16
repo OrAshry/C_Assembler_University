@@ -1,5 +1,11 @@
 #include "helpingFunction.h"
 
+char *saved_words[] = { "mov", "cmp", "add", "sub", 
+                        "not", "clr", "lea", "inc", 
+                        "dec", "jmp", "bne", "red", 
+                        "prn", "jsr", "rts", "stop", 
+                        "data", "string", "entry", "extern" };
+
 void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
 {
     void *ptr;
@@ -95,4 +101,17 @@ void failureExit(char *message)
 {
     printf("%s\n", message);
     exit(1);
+}
+
+int is_saved_word(char const *str)
+{
+    int i;
+    for (i = 0; i < SAVE_WORDS_SIZE; i++)
+    {
+        if (strcmp(str, saved_words[i]) == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
 }
