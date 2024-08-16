@@ -256,6 +256,7 @@ int main(void)
         {
             createEntFile("test");
             createExtFile("test");
+            createObFile("test");
         }
 
         fclose(file);

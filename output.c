@@ -1,13 +1,15 @@
 #include "output.h"
 
-/* Entry's output file */
-void createEntFile(const char *input_file_name) {
+/* Entry output file */
+void createEntFile(const char *input_file_name)
+{
     char *ent_file_name;
     FILE *ent_file;
     table_ptr find = head_ptr;
 
     /* Check if there are entry symbols */
-    if(find_entry(find) == NULL) {
+    if(find_entry(find) == NULL)
+    {
         return;
     }
 
@@ -20,14 +22,16 @@ void createEntFile(const char *input_file_name) {
 
     /* Open .ent file for writing */
     ent_file = fopen(ent_file_name, "w");
-    if(!ent_file) {
+    if(!ent_file)
+    {
         fprintf(stderr, "Could not open the file %s for writing\n", ent_file_name);
         free(ent_file_name);
         return;
     }
 
     /* Writing the symbol names and addresses */
-    while((find = find_entry(find)) != NULL) {
+    while((find = find_entry(find)) != NULL)
+    {
         fprintf(ent_file, "%s %d\n", find -> symbol_name, find -> symbol_address);
         find = find -> next;
     }
@@ -37,7 +41,8 @@ void createEntFile(const char *input_file_name) {
 }
 
 /* Extern output file */
-void createExtFile(const char *input_file_name) {
+void createExtFile(const char *input_file_name)
+{
     char *ext_file_name;
     FILE *ext_file;
     table_ptr find = head_ptr;
@@ -45,7 +50,8 @@ void createExtFile(const char *input_file_name) {
     int i;
 
     /* Check if there are extern symbols */
-    if (!find_extern_in_symbol_table(find)) {
+    if (!find_extern_in_symbol_table(find))
+    {
         return;
     }
 
@@ -58,16 +64,19 @@ void createExtFile(const char *input_file_name) {
 
     /* Open .ext file for writing */
     ext_file = fopen(ext_file_name, "w");
-    if (!ext_file) {
+    if (!ext_file)
+    {
         fprintf(stderr, "Could not open the file %s for writing\n", ext_file_name);
         free(ext_file_name);
         return;
     }
 
     /* Writing the symbol names and the addresses they have been used */
-    while (current_extern != NULL) {
+    while (current_extern != NULL)
+    {
         /* Write each address on a new line */
-        for (i = 0; i < current_extern->used_counter; i++) {
+        for (i = 0; i < current_extern->used_counter; i++)
+        {
             fprintf(ext_file, "%s\t%d\n", current_extern->name, current_extern->used_addresses[i]);
         }
         current_extern = current_extern->next;
@@ -76,4 +85,39 @@ void createExtFile(const char *input_file_name) {
     /* Clean up */
     fclose(ext_file);
     free(ext_file_name);
+}
+
+/* Object output file */
+void createObFile(const char *input_file_name) {
+    char *ob_file_name;
+    FILE *ob_file;
+
+    /* Check if there is any code  */
+    if((machine_code_ptr->DC == 0) && (machine_code_ptr->IC == 0))
+    {
+        return;
+    }
+
+    /* Allocate memory for the .ob file name */
+    ob_file_name = (char *)allocateMemory(1, strlen(input_file_name) + 4, MALLOC_ID);
+
+    /* Create the .ob file name */
+    strcpy(ob_file_name, input_file_name);
+    strcat(ob_file_name, ".ext");
+
+    /* Open .ob file for writing */
+    ob_file = fopen(ob_file_name, "w");
+    if (!ob_file) 
+    {
+        fprintf(stderr, "Could not open the file %s for writing\n", ob_file_name);
+        free(ob_file_name);
+        return;
+    }
+
+    /* Writing the header (number of instructions and number of directive) */
+    fprintf(ob_file, "%d\t%d\n", (machine_code_ptr->IC) - 100,  (machine_code_ptr->DC));
+    
+    /* Clean up */
+    fclose(ob_file);
+    free(ob_file_name);
 }
