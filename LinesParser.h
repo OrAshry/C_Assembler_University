@@ -2,7 +2,7 @@
 #define LINESPARSER_H
 
 #include "stringSplit.h"
-#include "constants.h"
+#include "Constants.h"
 #include <ctype.h>
 #include <string.h>
 #include "helpingFunction.h"

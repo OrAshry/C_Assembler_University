@@ -11,16 +11,6 @@ table_ptr symbol_search(table_ptr ptr, const char search_name[MAX_SYMBOL_NAME]) 
     return NULL;
 }
 
-/* Search external sembols inside the symbol table */
-table_ptr find_extern(table_ptr ptr) {
-    while(ptr) {
-        if(ptr -> symbol_type == extern_symbol) {
-            return ptr;
-        }
-        ptr = ptr -> next;
-    }
-}
-
 /* Search entry symbols inside the symbol table */
 table_ptr find_entry(table_ptr ptr) {
     while(ptr) {
@@ -29,4 +19,29 @@ table_ptr find_entry(table_ptr ptr) {
         }
         ptr = ptr -> next;
     }
+    return NULL;
+}
+
+/* Search entry symbols inside the symbol table */
+table_ptr find_extern_in_symbol_table(table_ptr ptr) {
+    while(ptr) 
+    {
+        if(ptr -> symbol_type == extern_symbol)
+        {
+            return ptr;
+        }
+        ptr = ptr -> next;
+    }
+    return NULL;
+}
+
+/* Search external sembols inside the extern_address struct table */
+extern_addresses_ptr find_extern(extern_addresses_ptr ptr, const char search_name[MAX_SYMBOL_NAME]) {
+    while(ptr) {
+        if(strcmp(ptr->name, search_name) == 0) {
+            return ptr;
+        }
+        ptr = ptr -> next;
+    }
+    return NULL;
 }

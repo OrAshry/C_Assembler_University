@@ -33,7 +33,7 @@ void intToBinaryString(int n, char *binaryStr, int size) {
 
 void print_code_image(const translation_ptr p) {
     int i;
-    char binaryStr[15]; 
+    char binaryStr[16]; 
 
     printf("Code Image:\n");
     for (i = 0; i < MAX_MEM_SIZE; i++) {
@@ -43,4 +43,27 @@ void print_code_image(const translation_ptr p) {
         }
     }
     putchar('\n');
+}
+
+void print_extern_usage(extern_addresses_ptr head) {
+    extern_addresses_ptr current = head;
+    int i;
+    printf("External Symbols Usage:\n");
+
+    while (current != NULL) {
+        printf("Name: %-15s Usage Counter: %-5d Addresses: ", 
+               current->name, current->used_counter);
+
+        for (i = 0; i < current->used_counter; i++) {
+            printf("%-5d", current->used_addresses[i]);
+            if (i < current->used_counter - 1) {
+                printf(", ");
+            }
+        }
+
+        printf("\n");
+        current = current->next;
+    }
+
+    printf("\n");
 }

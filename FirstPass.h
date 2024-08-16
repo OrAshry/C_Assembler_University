@@ -5,6 +5,7 @@
 #include "Translate.h"
 #include "SymbolTable.h"
 #include "LinesParser.h"
+#include "output.h"
 
 /* Prototypes */
 int firstPass(char * file_name, FILE * file);
