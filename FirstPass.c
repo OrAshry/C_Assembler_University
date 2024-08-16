@@ -95,7 +95,7 @@ int firstPass(char *file_name, FILE *file)
                         /* If its entry or extern */
                         else
                         {
-                            printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name, line_counter, answer.labelName);
+                            printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name, line_counter, found->symbol_name);
                             error_flag = 1;
                         }
                     }
@@ -107,6 +107,10 @@ int firstPass(char *file_name, FILE *file)
                     if (answer.ast_options.dir.dir_type == ast_extern) 
                     {
                         continue;
+                    }
+                    else {
+                        printf("Error: In file %s at line %d the symbol %s has been redefined.\n", file_name, line_counter, found->symbol_name);
+                        error_flag = 1;
                     }
                 }
 
