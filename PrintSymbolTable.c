@@ -89,6 +89,5 @@ void print_extern_usage(extern_addresses_ptr head) {
         printf("\n");
         current = current->next;
     }
-
     printf("\n");
 }
