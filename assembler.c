@@ -15,22 +15,20 @@ int main(int argc, char ** argv){
         if(amFileName){ /* If file created successfully without errors */
             am_file = open_file(amFileName, "r"); /* Open am file for read mode */
             if(am_file){
-                if(firstPass(amFileName, am_file) != 1){ /* Run first pass */
+                if(firstPass(argv[i], am_file) != 1){ /* Run first pass */
                     /* Firstpass success */
-                    if(secondPass(amFileName, am_file) != 1){ /* Run second pass */
+                    rewind(am_file); /* Rewind file pointer */
+                    if(secondPass(argv[i], am_file) != 1){ /* Run second pass */
                         /* Secondpass success */
-                        createObFile(amFileName); /* Create ob file */
-                        createEntFile(amFileName); /* Create ent file */
-                        createExtFile(amFileName); /* Create ext file */
+                        createObFile(argv[i]); /* Create ob file */
+                        createEntFile(argv[i]); /* Create ent file */
+                        createExtFile(argv[i]); /* Create ext file */
                     }
                 }
-                fclose(am_file);
+                fclose(am_file); /* Close file */
             }
             free(amFileName);
-            /*free(machine_code_ptr);*/
             free_macro_table(&macro_table);
-            /*free(extern_usage);*/
-            /*free(machine_code);*/
         }
     }
 
