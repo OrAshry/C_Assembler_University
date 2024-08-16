@@ -77,7 +77,7 @@ void createExtFile(const char *input_file_name)
         /* Write each address on a new line */
         for (i = 0; i < current_extern->used_counter; i++)
         {
-            fprintf(ext_file, "%s\t%d\n", current_extern->name, current_extern->used_addresses[i]);
+            fprintf(ext_file, "%s\t%04d\n", current_extern->name, current_extern->used_addresses[i]);
         }
         current_extern = current_extern->next;
     }
