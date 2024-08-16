@@ -7,6 +7,10 @@
 #include <ctype.h>
 #include "LinesParser.h"
 
+#define SAVE_WORDS_SIZE 20
+
+extern char *saved_words[];
+
 struct ast; /* Forward declaration of struct ast */
 
 enum FunctionId
@@ -22,5 +26,6 @@ int is_label(char const *str, struct ast *ast, int const definition);
 int is_register(char const *str);
 struct string_split split_string(char * str, const char * delimiter);
 void failureExit(char *message);
+int is_saved_word(char const *str);
 
 #endif

@@ -44,6 +44,11 @@ struct Macro *create_macro(char *token, int *result, struct Macro **macro_table,
         return NULL;
     }
 
+    if(is_saved_word(macro_name) == 1){
+        *result = -3;
+        return NULL;
+    }
+
     macro_ptr->context = (char **)allocateMemory(DEF_MAT_SIZE, sizeof(char *), CALLOC_ID);
     strcpy(macro_ptr->name, macro_name);
     if (macro_name != NULL)
@@ -94,9 +99,8 @@ char *get_macro_name(char *token)
     strcpy(name, token);
 
     token = strtok(NULL, " ");
-    if (token != NULL)
+    if (token != NULL) /* This is not a macro call */
     {
-        printf("Error: Macro definition isn't defined well!\n");
         return NULL;
     }
 
@@ -166,7 +170,7 @@ int is_macro_body(char *line, struct Macro **macro_ptr)
     return 1;
 }
 
-int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_ptr)
+int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_ptr, const int macro_counter)
 {
     char *token = NULL;
     int i = 0;
@@ -189,7 +193,7 @@ int is_macro_call(char *line, struct Macro **macro_table, struct Macro **macro_p
     }
 
     /*need to find macro name in macro table*/
-    for (i = 0; i < MACRO_TABLE_SIZE; i++)
+    for (i = 0; i < macro_counter; i++)
     {
         if (strcmp(macro_table[i]->name, macro_name) == 0)
         {
@@ -241,21 +245,24 @@ int determine_line_type(char *line, struct Macro **macro_table, struct Macro **m
     {
         return MACRO_END;
     }
-    else if ((call_result = is_macro_call(line, macro_table, macro_ptr)) == 1)
+    else if((body_result = is_macro_body(line, macro_ptr)) == 1){
+        return MACRO_BODY;
+    }
+    else if ((call_result = is_macro_call(line, macro_table, macro_ptr, macro_counter)) == 1)
     {
         return MACRO_CALL;
     }
-    else if ((body_result = is_macro_body(line, macro_ptr)) == 1)
-    {
-        return MACRO_BODY;
-    }
-    else if (def_result == -1 || body_result == -1 || call_result == -1 || end_result == -1)
+    else if (def_result == -1)
     {
         return -1;
     }
     else if (def_result == -2)
     {
         return -2;
+    }
+    else if (def_result == -3)
+    {
+        return -3;
     }
     else
     {
@@ -295,15 +302,19 @@ struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int 
         case MACRO_BODY:
             break;
         case -1:
-            printf("Continue to next file because of error!\n");
             *result = -1;
             mcr_counter--;
             *macro_counter = mcr_counter;
             return macro_context;
             break;
         case -2:
-            printf("Continue to next file because of error!\n");
             *result = -2;
+            mcr_counter--;
+            *macro_counter = mcr_counter;
+            return macro_context;
+            break;
+        case -3:
+            *result = -3;
             mcr_counter--;
             *macro_counter = mcr_counter;
             return macro_context;
@@ -348,7 +359,7 @@ void print_macro_table(struct MacroContext *macro_table) {
     }
 }
 
-void macro_processing(char *file_name, struct MacroContext *macro_table)
+char * macro_processing(char *file_name, struct MacroContext *macro_table)
 {
     int result, macro_counter = 0;
 
@@ -380,19 +391,27 @@ void macro_processing(char *file_name, struct MacroContext *macro_table)
     *macro_table = fill_am_file(am_file, as_file, &result, &macro_counter);
 
     /* Check for error - delete file */
-    if (result == -1)
+    if (result == -1 || result == -2 || result == -3)
     {
         if (remove(amFileName) == 0)
         {
             printf("File deleted successfully\n");
         }
-    }else if(result == -2){
-        printf("Error: Duplicate in macro defining with same name!\n");
+        if(result == -1){
+            printf("Error: Unable to create macro because of additional data\n");
+        }
+        else if(result == -2){
+            printf("Error: Duplicate macro name\n");
+        }
+        else if(result == -3){
+            printf("Error: Macro call can't be saved word\n");
+        }
+        amFileName = NULL;
     }
 
     /* Free macro table */
-    print_macro_table(macro_table);
-    free_macro_table(macro_table);
+    /*print_macro_table(macro_table);*/
+    /*free_macro_table(macro_table);*/
 
     /* Close files */
     if (as_file != NULL)
@@ -402,13 +421,7 @@ void macro_processing(char *file_name, struct MacroContext *macro_table)
 
     /* Free memory */
     free(asFileName);
-    free(amFileName);
-}
 
-/*
-int main()
-{
-    struct MacroContext macro_table;
-    macro_processing("test_tomer", &macro_table);
-    return 0;
-}*/
+    /* Return file name */
+    return amFileName;
+}
