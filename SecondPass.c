@@ -1,4 +1,4 @@
-#include "SecondPass.h"
+#include "secondPass.h"
 
 extern_addresses extern_usage = {0};
 extern_addresses_ptr extern_usage_head_ptr = NULL;

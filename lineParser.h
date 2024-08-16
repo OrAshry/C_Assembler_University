@@ -1,5 +1,5 @@
-#ifndef LINESPARSER_H
-#define LINESPARSER_H
+#ifndef LINEPARSER_H
+#define LINEPARSER_H
 
 #include "stringSplit.h"
 #include "Constants.h"

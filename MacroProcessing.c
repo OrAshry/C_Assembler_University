@@ -1,4 +1,4 @@
-#include "MacroProcessing.h"
+#include "macroProcessing.h"
 
 FILE *open_file(char *file_name, char *mode)
 {
@@ -349,16 +349,6 @@ void free_macro_table(struct MacroContext *macro_table) {
     free(macro_table->macro_table);
 }
 
-void print_macro_table(struct MacroContext *macro_table) {
-    int i, j;
-    for (i = 0; i < macro_table->macro_counter; i++) {
-        printf("Macro name: %s\n", macro_table->macro_table[i]->name);
-        for (j = 0; j < macro_table->macro_table[i]->lines_counter; j++) {
-            printf("Macro context: %s\n", macro_table->macro_table[i]->context[j]);
-        }
-    }
-}
-
 char * macro_processing(char *file_name, struct MacroContext *macro_table)
 {
     int result, macro_counter = 0;
@@ -408,10 +398,6 @@ char * macro_processing(char *file_name, struct MacroContext *macro_table)
         }
         amFileName = NULL;
     }
-
-    /* Free macro table */
-    /*print_macro_table(macro_table);*/
-    /*free_macro_table(macro_table);*/
 
     /* Close files */
     if (as_file != NULL)

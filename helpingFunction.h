@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "LinesParser.h"
+#include "lineParser.h"
 
 #define SAVE_WORDS_SIZE 20
 

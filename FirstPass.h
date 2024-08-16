@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "Translate.h"
 #include "SymbolTable.h"
-#include "LinesParser.h"
+#include "lineParser.h"
 #include "output.h"
 
 /* Prototypes */

@@ -1,5 +1,5 @@
-#include "MacroProcessing.h"
-#include "FirstPass.h"
+#include "macroProcessing.h"
+#include "firstPass.h"
 #include "SecondPass.h"
 #include "output.h"
 

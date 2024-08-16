@@ -1,5 +1,5 @@
 /*for the test*/
-#include "SymbolTable.h"
+#include "symbolTable.h"
 
 void print_symbol_table(table_ptr p) {
     printf("Symbol Table:\n");

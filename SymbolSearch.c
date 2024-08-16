@@ -1,4 +1,4 @@
-#include "SymbolTable.h"
+#include "symbolTable.h"
 
 /* Search symbols inside the symbol table by name */
 table_ptr symbol_search(table_ptr ptr, const char search_name[MAX_SYMBOL_NAME]) {

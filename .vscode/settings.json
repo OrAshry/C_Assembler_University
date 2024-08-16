@@ -11,7 +11,9 @@
         "linesparser.h": "c",
         "secondpass.h": "c",
         "stringsplit.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "symboltable.h": "c",
+        "translate.h": "c"
     },
     "editor.mouseWheelZoom": true
 }
