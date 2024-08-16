@@ -1,4 +1,4 @@
-#include "LinesParser.h"
+#include "lineParser.h"
 
 struct inst inst_table[INST_SIZE] = {
     {"mov", 0, "0123", "123"},

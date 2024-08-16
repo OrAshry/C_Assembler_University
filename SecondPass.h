@@ -1,7 +1,7 @@
 #ifndef SECOND_PASS_H
 #define SECOND_PASS_H
 
-#include "FirstPass.h"
+#include "firstPass.h"
 
 #define A 2
 #define R 1

@@ -1,4 +1,4 @@
-#include "FirstPass.h"
+#include "firstPass.h"
 
 table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
 translation machine_code = {0};
