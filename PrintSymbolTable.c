@@ -45,6 +45,31 @@ void print_code_image(const translation_ptr p) {
     putchar('\n');
 }
 
+void fprint_code_image(const translation_ptr p, FILE *file) {
+    int i;
+    char binaryStr[16]; 
+
+    for (i = 0; i < MAX_MEM_SIZE; i++) {
+        if (p->code_image[i] != '\0') {
+            intToBinaryString(p->code_image[i], binaryStr, 15);
+            fprintf(file,"%04d %s\n", i, binaryStr);
+        }
+    }
+    putchar('\n');
+}
+
+void fprint_data_image(const translation_ptr p, FILE *file) {
+    int i;
+    char binaryStr[16]; 
+
+    for (i = 0; i < MAX_MEM_SIZE; i++) {
+        if (p->data_image[i] != '\0') {
+            fprintf(file, "%04d: %d\n", i, p->data_image[i]);
+        }
+    }
+    putchar('\n');
+}
+
 void print_extern_usage(extern_addresses_ptr head) {
     extern_addresses_ptr current = head;
     int i;
