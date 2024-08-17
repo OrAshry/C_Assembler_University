@@ -20,9 +20,9 @@ int main(int argc, char ** argv){
                     rewind(am_file); /* Rewind file pointer */
                     if(secondPass(argv[i], am_file) != 1){ /* Run second pass */
                         /* Secondpass success */
-                        createObFile(argv[i]); /* Create ob file */
                         createEntFile(argv[i]); /* Create ent file */
                         createExtFile(argv[i]); /* Create ext file */
+                        createObFile(argv[i]); /* Create ob file */
                     }
                 }
                 fclose(am_file); /* Close file */

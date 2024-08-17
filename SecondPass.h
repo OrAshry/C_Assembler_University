@@ -9,7 +9,6 @@
 
 #define ADDRESS_BIT_LOCATION 3
 
-
 extern extern_addresses extern_usage;
 extern extern_addresses_ptr extern_usage_head_ptr;
 extern extern_addresses_ptr extern_ptr;
@@ -17,5 +16,6 @@ extern extern_addresses_ptr extern_ptr;
 /* Prototypes */
 int secondPass(char * file_name, FILE * file);
 void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_file, int current_am_line);
+void free_extern_table(extern_addresses_ptr *head);
 
 #endif

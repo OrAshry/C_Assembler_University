@@ -46,5 +46,6 @@ void print_code_image(const translation_ptr p);
 void print_extern_usage(extern_addresses_ptr head);
 void fprint_code_image(const translation_ptr p, FILE *file);
 void fprint_data_image(const translation_ptr p, FILE *file);
+void free_symbol_table(table_ptr *head);
 
 #endif 

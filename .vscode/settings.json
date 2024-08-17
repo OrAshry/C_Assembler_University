@@ -13,7 +13,8 @@
         "stringsplit.h": "c",
         "stdlib.h": "c",
         "symboltable.h": "c",
-        "translate.h": "c"
+        "translate.h": "c",
+        "output.h": "c"
     },
     "editor.mouseWheelZoom": true
 }

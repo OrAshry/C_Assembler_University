@@ -230,3 +230,16 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
         }
     }
 }
+
+void free_extern_table(extern_addresses_ptr *head){
+    extern_addresses_ptr current = *head;
+    extern_addresses_ptr next;
+
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+
+    *head = NULL;
+}
