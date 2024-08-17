@@ -6,6 +6,7 @@ void createEntFile(const char *input_file_name)
     char *ent_file_name;
     FILE *ent_file;
     table_ptr find = head_ptr;
+    table_ptr current_entry;
 
     /* Check if there are entry symbols */
     if(find_entry(find) == NULL)
@@ -30,10 +31,18 @@ void createEntFile(const char *input_file_name)
     }
 
     /* Writing the symbol names and addresses */
-    while((find = find_entry(find)) != NULL)
+    while ((current_entry = find_entry(find)) != NULL)
     {
-        fprintf(ent_file, "%s %d\n", find -> symbol_name, find -> symbol_address);
-        find = find -> next;
+        find = current_entry->next;
+
+        /* Write the symbol name and address */
+        fprintf(ent_file, "%s %d", current_entry->symbol_name, current_entry->symbol_address);
+
+        /* Check if this is the last entry */
+        if (find_entry(find) != NULL)
+        {
+            fprintf(ent_file, "\n");
+        }
     }
 
     fclose(ent_file);
@@ -74,10 +83,15 @@ void createExtFile(const char *input_file_name)
     /* Writing the symbol names and the addresses they have been used */
     while (current_extern != NULL)
     {
-        /* Write each address on a new line */
+        /* Write each address */
         for (i = 0; i < current_extern->used_counter; i++)
         {
-            fprintf(ext_file, "%s\t%04d\n", current_extern->name, current_extern->used_addresses[i]);
+            fprintf(ext_file, "%s\t%04d", current_extern->name, current_extern->used_addresses[i]);
+            /* Avoid adding a newline if it's the last entry */
+            if (current_extern->next != NULL || i < current_extern->used_counter - 1)
+            {
+                fprintf(ext_file, "\n");
+            }
         }
         current_extern = current_extern->next;
     }
@@ -86,6 +100,7 @@ void createExtFile(const char *input_file_name)
     fclose(ext_file);
     free(ext_file_name);
 }
+
 
 /* Object output file */
 void createObFile(const char *input_file_name) {
