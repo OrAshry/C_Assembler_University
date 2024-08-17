@@ -13,8 +13,6 @@ LOOP:   jmp L1
 prn #-5
 bne LOOP
 
-jump LOOP
-
 sub *r1, *r4
 bne END
 

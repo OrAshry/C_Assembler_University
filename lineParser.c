@@ -432,8 +432,15 @@ struct ast get_ast_from_line(char *line)
             strcpy(ast.lineError, "Label definition must end with ':'");
             return ast;
         }
-
+    
         ast.labelName[strlen(ast.labelName) - 1] = NULL_BYTE; /* Remove the ':' from the label name */
+
+        if(is_saved_word(ast.labelName))
+        {
+            strcpy(ast.lineError, "Label name is a saved word");
+            ast.ast_type = ast_error;
+            return ast;
+        }
     }
 
     /* If current line is directive line with . */
