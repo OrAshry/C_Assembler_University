@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     {
         amFileName = macro_processing(argv[i], &macro_table); /* Create am file*/
         if (amFileName)
-        {                                         /* If file created successfully without errors */
+        {   /* If file created successfully without errors */
             am_file = open_file(amFileName, "r"); /* Open am file for read mode */
             if (am_file)
             {
