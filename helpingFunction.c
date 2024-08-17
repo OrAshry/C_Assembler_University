@@ -77,6 +77,10 @@ int is_register(char const *str)
     {
         return 1;
     }
+    
+    if(strcmp(str, "r0") == 0){ /* Special case - if register is r0, is_number return 0 */
+        return 1;
+    }
     return 0;
 }
 
