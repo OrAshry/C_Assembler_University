@@ -17,8 +17,6 @@ sub *r1, *r4
 prn #-5
 bne LOOP
 
-jump LOOP
-
 M1
 
 L1:     inc K

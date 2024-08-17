@@ -3,6 +3,9 @@
 MAIN: add r3, LIST
 jsr fn1
 LOOP: prn #48
+
+jmp: mov r1, r5
+
 lea STR, r6
 inc r6
 mov *r6, L3

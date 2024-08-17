@@ -122,9 +122,6 @@ void createObFile(const char *input_file_name) {
     fprint_data_image(machine_code_ptr, ob_file);
     
     /* Clean up */
-    free_symbol_table(&head_ptr);
-    free_extern_table(&extern_usage_head_ptr);
-    free_machine_code(machine_code_ptr);
     fclose(ob_file);
     free(ob_file_name);
 }
