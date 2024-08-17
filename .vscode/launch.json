@@ -11,7 +11,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/a.out",
-            "args": ["tomer_test2"],
+            "args": ["tomer_test2", "valid_input_3"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

@@ -310,7 +310,7 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
     }
 
     /* If comma in string, we need to split string by comma */
-    if ((operands.size > index) && strchr(operands.string[index], COMMA_CHAR) != NULL)
+    if ((operands.size > index) && strchr(concat_string, COMMA_CHAR) != NULL)
     {
         temp_split_str = split_string(concat_string, COMMA);
     }
