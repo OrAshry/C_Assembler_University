@@ -16,8 +16,7 @@ struct inst inst_table[INST_SIZE] = {
     {"prn", 12, "", "0123"},
     {"jsr", 13, "", "12"},
     {"rts", 14, "", ""},
-    {"stop", 15, "", ""}
-};
+    {"stop", 15, "", ""}};
 
 int is_number(char *str, int const min_num, int const max_num, int *result, char **end_ptr)
 {
@@ -42,7 +41,10 @@ int is_number(char *str, int const min_num, int const max_num, int *result, char
         return 0;
     }
 
-    *end_ptr = endptr;
+    if (end_ptr)
+    {
+        *end_ptr = endptr;
+    }
     *result = 1;
     return num;
 }
@@ -219,24 +221,44 @@ int get_operand_type(char *operand, struct ast *ast)
 
 void update_ast_operands(char *value, struct ast *ast, int operand_type, int operand_index)
 {
+    int result = __INT_MAX__;
+    int integer_value;
     switch (operand_type)
     {
     case ast_immidiate:
         ast->ast_options.inst.operands[operand_index].operand_type = ast_immidiate;
-        ast->ast_options.inst.operands[operand_index].operand_option.immed = atoi(value + 1);
+        integer_value = is_number(value + 1, MIN_NUM, MAX_NUM, &result, NULL);
+        ast->ast_options.inst.operands[operand_index].operand_option.immed = integer_value;
         break;
     case ast_register_direct:
         ast->ast_options.inst.operands[operand_index].operand_type = ast_register_direct;
-        ast->ast_options.inst.operands[operand_index].operand_option.reg = atoi(value + 1);
+        integer_value = is_number(value + 1, MIN_NUM, MAX_NUM, &result, NULL);
+        ast->ast_options.inst.operands[operand_index].operand_option.reg = integer_value;
         break;
     case ast_register_address:
         ast->ast_options.inst.operands[operand_index].operand_type = ast_register_address;
-        ast->ast_options.inst.operands[operand_index].operand_option.reg = atoi(value + 2);
+        integer_value = is_number(value + 2, MIN_NUM, MAX_NUM, &result, NULL);
+        ast->ast_options.inst.operands[operand_index].operand_option.reg = integer_value;
         break;
     case ast_label:
         ast->ast_options.inst.operands[operand_index].operand_type = ast_label;
         strcpy(ast->ast_options.inst.operands[operand_index].operand_option.label, value);
         break;
+    default:
+        break;
+    }
+
+    switch (result)
+    {
+    case 0:
+        strcpy(ast->lineError, "Invalid number");
+        ast->ast_type = ast_error;
+    case 2:
+        strcpy(ast->lineError, "Number is too big");
+        ast->ast_type = ast_error;
+    case 3:
+        strcpy(ast->lineError, "Number is too small");
+        ast->ast_type = ast_error;
     default:
         break;
     }
@@ -309,8 +331,8 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
         }
     }
 
-    /* If comma in string, we need to split string by comma */
-    if ((operands.size > index) && strchr(concat_string, COMMA_CHAR) != NULL)
+    /* If comma in string and instruction only source and dest operands, we need to split string by comma */
+    if ((operands.size > index) && strchr(concat_string, COMMA_CHAR) != NULL && inst.source[0] && inst.dest[0])
     {
         temp_split_str = split_string(concat_string, COMMA);
     }
@@ -399,8 +421,8 @@ void fill_directive_ast(struct ast *ast, struct string_split split_result, int i
 
 struct ast get_ast_from_line(char *line)
 {
-    struct ast ast = {0};  /* Init ast type */
-    int index = 0; /* index init */
+    struct ast ast = {0}; /* Init ast type */
+    int index = 0;        /* index init */
 
     struct string_split split_result = split_string(line, SPACES); /* Split line into substrings */
 
@@ -419,8 +441,8 @@ struct ast get_ast_from_line(char *line)
     }
 
     /* If current string is a Label */
-    if (split_result.string[index][0] != DIRECTIVE_CHAR              &&
-        is_label(split_result.string[index], &ast, DEFINITION_LABEL) && 
+    if (split_result.string[index][0] != DIRECTIVE_CHAR &&
+        is_label(split_result.string[index], &ast, DEFINITION_LABEL) &&
         !is_instruction(split_result.string[index], &ast))
     {
         strcpy(ast.labelName, split_result.string[index++]); /* Init label name */
@@ -432,10 +454,10 @@ struct ast get_ast_from_line(char *line)
             strcpy(ast.lineError, "Label definition must end with ':'");
             return ast;
         }
-    
+
         ast.labelName[strlen(ast.labelName) - 1] = NULL_BYTE; /* Remove the ':' from the label name */
 
-        if(is_saved_word(ast.labelName))
+        if (is_saved_word(ast.labelName))
         {
             strcpy(ast.lineError, "Label name is a saved word");
             ast.ast_type = ast_error;
