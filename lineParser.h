@@ -28,7 +28,7 @@
 #define DIRECTIVE_EXTERN ".extern"
 #define DIRECTIVE_ENTRY ".entry"
 #define STRING_CHAR '"'
-#define REGISTER_MIN 1
+#define REGISTER_MIN 0
 #define REGISTER_MAX 7
 #define REGISTER_CHAR 'r'
 #define DEFINITION_LABEL 1
@@ -104,8 +104,8 @@ void parse_operands(struct string_split operands, int index, struct ast * ast);
 int fill_string(struct string_split split_result, int index, struct ast *ast);
 void fill_directive_ast(struct ast * ast, struct string_split split_result, int index);
 int validate_numbers(struct string_split const split_str, int const size, struct ast *ast, int const index);
-void set_ast_inst_two_operands(struct ast * ast, struct string_split split_result, int index);
-void set_ast_inst_one_operands(struct ast * ast, struct string_split split_result, int index);
+void set_ast_inst_two_operands(struct ast * ast, struct string_split split_result);
+void set_ast_inst_one_operands(struct ast * ast, struct string_split split_result);
 int get_operand_type(char *operand, struct ast *ast);
 void update_ast_operands(char *value, struct ast * ast, int operand_type, int operand_index);
 

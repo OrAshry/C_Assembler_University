@@ -45,6 +45,7 @@ int is_number(char *str, int const min_num, int const max_num, int *result, char
     {
         *end_ptr = endptr;
     }
+
     *result = 1;
     return num;
 }
@@ -253,18 +254,21 @@ void update_ast_operands(char *value, struct ast *ast, int operand_type, int ope
     case 0:
         strcpy(ast->lineError, "Invalid number");
         ast->ast_type = ast_error;
+        break;
     case 2:
         strcpy(ast->lineError, "Number is too big");
         ast->ast_type = ast_error;
+        break;
     case 3:
         strcpy(ast->lineError, "Number is too small");
         ast->ast_type = ast_error;
+        break;
     default:
         break;
     }
 }
 
-void set_ast_inst_two_operands(struct ast *ast, struct string_split split_result, int index)
+void set_ast_inst_two_operands(struct ast *ast, struct string_split split_result)
 {
     struct inst inst = inst_table[ast->ast_options.inst.inst_type];
     char line_error[MAX_LINE] = {0};
@@ -295,7 +299,7 @@ void set_ast_inst_two_operands(struct ast *ast, struct string_split split_result
     update_ast_operands(split_result.string[1], ast, dest_type, 1);   /* Update destination operand*/
 }
 
-void set_ast_inst_one_operands(struct ast *ast, struct string_split split_result, int index)
+void set_ast_inst_one_operands(struct ast *ast, struct string_split split_result)
 {
     struct inst inst = inst_table[ast->ast_options.inst.inst_type];
     char line_error[MAX_LINE] = {0};
@@ -350,7 +354,7 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
             ast->ast_type = ast_error;
             return;
         }
-        set_ast_inst_two_operands(ast, temp_split_str, index);
+        set_ast_inst_two_operands(ast, temp_split_str);
     }
 
     /* Case of one destination operand in instruction */
@@ -362,7 +366,7 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
             ast->ast_type = ast_error;
             return;
         }
-        set_ast_inst_one_operands(ast, temp_split_str, index);
+        set_ast_inst_one_operands(ast, temp_split_str);
     }
 
     /* Case of none operands in instruction */
