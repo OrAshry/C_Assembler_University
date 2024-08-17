@@ -178,7 +178,7 @@ int secondPass(char *file_name, FILE *file)
 
     print_extern_usage(extern_usage_head_ptr);
     print_code_image(machine_code_ptr);
-
+    printf("%d", error_flag);
     return error_flag;
 }
 

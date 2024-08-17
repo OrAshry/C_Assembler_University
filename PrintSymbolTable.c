@@ -22,6 +22,15 @@ void print_data_image(const translation_ptr p) {
     putchar('\n');
 }
 
+void intToOctalString(int n, char *octalStr, int size) {
+    int i;
+    octalStr[size] = '\0';  
+    for (i = size - 1; i >= 0; i--) {
+        octalStr[i] = (n & 7) + '0';  /* Convert the last 3 bits to an octal digit */
+        n >>= 3;  /* Shift right by 3 bits to process the next digit */
+    }
+}
+
 void intToBinaryString(int n, char *binaryStr, int size) {
     int i;
     binaryStr[size] = '\0';  
@@ -47,12 +56,12 @@ void print_code_image(const translation_ptr p) {
 
 void fprint_code_image(const translation_ptr p, FILE *file) {
     int i;
-    char binaryStr[16]; 
+    char octalStr[6];  /* Adjusted to 6 to accommodate 5 octal digits plus the null terminator */
 
-    for (i = 0; i < MAX_MEM_SIZE; i++) {
+    for (i = 0; i < machine_code_ptr->IC; i++) {
         if (p->code_image[i] != '\0') {
-            intToBinaryString(p->code_image[i], binaryStr, 15);
-            fprintf(file,"%04d %s\n", i, binaryStr);
+            intToOctalString(p->code_image[i], octalStr, 5);  /* Using 5 for 5-digit octal */
+            fprintf(file, "%04d %s\n", i, octalStr);
         }
     }
     putchar('\n');
@@ -60,15 +69,17 @@ void fprint_code_image(const translation_ptr p, FILE *file) {
 
 void fprint_data_image(const translation_ptr p, FILE *file) {
     int i;
-    char binaryStr[16]; 
+    char octalStr[6];  /* 5 digits plus the null terminator */
 
-    for (i = 0; i < MAX_MEM_SIZE; i++) {
-        if (p->data_image[i] != '\0') {
-            fprintf(file, "%04d: %d\n", i, p->data_image[i]);
+    for (i = 0; i < machine_code_ptr->DC; i++) {
+        if ((p->data_image[i] != '\0') || (p->data_image[i] == 0)) {
+            intToOctalString(p->data_image[i], octalStr, 5);  /* Convert to 5-digit octal */
+            fprintf(file, "%04d %s\n", i + machine_code_ptr->IC, octalStr);  /* Print the address with 4 digits and octal with 5 digits */
         }
     }
     putchar('\n');
 }
+
 
 void print_extern_usage(extern_addresses_ptr head) {
     extern_addresses_ptr current = head;

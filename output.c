@@ -77,7 +77,7 @@ void createExtFile(const char *input_file_name)
         /* Write each address on a new line */
         for (i = 0; i < current_extern->used_counter; i++)
         {
-            fprintf(ext_file, "%s\t%d\n", current_extern->name, current_extern->used_addresses[i]);
+            fprintf(ext_file, "%s\t%04d\n", current_extern->name, current_extern->used_addresses[i]);
         }
         current_extern = current_extern->next;
     }
@@ -91,7 +91,6 @@ void createExtFile(const char *input_file_name)
 void createObFile(const char *input_file_name) {
     char *ob_file_name;
     FILE *ob_file;
-    int i;
 
     /* Check if there is any code  */
     if((machine_code_ptr->DC == 0) && (machine_code_ptr->IC == 0))
@@ -120,8 +119,10 @@ void createObFile(const char *input_file_name) {
 
     /* Writing the code_image */
     fprint_code_image(machine_code_ptr, ob_file);
+    fprint_data_image(machine_code_ptr, ob_file);
     
     /* Clean up */
+    free_symbol_table(head_ptr);
     fclose(ob_file);
     free(ob_file_name);
 }

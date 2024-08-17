@@ -45,3 +45,16 @@ void add_symbol_to_extern_usage(char new_name[MAX_SYMBOL_NAME], int new_address,
         current -> next = new_extern;
     }
 }
+
+void free_symbol_table(table_ptr *head) {
+    table_ptr current = *head;
+    table_ptr next;
+
+    while (current != NULL) {
+        next = current->next;
+        free(current);       
+        current = next;       
+    }
+
+    *head = NULL;
+}
