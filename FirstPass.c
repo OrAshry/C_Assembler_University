@@ -1,10 +1,27 @@
 #include "FirstPass.h"
 
 table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
-translation machine_code = {0};
 table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
-translation_ptr machine_code_ptr = &machine_code;
+translation machine_code = {0}; /* Structure to hold machine code information, initialized to zero */
+translation_ptr machine_code_ptr = &machine_code; /* Pointer to the machine code structure */
 
+/**
+ * Performs the first pass of the assembly process.
+ * 
+ * This function processes an assembly file, parses lines to extract symbols and
+ * directives, updates the symbol table, and computes addresses for instructions
+ * and data. It handles errors related to line length, symbol redefinition, and
+ * memory size limitations. It calculates the number of words needed
+ * for Directive, codes the data into the data image,
+ * 
+ * @param file_name       The name of the assembly source file being processed.
+ * @param file            The file pointer to the assembly source file.
+ * @param macro_context   A pointer to the macro context structure used for macro
+ *                        processing (may be NULL if not used).
+ * 
+ * @return                An integer error flag: 0 if no errors occurred, 1 if
+ *                        errors were detected.
+ */
 int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
 {
     /* Declarations */
@@ -212,7 +229,6 @@ int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
                 for (i = 0; i < L; i++)
                 {
                     machine_code_ptr->data_image[machine_code_ptr->DC] = answer.ast_options.dir.dir_options.data[i];
-                    printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
                     /* Increment DC after each data entry to ensure proper placement in data image */
                     if ((i < L - 1) || answer.ast_options.dir.dir_type == ast_data)
                     {
@@ -287,13 +303,5 @@ int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
         }
         found = (found->next);
     }
-
-    putchar('\n');
-
-    print_symbol_table(head_ptr);
-    putchar('\n');
-    print_data_image(machine_code_ptr);
-    putchar('\n');
-    
     return error_flag;
 }

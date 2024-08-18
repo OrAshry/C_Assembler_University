@@ -1,10 +1,24 @@
 #include "secondPass.h"
 
+/**
+ * @brief Performs the second pass over the assembly file, processing instructions and tracking external symbol usage.
+ *
+ * This function processes the given assembly file in the second pass. It calculates the number of words needed
+ * for instructions, codes the instructions into the code image, and tracks the usage of external symbols.
+ * If an error occurs (such as exceeding the maximum memory size or using undefined symbols), it will set
+ * an error flag and return NULL. The function also updates the `extern_usage_head_ptr` with external symbol usage.
+ *
+ * @param file_name The name of the assembly file being processed.
+ * @param file A pointer to the file stream of the assembly file.
+ * @param extern_usage_head_ptr A pointer to the head of the external symbols usage list.
+ * @param err_flag A pointer to an integer that will be set to 1 if any errors are encountered.
+ * @return A pointer to the updated external symbols usage list, or NULL if an error occurs.
+ */
 extern_addresses_ptr secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_head_ptr, int *err_flag)
 {
     /* Declarations */
     int error_flag = 0;
-    int skip_to_next_line;
+    int skip_to_next_line; /* Indicate that the current line should be skipped if an error occurs */
     int am_line_counter = 1; /* After macro line counter */
     int L; /* Words counter */
     int i;
@@ -171,15 +185,24 @@ extern_addresses_ptr secondPass(char *file_name, FILE *file, extern_addresses_pt
 
         am_line_counter++;
     }
-
-    print_extern_usage(extern_usage_head_ptr);
-    print_code_image(machine_code_ptr);
-    printf("%d", error_flag);
     *err_flag = error_flag;
     return extern_usage_head_ptr;
 }
 
-/* This function will code the second and third words */
+
+/**
+ * @brief Encodes the second and third words of an instruction into the code image.
+ *
+ * This function encodes the operands of an instruction into the code image, based on the addressing mode
+ * (immediate, label, or register). The function adjusts the bit positions based on the type of operand and
+ * the number of words being encoded. If an error occurs during encoding, the error flag is set.
+ *
+ * @param num_of_words The number of words to encode (usually 2 or 3).
+ * @param a The abstract syntax tree (AST) node representing the instruction to encode.
+ * @param flag A pointer to an integer that will be set to 1 if any errors are encountered.
+ * @param name_of_file The name of the assembly file being processed.
+ * @param current_am_line The current line number in the assembly file after macro expansion.
+ */
 void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_file, int current_am_line)
 {
     int i;
@@ -228,7 +251,15 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
     }
 }
 
-/* Clean up function for the extern struct*/
+/**
+ * @brief Frees the memory allocated for the external symbols usage list.
+ *
+ * This function iterates through the external symbols usage list and frees the memory allocated
+ * for each node. It also resets the symbol names and usage addresses within each node to ensure
+ * proper cleanup.
+ *
+ * @param head A pointer to the head of the external symbols usage list.
+ */
 void free_extern_table(extern_addresses_ptr head){
     int i;
     extern_addresses_ptr current = head;
