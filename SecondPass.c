@@ -1,9 +1,5 @@
 #include "secondPass.h"
 
-
-extern_addresses_ptr extern_usage_head_ptr = NULL;
-extern_addresses_ptr extern_ptr;
-
 int secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_head_ptr)
 {
     /* Declarations */
