@@ -436,7 +436,7 @@ struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int 
             return macro_context;
         }
 
-        if (line != NULL)
+        if (line[0] != '\0')
         {
             memset(line, 0, MAX_LINE); /* initalize line variable */
         }
