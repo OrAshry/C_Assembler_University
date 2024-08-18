@@ -53,9 +53,9 @@ int is_number(char *str, int const min_num, int const max_num, int *result, char
 int is_defined_macro(char *label, struct MacroContext *macro_table)
 {
     int i;
-    for(i = 0; i < macro_table->macro_counter; i++)
+    for (i = 0; i < macro_table->macro_counter; i++)
     {
-        if(strcmp(label, macro_table->macro_table[i]->name) == 0)
+        if (strcmp(label, macro_table->macro_table[i]->name) == 0)
         {
             return 1;
         }
@@ -331,39 +331,117 @@ void set_ast_inst_one_operands(struct ast *ast, struct string_split split_result
     update_ast_operands(split_result.string[0], ast, dest_type, 0); /* Update destination operand */
 }
 
-void parse_operands(struct string_split operands, int index, struct ast *ast)
+char *concat_string_split(struct string_split split_result, int const index, int const size)
 {
-    struct string_split temp_split_str = {0};
-    struct inst inst = inst_table[ast->ast_options.inst.inst_type];
     char *concat_string = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
     int i = 0;
 
-    /* Concat string */
-    for (i = index; i < operands.size; i++)
+    for (i = index; i < size; i++)
     {
-        strcat(concat_string, operands.string[i]);
-        if (i != operands.size - 1)
+        strcat(concat_string, split_result.string[i]);
+        if (i != size - 1)
         {
             strcat(concat_string, SPACE);
         }
     }
 
+    return concat_string;
+}
+
+/*
+Check if comma between operands
+@param string - the string to check
+@param first_operand - the first operand
+@return 1 if comma between operands, 0 if not, -1 if error
+*/
+int has_comma_between_operands(char *string, char *first_operand)
+{
+    const char *ptr = strstr(string, first_operand);
+    int index, i;
+
+    if (ptr != NULL) {
+        index = ptr - string; /* Index of first_operand in string */
+    } else {
+        return -1;
+    }
+
+    for(i = index; i < strlen(string); i++){
+        if(string[i] == COMMA_CHAR){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void parse_operands(struct string_split operands, int index, struct ast *ast)
+{
+    struct string_split temp_split_str = {0};
+    struct inst inst = inst_table[ast->ast_options.inst.inst_type];
+    char *concat_string = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    char *original_concat_string = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID);
+    char *temp_concat;
+    int i = 0;
+
+    /* Concat string */
+    strcpy(concat_string, concat_string_split(operands, index, operands.size));
+    strcpy(original_concat_string, concat_string);
+
     /* If comma in string and instruction only source and dest operands, we need to split string by comma */
     if ((operands.size > index) && strchr(concat_string, COMMA_CHAR) != NULL && inst.source[0] && inst.dest[0])
     {
+        /* First part: Split by comma */
         temp_split_str = split_string(concat_string, COMMA);
+
+        /* Second part: Remove spaces if exists (just in case) */
+        if (temp_split_str.size == 2)
+        {
+            temp_concat = (char *)allocateMemory(MAX_LINE, sizeof(char), CALLOC_ID); /* Init temp_concat */
+            strcpy(temp_concat, concat_string_split(temp_split_str, 0, temp_split_str.size));
+
+            for (i = 0; i < temp_split_str.size; i++)
+            {
+                memset(temp_split_str.string[i], 0, strlen(temp_split_str.string[i]));
+            }
+            temp_split_str.size = 0;
+
+            temp_split_str = split_string(temp_concat, SPACES);
+
+            memset(concat_string, 0, strlen(concat_string));
+            strcpy(concat_string, temp_concat);
+            free(temp_concat);
+        }
     }
 
     /* If comma not in string, split by SPACE */
     if (!temp_split_str.size)
         temp_split_str = split_string(concat_string, SPACE);
 
+    if (index < operands.size && operands.string[index][0] == COMMA_CHAR)
+    {
+        strcpy(ast->lineError, "Comma must not come after the instruction");
+        ast->ast_type = ast_error;
+        return;
+    }
+    else if (operands.string[operands.size - 1][0] == COMMA_CHAR)
+    {
+        strcpy(ast->lineError, "Comma must not be at the end of the line");
+        ast->ast_type = ast_error;
+        return;
+    }
+
     /* Case of two operands in instruction */
     if (inst.source[0] && inst.dest[0])
     {
         if (temp_split_str.size != 2)
         {
-            strcpy(ast->lineError, "Invalid number of operands");
+            strcpy(ast->lineError, "Instruction must have two operands while separated by comma");
+            ast->ast_type = ast_error;
+            return;
+        }
+        
+        if ((index + 1) < operands.size && !has_comma_between_operands(original_concat_string, temp_split_str.string[0]))
+        {
+            strcpy(ast->lineError, "Comma must be between operands");
             ast->ast_type = ast_error;
             return;
         }
@@ -375,7 +453,7 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
     {
         if (temp_split_str.size != 1)
         {
-            strcpy(ast->lineError, "Invalid number of operands");
+            strcpy(ast->lineError, "Instruction must have one operand only");
             ast->ast_type = ast_error;
             return;
         }
@@ -387,7 +465,7 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
     {
         if (temp_split_str.size != 0)
         {
-            strcpy(ast->lineError, "Invalid number of operands");
+            strcpy(ast->lineError, "Instruction must have no operands");
             ast->ast_type = ast_error;
             return;
         }
@@ -480,7 +558,7 @@ struct ast get_ast_from_line(char *line, struct MacroContext *macro_table)
             ast.ast_type = ast_error;
             return ast;
         }
-        else if(macro_table != NULL && is_defined_macro(ast.labelName, macro_table))
+        else if (macro_table != NULL && is_defined_macro(ast.labelName, macro_table))
         {
             strcpy(ast.lineError, "Label name is a already defined as macro name");
             ast.ast_type = ast_error;

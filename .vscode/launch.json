@@ -11,7 +11,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/a.out",
-            "args": ["invalid_input_3"],
+            "args": ["valid_input_3", "tomer_test2", "invalid_input_3", "fib_exam"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

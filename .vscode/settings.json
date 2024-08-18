@@ -15,7 +15,11 @@
         "symboltable.h": "c",
         "translate.h": "c",
         "output.h": "c",
-        "lineparser.h": "c"
+        "lineparser.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c"
     },
     "editor.mouseWheelZoom": true
 }
