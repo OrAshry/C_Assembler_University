@@ -74,10 +74,21 @@ void fprint_data_image(const translation_ptr p, FILE *file) {
     for (i = 0; i < machine_code_ptr->DC; i++) {
         if ((p->data_image[i] != '\0') || (p->data_image[i] == 0)) {
             intToOctalString(p->data_image[i], octalStr, 5);  /* Convert to 5-digit octal */
-            fprintf(file, "%04d %s", i + machine_code_ptr->IC, octalStr);  /* Print the address with 4 digits and octal with 5 digits */
-            if(i < machine_code_ptr->DC - 1) 
+            if(machine_code_ptr->IC == 0) 
             {
-                fprintf(file, "\n");
+                fprintf(file, "%04d %s", i + 100, octalStr);  /* Print the address with 4 digits and octal with 5 digits */
+                if(i < (machine_code_ptr->DC + 100) - 1) 
+                {
+                    fprintf(file, "\n");
+                }
+            }
+            else 
+            {
+                fprintf(file, "%04d %s", i + machine_code_ptr->IC, octalStr);  /* Print the address with 4 digits and octal with 5 digits */
+                if(i < machine_code_ptr->DC - 1) 
+                {
+                    fprintf(file, "\n");
+                }
             }
         }
     }
