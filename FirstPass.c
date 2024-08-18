@@ -36,7 +36,7 @@ int firstPass(char *file_name, FILE *file)
         /* If there is a syntax error*/
         if (answer.ast_type == ast_error)
         {
-            printf("Error: In file %s at line %d there is a sysntax error: %s\n", file_name, line_counter, answer.lineError);
+            printf("Error: In file %s at line %d there is an error: %s\n", file_name, line_counter, answer.lineError);
             line_counter++;
             error_flag = 1;
             continue;
