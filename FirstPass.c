@@ -1,4 +1,4 @@
-#include "firstPass.h"
+#include "FirstPass.h"
 
 table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
 translation machine_code = {0};
@@ -7,7 +7,6 @@ translation_ptr machine_code_ptr = &machine_code;
 
 int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
 {
-
     /* Declarations */
     int error_flag = 0;
     int L; /* Number of words that the current instruction takes */
