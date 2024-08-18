@@ -459,7 +459,7 @@ char *concat_string_split(struct string_split split_result, int const index, int
 int has_comma_between_operands(const char *string, const char *first_operand, const char *second_operand)
 {
     const char *ptr = strstr(string, first_operand); /* Find first_operand in string */
-    const char *ptr2 = strstr(string, second_operand); /* Find second_operand in string */
+    const char *ptr2;
     int index, end, i;
 
     if (ptr != NULL)
@@ -470,6 +470,8 @@ int has_comma_between_operands(const char *string, const char *first_operand, co
     {
         return -1;
     }
+
+    ptr2 = strstr(string + strlen(first_operand), second_operand); /* Find second_operand in string */
 
     if(ptr2 != NULL)
     {
