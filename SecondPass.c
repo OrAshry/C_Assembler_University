@@ -1,10 +1,10 @@
 #include "secondPass.h"
 
-extern_addresses extern_usage = {0};
+
 extern_addresses_ptr extern_usage_head_ptr = NULL;
 extern_addresses_ptr extern_ptr;
 
-int secondPass(char *file_name, FILE *file)
+int secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_head_ptr)
 {
     /* Declarations */
     int error_flag = 0;
@@ -23,6 +23,7 @@ int secondPass(char *file_name, FILE *file)
         two_op_reg = 0;
         L = 1;
         skip_to_next_line = 0;
+        extern_addresses_ptr extern_ptr = extern_usage_head_ptr;
 
         /* Calculate words and code the code into code_image */
         if (answer_line.ast_type == ast_inst)
@@ -72,7 +73,7 @@ int secondPass(char *file_name, FILE *file)
                         {
                             if (found->symbol_type == extern_symbol) 
                             {
-                                extern_ptr = find_extern(extern_usage_head_ptr, answer_line.ast_options.inst.operands[i].operand_option.label);
+                                extern_ptr = find_extern(extern_ptr, answer_line.ast_options.inst.operands[i].operand_option.label);
                                 if (extern_ptr)
                                 {
                                     /* Assign addresses */

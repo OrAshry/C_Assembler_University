@@ -50,7 +50,7 @@ void createEntFile(const char *input_file_name)
 }
 
 /* Extern output file */
-void createExtFile(const char *input_file_name)
+void createExtFile(const char *input_file_name, extern_addresses_ptr extern_usage_head_ptr)
 {
     char *ext_file_name;
     FILE *ext_file;
