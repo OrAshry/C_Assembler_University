@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "Constants.h"
 #include "helpingFunction.h"
+#include "macroContext.h"
 
 #define DEF_MAT_SIZE 15
 #define MACRO_TABLE_SIZE 200
@@ -18,11 +19,6 @@ struct Macro
     char name[MAX_LINE];
     char **context;
     int lines_counter;
-};
-
-struct MacroContext {
-    struct Macro **macro_table;
-    int macro_counter;
 };
 
 enum MacroState

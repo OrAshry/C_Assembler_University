@@ -19,7 +19,7 @@ int main(int argc, char **argv)
             am_file = open_file(amFileName, "r"); /* Open am file for read mode */
             if (am_file)
             {
-                if (firstPass(argv[i], am_file) != 1)
+                if (firstPass(argv[i], am_file, &macro_table) != 1)
                 { /* Run first pass */
                     /* Firstpass success */
                     rewind(am_file); /* Rewind file pointer */
