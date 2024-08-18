@@ -130,8 +130,14 @@ void createObFile(const char *input_file_name) {
     }
 
     /* Writing the header (number of instructions and number of directive) */
-    fprintf(ob_file, "%d\t%d\n", (machine_code_ptr->IC) - 100,  (machine_code_ptr->DC));
-
+    if((machine_code_ptr->IC) == 0) 
+    {
+        fprintf(ob_file, "%d\t%d\n", (machine_code_ptr->IC),  (machine_code_ptr->DC));
+    }
+    else 
+    {
+        fprintf(ob_file, "%d\t%d\n", (machine_code_ptr->IC) - 100,  (machine_code_ptr->DC));
+    }
     /* Writing the code_image */
     fprint_code_image(machine_code_ptr, ob_file);
     fprint_data_image(machine_code_ptr, ob_file);
