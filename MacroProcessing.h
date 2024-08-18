@@ -14,6 +14,7 @@
 #define STARTMACR "macr"
 #define ENDMACR "endmacr"
 
+/* Macro Structure */
 struct Macro
 {
     char name[MAX_LINE];
@@ -21,6 +22,7 @@ struct Macro
     int lines_counter;
 };
 
+/* Macro State Enumeration */
 enum MacroState
 {
     MACRO_DEF,
@@ -30,6 +32,7 @@ enum MacroState
     MACRO_BODY
 };
 
+/* Functions Prototype */
 FILE *open_file(char *file_name, char *mode);
 struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int *macro_counter);
 char * macro_processing(char *file_name, struct MacroContext *macro_table);
@@ -41,7 +44,8 @@ int is_macro_end(char *line, struct Macro **macro_ptr);
 struct Macro *create_macro(char *token, int *result, struct Macro **macro_table, const int macro_counter);
 char *get_macro_name(char *token);
 void update_macro_context(char *line, struct Macro **macro_ptr);
-void free_macro_table(struct MacroContext *macro_table);
+void free_macro_ctx_table(struct MacroContext *macro_table);
+void free_macro_table(struct Macro *macro_table);
 void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int macro_counter);
 int check_duplicate_macro(const char *macro_name, struct Macro **macro_table, const int macro_counter);
 

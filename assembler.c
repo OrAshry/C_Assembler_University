@@ -34,7 +34,7 @@ int main(int argc, char **argv)
             }
             /* Freeing variables */
             free(amFileName);
-            free_macro_table(&macro_table);
+            free_macro_ctx_table(&macro_table);
             free_symbol_table(&head_ptr);
             free_extern_table(&extern_usage);
             free_machine_code(machine_code_ptr);

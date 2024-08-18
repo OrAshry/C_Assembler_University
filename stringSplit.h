@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "constants.h"
 
+/* Structure to hold the splitted string */
 struct string_split{
     char * string[81];
     int size;
@@ -12,7 +13,7 @@ struct string_split{
 
 #include "helpingFunction.h"
 
-/* Split a string into substrings using a delimiter */
+/* Functions Prototypes */
 struct string_split split_string(char * str, const char * delimiter);
 
 #endif

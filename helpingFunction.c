@@ -1,11 +1,20 @@
 #include "helpingFunction.h"
 
-char *saved_words[] = { "mov", "cmp", "add", "sub", 
-                        "not", "clr", "lea", "inc", 
-                        "dec", "jmp", "bne", "red", 
-                        "prn", "jsr", "rts", "stop", 
-                        "data", "string", "entry", "extern" };
+/* Saved words array for use in other files */
+char *saved_words[] = {"mov", "cmp", "add", "sub",
+                       "not", "clr", "lea", "inc",
+                       "dec", "jmp", "bne", "red",
+                       "prn", "jsr", "rts", "stop",
+                       "data", "string", "entry", "extern"};
 
+/**
+ * @brief Allocates memory using a specified allocation function.
+ *
+ * @param numElements Number of elements to allocate.
+ * @param sizeOfElement Size of each element.
+ * @param functionID The ID specifying the allocation function (CALLOC, MALLOC, REALLOC).
+ * @return void* Pointer to the allocated memory, or NULL if allocation fails.
+ */
 void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
 {
     void *ptr;
@@ -26,13 +35,21 @@ void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID)
     return ptr;
 }
 
-/* definition int is 1 if definition label else 0*/
+/**
+ * @brief Checks if a string is a valid label and optionally updates the AST.
+ *
+ * @param str The string to check.
+ * @param ast A pointer to the AST structure to update if `definition` is true.
+ * @param definition Indicates if this is a label definition (1) or reference (0).
+ * @return int Returns 1 if the string is a valid label, otherwise 0.
+ */
 int is_label(char const *str, struct ast *ast, int const definition)
 {
     int i;
     int size;
 
-    if(!str){
+    if (!str)
+    {
         return 0;
     }
 
@@ -65,6 +82,11 @@ int is_label(char const *str, struct ast *ast, int const definition)
     return 1;
 }
 
+/**
+ * @brief Check if a string is register from r0 to r7
+ * @param str The string to check
+ * @return 1 if the string is a register, 0 otherwise
+ */
 int is_register(char const *str)
 {
     char *endptr = NULL;
@@ -77,13 +99,22 @@ int is_register(char const *str)
     {
         return 1;
     }
-    
-    if(strcmp(str, "r0") == 0){ /* Special case - if register is r0, is_number return 0 */
+
+    if (strcmp(str, "r0") == 0)
+    { /* Special case - if register is r0, is_number return 0 */
         return 1;
     }
     return 0;
 }
 
+/**
+ * @brief Checks if a given string matches a known instruction and updates the AST accordingly.
+ *
+ * @param str The string to be checked as a potential instruction.
+ * @param ast A pointer to the abstract syntax tree structure to be updated if the instruction is found.
+ *
+ * @return int Returns 1 if the string matches a known instruction, otherwise returns 0.
+ */
 int is_instruction(char const *str, struct ast *ast)
 {
     int i;
@@ -101,12 +132,24 @@ int is_instruction(char const *str, struct ast *ast)
     return 0;
 }
 
+/**
+ * @brief Prints an error message and exits the program with a failure status.
+ *
+ * @param message The error message to be printed before exiting.
+ */
 void failureExit(char *message)
 {
     printf("%s\n", message);
     exit(1);
 }
 
+/**
+ * @brief Checks if the given string matches any saved word.
+ *
+ * @param str The string to be checked.
+ *
+ * @return int Returns 1 if the string is a saved word, otherwise returns 0.
+ */
 int is_saved_word(char const *str)
 {
     int i;

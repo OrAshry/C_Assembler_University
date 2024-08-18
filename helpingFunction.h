@@ -16,16 +16,15 @@ struct ast; /* Forward declaration of struct ast */
 enum FunctionId
 {
     CALLOC_ID,
-    MALLOC_ID,
-    REALLOC_ID
+    MALLOC_ID
 };
 
+/* Prototype Functions */
 void *allocateMemory(size_t numElements, size_t sizeOfElement, int functionID);
 int is_instruction(char const *str, struct ast *ast);
 int is_label(char const *str, struct ast *ast, int const definition);
 int is_register(char const *str);
-struct string_split split_string(char * str, const char * delimiter);
 void failureExit(char *message);
 int is_saved_word(char const *str);
 
-#endif
+#endif /* HELPINGFUNCTION_H */
