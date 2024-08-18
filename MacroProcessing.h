@@ -44,7 +44,8 @@ int is_macro_end(char *line, struct Macro **macro_ptr);
 struct Macro *create_macro(char *token, int *result, struct Macro **macro_table, const int macro_counter);
 char *get_macro_name(char *token);
 void update_macro_context(char *line, struct Macro **macro_ptr);
-void free_macro_table(struct MacroContext *macro_table);
+void free_macro_ctx_table(struct MacroContext *macro_table);
+void free_macro_table(struct Macro *macro_table);
 void append_macro_table(struct Macro **macro_table, struct Macro *macro_ptr, int macro_counter);
 int check_duplicate_macro(const char *macro_name, struct Macro **macro_table, const int macro_counter);
 

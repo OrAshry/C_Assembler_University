@@ -450,6 +450,7 @@ struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int 
     *result = 0;
     macro_context.macro_table = macro_table;
     macro_context.macro_counter = mcr_counter;
+    
     return macro_context;
 }
 
@@ -458,21 +459,35 @@ struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int 
  *
  * @param macro_table A pointer to a `MacroContext` structure containing the macro table to be freed.
  */
-void free_macro_table(struct MacroContext *macro_table)
+void free_macro_ctx_table(struct MacroContext *macro_table)
 {
-    int i, j;
+    int i;
     for (i = 0; i < macro_table->macro_counter; i++)
     {
-        for (j = 0; j < macro_table->macro_table[i]->lines_counter; j++)
-        {
-            free(macro_table->macro_table[i]->context[j]);
-        }
-        macro_table->macro_table[i]->context = NULL;
-        macro_table->macro_table[i] = NULL;
+        free_macro_table(macro_table->macro_table[i]);
     }
     macro_table->macro_table = NULL;
     macro_table->macro_counter = 0;
     free(macro_table->macro_table);
+}
+
+/**
+ * @brief Frees the memory allocated for the macro table and its contents.
+ *
+ * @param macro_table A pointer to a `Macro` structure containing the macro table to be freed.
+ */
+void free_macro_table(struct Macro *macro_table)
+{
+    int i;
+    for (i = 0; i < macro_table->lines_counter; i++)
+    {
+        free(macro_table->context[i]);
+    }
+    macro_table->context = NULL;
+    free(macro_table->context);
+    macro_table->lines_counter = 0;
+    memset(macro_table->name, 0, MAX_LINE);
+    free(macro_table);
 }
 
 char *macro_processing(char *file_name, struct MacroContext *macro_table)
