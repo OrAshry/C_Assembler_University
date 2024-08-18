@@ -5,7 +5,7 @@ translation machine_code = {0};
 table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
 translation_ptr machine_code_ptr = &machine_code;
 
-int firstPass(char *file_name, FILE *file)
+int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
 {
 
     /* Declarations */
@@ -31,7 +31,7 @@ int firstPass(char *file_name, FILE *file)
             continue;
         }
         strcpy(read_line, buffer_line);
-        answer = get_ast_from_line(read_line);
+        answer = get_ast_from_line(read_line, macro_context);
 
         /* If there is a syntax error*/
         if (answer.ast_type == ast_error)

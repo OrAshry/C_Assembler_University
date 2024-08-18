@@ -19,7 +19,7 @@ int secondPass(char *file_name, FILE *file)
     
     while (fgets(line, MAX_LINE_LENGTH, file))
     {
-        answer_line = get_ast_from_line(line);
+        answer_line = get_ast_from_line(line, NULL);
         two_op_reg = 0;
         L = 1;
         skip_to_next_line = 0;

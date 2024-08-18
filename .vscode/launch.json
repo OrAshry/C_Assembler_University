@@ -11,7 +11,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/a.out",
-            "args": ["invalid_input_4"],
+            "args": ["invalid_input_3"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

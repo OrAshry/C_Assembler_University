@@ -1,6 +1,8 @@
 #ifndef LINEPARSER_H
 #define LINEPARSER_H
 
+#include "macroContext.h"
+#include "macroProcessing.h"
 #include "stringSplit.h"
 #include "Constants.h"
 #include <ctype.h>
@@ -18,6 +20,8 @@
 #define COMMA_CHAR ','
 #define MIN_NUM -16384
 #define MAX_NUM 16383
+#define MIN_NUM_IMMID -2048
+#define MAX_NUM_IMMID 2047
 #define SPACE_CHAR ' '
 #define SPACE " "
 #define INST_SIZE 16
@@ -97,7 +101,7 @@ struct ast{
     }ast_options;
 };
 
-struct ast get_ast_from_line(char * line);
+struct ast get_ast_from_line(char * line, struct MacroContext *macro_table);
 int is_number(char * str, int min_num, int max_num, int * result, char ** end_ptr);
 int is_op_valid(int const operand_type, char const * inst_options);
 void parse_operands(struct string_split operands, int index, struct ast * ast);
@@ -108,5 +112,6 @@ void set_ast_inst_two_operands(struct ast * ast, struct string_split split_resul
 void set_ast_inst_one_operands(struct ast * ast, struct string_split split_result);
 int get_operand_type(char *operand, struct ast *ast);
 void update_ast_operands(char *value, struct ast * ast, int operand_type, int operand_index);
+int is_defined_macro(char *label, struct MacroContext *macro_table);
 
 #endif
