@@ -53,10 +53,6 @@ table_ptr symbol_search(table_ptr ptr, const char search_name[MAX_SYMBOL_NAME]);
 table_ptr find_extern_in_symbol_table(table_ptr ptr);
 extern_addresses_ptr find_extern(extern_addresses_ptr ptr, const char search_name[MAX_SYMBOL_NAME]);
 table_ptr find_entry(table_ptr ptr);
-void print_symbol_table(table_ptr p); /*for the test*/
-void print_data_image(const translation_ptr p);
-void print_code_image(const translation_ptr p);
-void print_extern_usage(extern_addresses_ptr head);
 void fprint_code_image(const translation_ptr p, FILE *file);
 void fprint_data_image(const translation_ptr p, FILE *file);
 void free_symbol_table(table_ptr *head);

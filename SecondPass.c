@@ -185,10 +185,6 @@ extern_addresses_ptr secondPass(char *file_name, FILE *file, extern_addresses_pt
 
         am_line_counter++;
     }
-
-    print_extern_usage(extern_usage_head_ptr);
-    print_code_image(machine_code_ptr);
-    printf("%d", error_flag);
     *err_flag = error_flag;
     return extern_usage_head_ptr;
 }

@@ -229,7 +229,6 @@ int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
                 for (i = 0; i < L; i++)
                 {
                     machine_code_ptr->data_image[machine_code_ptr->DC] = answer.ast_options.dir.dir_options.data[i];
-                    printf("Writing to address %d: %d\n", machine_code_ptr->DC, machine_code_ptr->data_image[machine_code_ptr->DC]);
                     /* Increment DC after each data entry to ensure proper placement in data image */
                     if ((i < L - 1) || answer.ast_options.dir.dir_type == ast_data)
                     {
@@ -304,13 +303,5 @@ int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
         }
         found = (found->next);
     }
-
-    putchar('\n');
-
-    print_symbol_table(head_ptr);
-    putchar('\n');
-    print_data_image(machine_code_ptr);
-    putchar('\n');
-    
     return error_flag;
 }
