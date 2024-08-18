@@ -467,9 +467,11 @@ void free_macro_table(struct MacroContext *macro_table)
         {
             free(macro_table->macro_table[i]->context[j]);
         }
-        free(macro_table->macro_table[i]->context);
-        free(macro_table->macro_table[i]);
+        macro_table->macro_table[i]->context = NULL;
+        macro_table->macro_table[i] = NULL;
     }
+    macro_table->macro_table = NULL;
+    macro_table->macro_counter = 0;
     free(macro_table->macro_table);
 }
 
