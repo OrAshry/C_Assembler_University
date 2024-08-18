@@ -50,6 +50,19 @@ int is_number(char *str, int const min_num, int const max_num, int *result, char
     return num;
 }
 
+int is_defined_macro(char *label, struct MacroContext *macro_table)
+{
+    int i;
+    for(i = 0; i < macro_table->macro_counter; i++)
+    {
+        if(strcmp(label, macro_table->macro_table[i]->name) == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int fill_string(struct string_split const split_result, int const index, struct ast *ast)
 {
     int i, j, results[RESULT_ARR_SIZE] = {0}, data_size_ = 0, last_idx;
@@ -228,7 +241,7 @@ void update_ast_operands(char *value, struct ast *ast, int operand_type, int ope
     {
     case ast_immidiate:
         ast->ast_options.inst.operands[operand_index].operand_type = ast_immidiate;
-        integer_value = is_number(value + 1, MIN_NUM, MAX_NUM, &result, NULL);
+        integer_value = is_number(value + 1, MIN_NUM_IMMID, MAX_NUM_IMMID, &result, NULL);
         ast->ast_options.inst.operands[operand_index].operand_option.immed = integer_value;
         break;
     case ast_register_direct:
@@ -423,7 +436,7 @@ void fill_directive_ast(struct ast *ast, struct string_split split_result, int i
     }
 }
 
-struct ast get_ast_from_line(char *line)
+struct ast get_ast_from_line(char *line, struct MacroContext *macro_table)
 {
     struct ast ast = {0}; /* Init ast type */
     int index = 0;        /* index init */
@@ -464,6 +477,12 @@ struct ast get_ast_from_line(char *line)
         if (is_saved_word(ast.labelName))
         {
             strcpy(ast.lineError, "Label name is a saved word");
+            ast.ast_type = ast_error;
+            return ast;
+        }
+        else if(macro_table != NULL && is_defined_macro(ast.labelName, macro_table))
+        {
+            strcpy(ast.lineError, "Label name is a already defined as macro name");
             ast.ast_type = ast_error;
             return ast;
         }
