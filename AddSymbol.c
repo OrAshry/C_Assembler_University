@@ -31,7 +31,10 @@ void add_symbol_to_extern_usage(char new_name[MAX_SYMBOL_NAME], int new_address,
     new_extern->next = NULL;
 
     /* The table is empty */
-    if(*ptr == NULL) {
+    /*if(*ptr == NULL) {
+        *ptr = new_extern;
+    }*/
+    if(strcmp((*ptr)->name, "") == 0) {
         *ptr = new_extern;
     }
 

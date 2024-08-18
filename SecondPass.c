@@ -1,6 +1,6 @@
 #include "secondPass.h"
 
-int secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_head_ptr)
+extern_addresses_ptr secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_head_ptr, int *err_flag)
 {
     /* Declarations */
     int error_flag = 0;
@@ -10,6 +10,7 @@ int secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_he
     int i;
     int two_op_reg; /* Flag that indicates if the there are 2 operands of type register*/
     char line[MAX_LINE_LENGTH] = {0}; /* The line muber of the source file after macro */
+    extern_addresses_ptr extern_ptr = extern_usage_head_ptr;
     struct ast answer_line = {0};
     machine_code_ptr->IC = 0; /* Restart inst counter */
     
@@ -19,8 +20,7 @@ int secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_he
         two_op_reg = 0;
         L = 1;
         skip_to_next_line = 0;
-        extern_addresses_ptr extern_ptr = extern_usage_head_ptr;
-
+        
         /* Calculate words and code the code into code_image */
         if (answer_line.ast_type == ast_inst)
         {
@@ -48,7 +48,8 @@ int secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_he
             {
                 error_flag = 1;
                 printf("Error: the program has reached maximum memmory size allowed.\n ");
-                return error_flag;
+                *err_flag = error_flag;
+                return NULL;
             }
 
             /* Initialize IC if needed */
@@ -174,7 +175,8 @@ int secondPass(char *file_name, FILE *file, extern_addresses_ptr extern_usage_he
     print_extern_usage(extern_usage_head_ptr);
     print_code_image(machine_code_ptr);
     printf("%d", error_flag);
-    return error_flag;
+    *err_flag = error_flag;
+    return extern_usage_head_ptr;
 }
 
 /* This function will code the second and third words */
@@ -227,15 +229,22 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
 }
 
 /* Clean up function for the extern struct*/
-void free_extern_table(extern_addresses_ptr *head){
-    extern_addresses_ptr current = *head;
+void free_extern_table(extern_addresses_ptr head){
+    int i;
+    extern_addresses_ptr current = head;
     extern_addresses_ptr next;
 
     while (current != NULL) {
         next = current->next;
-        free(current);
+        current->name[0] = '\0';
+        for(i = 0; i < current->used_counter; i++) {
+            current->used_addresses[i] = 0;
+        }
+        current->used_counter = 0;
+        free(current->next);
+        current->next = NULL;
         current = next;
     }
 
-    *head = NULL;
+    head = NULL;
 }
