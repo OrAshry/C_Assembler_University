@@ -14,6 +14,7 @@
 #define STARTMACR "macr"
 #define ENDMACR "endmacr"
 
+/* Macro Structure */
 struct Macro
 {
     char name[MAX_LINE];
@@ -21,6 +22,7 @@ struct Macro
     int lines_counter;
 };
 
+/* Macro State Enumeration */
 enum MacroState
 {
     MACRO_DEF,
@@ -30,6 +32,7 @@ enum MacroState
     MACRO_BODY
 };
 
+/* Functions Prototype */
 FILE *open_file(char *file_name, char *mode);
 struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int *macro_counter);
 char * macro_processing(char *file_name, struct MacroContext *macro_table);
