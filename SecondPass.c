@@ -192,7 +192,7 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
     {
         
         /* Checking if the operand is source or destination */
-        if((i == 0 && (num_of_words == 2))|| (i == 1)) 
+        if((i == 0 && (num_of_words == 2))|| (i == 1) || (a.ast_options.inst.operands[i].operand_type == ast_immidiate)) 
         {
             val = 3;
         }
