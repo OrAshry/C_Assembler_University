@@ -37,32 +37,32 @@ struct inst inst_table[INST_SIZE] = {
 int is_number(char *str, int const min_num, int const max_num, int *result, char **end_ptr)
 {
     char *endptr;
-    long int num = strtol(str, &endptr, DECIMAL_BASE);
+    long int num = strtol(str, &endptr, DECIMAL_BASE); /* Convert string to long int */
 
-    if (num == 0 && str == endptr)
+    if (num == 0 && str == endptr) /* If string is not a number */
     {
         *result = 0;
         return 0;
     }
 
-    if (num > max_num)
+    if (num > max_num) /* If number is bigger than max_num */
     {
         *result = 2;
         return 0;
     }
 
-    if (num < min_num)
+    if (num < min_num) /* If number is smaller than min_num */
     {
         *result = 3;
         return 0;
     }
 
-    if (end_ptr)
+    if (end_ptr) /* If end_ptr is defined */
     {
         *end_ptr = endptr;
     }
 
-    *result = 1;
+    *result = 1; /* Number is valid */
     return num;
 }
 
@@ -78,7 +78,7 @@ int is_defined_macro(char *label, struct MacroContext *macro_table)
     int i;
     for (i = 0; i < macro_table->macro_counter; i++)
     {
-        if (strcmp(label, macro_table->macro_table[i]->name) == 0)
+        if (strcmp(label, macro_table->macro_table[i]->name) == 0) /* If label is a macro name */
         {
             return 1;
         }
@@ -121,6 +121,7 @@ int fill_string(struct string_split const split_result, int const index, struct 
         return 0;
     }
 
+    /* Concatenate string sections */
     for (i = index; i < split_result.size; i++)
     {
         for (j = 0; j < strlen(split_result.string[i]); j++)
@@ -186,6 +187,7 @@ int validate_numbers(struct string_split const split_str, int const size, struct
         return 0;
     }
 
+    /* Init data section */
     while (concat_str[0] != '\0')
     {
         if (concat_str[0] == COMMA_CHAR)
@@ -196,8 +198,8 @@ int validate_numbers(struct string_split const split_str, int const size, struct
                 return 0;
             }
 
-            flag_comma = 1, flag_number = 0;
-            concat_str++;
+            flag_comma = 1, flag_number = 0; /* Set flags */
+            concat_str++;                   /* Skip comma */
         }
 
         else if (concat_str[0] != COMMA_CHAR && concat_str[0] != SPACE_CHAR)
@@ -208,16 +210,16 @@ int validate_numbers(struct string_split const split_str, int const size, struct
                 return 0;
             }
 
-            flag_number = 1, flag_comma = 0;
-            num = is_number(concat_str, MIN_NUM, MAX_NUM, &result, &end_ptr);
+            flag_number = 1, flag_comma = 0; /* Set flags */
+            num = is_number(concat_str, MIN_NUM, MAX_NUM, &result, &end_ptr); /* Check if number is valid */
             switch (result)
             {
             case 0:
                 strcpy(ast->lineError, "Invalid number");
                 return 0;
             case 1:
-                concat_str = end_ptr;
-                results[data_size_++] = num;
+                concat_str = end_ptr; /* Skip number */
+                results[data_size_++] = num; /* Add number to data section */
                 break;
             case 2:
                 strcpy(ast->lineError, "Number is too big");
@@ -253,7 +255,7 @@ int is_op_valid(int const operand_type, char const *inst_options)
     int i;
     for (i = 0; i < strlen(inst_options); i++)
     {
-        if (operand_type == inst_options[i] - '0')
+        if (operand_type == inst_options[i] - '0') /* If operand type is valid */
         {
             return 1;
         }
@@ -271,21 +273,21 @@ int is_op_valid(int const operand_type, char const *inst_options)
  */
 int get_operand_type(char *operand, struct ast *ast)
 {
-    if (operand[0] == '#' || operand[0] == '*')
+    if (operand[0] == '#' || operand[0] == '*') /* If operand is immediate or register address */
     {
         return ((operand[0] == '#') ? ast_immidiate : ast_register_address);
     }
-    else if (is_register(operand))
+    else if (is_register(operand)) /* If operand is register */
     {
         return ast_register_direct;
     }
-    else if (is_label(operand, ast, NOT_DEFINITION_LABEL))
+    else if (is_label(operand, ast, NOT_DEFINITION_LABEL)) /* If operand is label */
     {
         return ast_label;
     }
     else
     {
-        strcpy(ast->lineError, "Instruction line syntax error");
+        strcpy(ast->lineError, "Instruction line syntax error"); /* Invalid operand */
         ast->ast_type = ast_error;
         return -1;
     }
@@ -303,26 +305,26 @@ int get_operand_type(char *operand, struct ast *ast)
  */
 void update_ast_operands(char *value, struct ast *ast, int operand_type, int operand_index)
 {
-    int result = __INT_MAX__;
+    int result = __INT_MAX__; /* Init result */
     int integer_value;
     switch (operand_type)
     {
-    case ast_immidiate:
+    case ast_immidiate: /* If operand is immediate */
         ast->ast_options.inst.operands[operand_index].operand_type = ast_immidiate;
         integer_value = is_number(value + 1, MIN_NUM_IMMID, MAX_NUM_IMMID, &result, NULL);
         ast->ast_options.inst.operands[operand_index].operand_option.immed = integer_value;
         break;
-    case ast_register_direct:
+    case ast_register_direct: /* If operand is register */
         ast->ast_options.inst.operands[operand_index].operand_type = ast_register_direct;
         integer_value = is_number(value + 1, MIN_NUM, MAX_NUM, &result, NULL);
         ast->ast_options.inst.operands[operand_index].operand_option.reg = integer_value;
         break;
-    case ast_register_address:
+    case ast_register_address: /* If operand is register address */
         ast->ast_options.inst.operands[operand_index].operand_type = ast_register_address;
         integer_value = is_number(value + 2, MIN_NUM, MAX_NUM, &result, NULL);
         ast->ast_options.inst.operands[operand_index].operand_option.reg = integer_value;
         break;
-    case ast_label:
+    case ast_label: /* If operand is label */
         ast->ast_options.inst.operands[operand_index].operand_type = ast_label;
         strcpy(ast->ast_options.inst.operands[operand_index].operand_option.label, value);
         break;
@@ -330,7 +332,7 @@ void update_ast_operands(char *value, struct ast *ast, int operand_type, int ope
         break;
     }
 
-    switch (result)
+    switch (result) /* Check if number is valid after calling is_number function (if called) */
     {
     case 0:
         strcpy(ast->lineError, "Invalid number");
@@ -362,23 +364,23 @@ void update_ast_operands(char *value, struct ast *ast, int operand_type, int ope
 void set_ast_inst_two_operands(struct ast *ast, struct string_split split_result)
 {
     struct inst inst = inst_table[ast->ast_options.inst.inst_type];
-    char line_error[MAX_LINE] = {0};
+    char line_error[MAX_LINE] = {0}, operand_type[MAX_LINE] = {0};
     int source_type = get_operand_type(split_result.string[0], ast);
     int dest_type = get_operand_type(split_result.string[1], ast);
 
-    if (is_op_valid(source_type, inst.source) == 0)
+    if (is_op_valid(source_type, inst.source) == 0) /* Check if source operand is valid */
     {
-        strcat(line_error, "Invalid source operand type in ");
-        strcat(line_error, inst.name);
-        strcat(line_error, " instruction");
-        strcpy(ast->lineError, line_error);
-        ast->ast_type = ast_error;
-        return;
+        strcpy(operand_type, "Invalid source operand type in ");
     }
 
-    if (is_op_valid(dest_type, inst.dest) == 0)
+    if (is_op_valid(dest_type, inst.dest) == 0) /* Check if dest operand is valid */
     {
-        strcat(line_error, "Invalid dest operand type in ");
+        strcat(operand_type, "Invalid dest operand type in ");
+    }
+
+    if (strlen(operand_type) > 0) /* If operand type is invalid */
+    {
+        strcat(line_error, operand_type);
         strcat(line_error, inst.name);
         strcat(line_error, " instruction");
         strcpy(ast->lineError, line_error);
@@ -404,9 +406,9 @@ void set_ast_inst_one_operands(struct ast *ast, struct string_split split_result
 {
     struct inst inst = inst_table[ast->ast_options.inst.inst_type];
     char line_error[MAX_LINE] = {0};
-    int dest_type = get_operand_type(split_result.string[0], ast);
+    int dest_type = get_operand_type(split_result.string[0], ast); /* Get operand type */
 
-    if (is_op_valid(dest_type, inst.dest) == 0)
+    if (is_op_valid(dest_type, inst.dest) == 0) /* Check if dest operand is valid */
     {
         strcat(line_error, "Invalid dest operand type in ");
         strcat(line_error, inst.name);
@@ -450,13 +452,15 @@ char *concat_string_split(struct string_split split_result, int const index, int
  * 
  * @param string The string in which to search for the operand and comma.
  * @param first_operand The operand to check for a following comma.
+ * @param second_operand The second operand to check for a preceding comma.
  * 
  * @return int Returns 1 if a comma is found after the specified operand, 0 if no comma is found, and -1 if the operand is not found in the string.
 */
-int has_comma_between_operands(char *string, char *first_operand)
+int has_comma_between_operands(const char *string, const char *first_operand, const char *second_operand)
 {
-    const char *ptr = strstr(string, first_operand);
-    int index, i;
+    const char *ptr = strstr(string, first_operand); /* Find first_operand in string */
+    const char *ptr2 = strstr(string, second_operand); /* Find second_operand in string */
+    int index, end, i;
 
     if (ptr != NULL)
     {
@@ -467,7 +471,15 @@ int has_comma_between_operands(char *string, char *first_operand)
         return -1;
     }
 
-    for (i = index; i < strlen(string); i++)
+    if(ptr2 != NULL)
+    {
+        end = ptr2 - string; /* Index of second_operand in string */
+    }
+    else{
+        return -1;
+    }
+
+    for (i = index; i < end; i++) /* Check if comma is after first_operand */
     {
         if (string[i] == COMMA_CHAR)
         {
@@ -550,7 +562,7 @@ void parse_operands(struct string_split operands, int index, struct ast *ast)
             return;
         }
 
-        if ((index + 1) < operands.size && !has_comma_between_operands(original_concat_string, temp_split_str.string[0]))
+        if ((index + 1) < operands.size && !has_comma_between_operands(original_concat_string, temp_split_str.string[0], temp_split_str.string[1]))
         {
             strcpy(ast->lineError, "Comma must be between operands");
             ast->ast_type = ast_error;
@@ -597,15 +609,15 @@ void fill_directive_ast(struct ast *ast, struct string_split split_result, int i
 {
     ast->ast_type = ast_dir;
 
-    if (strcmp(split_result.string[index], DIRECTIVE_DATA) == 0)
+    if (strcmp(split_result.string[index], DIRECTIVE_DATA) == 0) /* If directive is .data */
     {
         ast->ast_options.dir.dir_type = ast_data;
-        if (!validate_numbers(split_result, split_result.size, ast, ++index))
+        if (!validate_numbers(split_result, split_result.size, ast, ++index)) 
         {
             ast->ast_type = ast_error;
         }
     }
-    else if (strcmp(split_result.string[index], DIRECTIVE_STRING) == 0)
+    else if (strcmp(split_result.string[index], DIRECTIVE_STRING) == 0) /* If directive is .string */
     {
         ast->ast_options.dir.dir_type = ast_string;
         if (!fill_string(split_result, index + 1, ast))
@@ -613,7 +625,7 @@ void fill_directive_ast(struct ast *ast, struct string_split split_result, int i
             ast->ast_type = ast_error;
         }
     }
-    else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 || strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0)
+    else if (strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 || strcmp(split_result.string[index], DIRECTIVE_EXTERN) == 0) /* If directive is .entry or .extern */
     {
         ast->ast_options.dir.dir_type = strcmp(split_result.string[index], DIRECTIVE_ENTRY) == 0 ? ast_entry : ast_extern;
         if (is_label(split_result.string[index + 1], ast, NOT_DEFINITION_LABEL))
@@ -627,7 +639,7 @@ void fill_directive_ast(struct ast *ast, struct string_split split_result, int i
     }
     else
     {
-        strcpy(ast->lineError, "Invalid directive");
+        strcpy(ast->lineError, "Invalid directive"); /* Invalid directive */
         ast->ast_type = ast_error;
     }
 }

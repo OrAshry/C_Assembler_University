@@ -140,6 +140,6 @@ int get_operand_type(char *operand, struct ast *ast);
 void update_ast_operands(char *value, struct ast *ast, int operand_type, int operand_index);
 int is_defined_macro(char *label, struct MacroContext *macro_table);
 char *concat_string_split(struct string_split split_result, int const index, int const size);
-int has_comma_between_operands(char *string, char *first_operand);
+int has_comma_between_operands(const char *string, const char *first_operand, const char *second_operand);
 
 #endif

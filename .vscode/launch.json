@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/a.out",
-            "args": ["valid_input_3", "tomer_test2"],
+            "args": ["valid_input_3", "tomer_test2", "invalid_input_3"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
