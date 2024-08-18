@@ -4,42 +4,44 @@ struct string_split split_string(char *str, const char *delimiter)
 {
     int strings_count = 0, in_quotes = 0;
     struct string_split split_result = {0};
+    char *temp_str = (char *)allocateMemory(strlen(str) + 1, sizeof(char), MALLOC_ID);
+    strcpy(temp_str, str);
 
     /** Skip leading whitespaces **/
-    while (isspace((unsigned char)*str))
-        str++;
+    while (isspace((unsigned char)*temp_str))
+        temp_str++;
 
     /** If the string is empty after removing whitespaces **/
-    if (*str == NULL_BYTE)
+    if (*temp_str == NULL_BYTE)
         return split_result;
 
     /*while (str && *str != '\0')*/
-    while (str)
+    while (temp_str)
     {
         /** If string final char is enter **/
-        if (*str == '\n')
+        if (*temp_str == '\n')
         {
-            *str = NULL_BYTE;
+            *temp_str = NULL_BYTE;
             break;
         }
 
         /** Check for the start or end of a quoted substring **/
-        if (*str == '\"')
+        if (*temp_str == '\"')
             in_quotes = !in_quotes; /** Toggle in_quotes flag **/
 
         /** Store current string in the list **/
-        if (*str != NULL_BYTE)
+        if (*temp_str != NULL_BYTE)
         {
-            split_result.string[strings_count++] = str;
+            split_result.string[strings_count++] = temp_str;
         }
 
         if (in_quotes)
         {
             /** Find the closing quote **/
-            str = strchr(str + 1, '\"');
-            if (str)
+            temp_str = strchr(temp_str + 1, '\"');
+            if (temp_str)
             {
-                str++; /** Move past the closing quote **/
+                temp_str++; /** Move past the closing quote **/
             }
             else
             {
@@ -49,16 +51,16 @@ struct string_split split_string(char *str, const char *delimiter)
         else
         {
             /** Move to the next string **/
-            str = strpbrk(str, delimiter);
+            temp_str = strpbrk(temp_str, delimiter);
 
-            if (str)
+            if (temp_str)
             {
-                *str = NULL_BYTE; /** Null terminate **/
-                str++;
+                *temp_str = NULL_BYTE; /** Null terminate **/
+                temp_str++;
 
                 /** Skip additional whitespaces **/
-                while (isspace((unsigned char)*str))
-                    str++;
+                while (isspace((unsigned char)*temp_str))
+                    temp_str++;
             }
         }
     }
