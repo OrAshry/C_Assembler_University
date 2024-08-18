@@ -24,8 +24,6 @@ int secondPass(char *file_name, FILE *file)
         L = 1;
         skip_to_next_line = 0;
 
-        /* Check for the use of label that wasnt defined */
-
         /* Calculate words and code the code into code_image */
         if (answer_line.ast_type == ast_inst)
         {
