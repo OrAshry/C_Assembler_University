@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     {
         amFileName = macro_processing(argv[i], &macro_table); /* Create am file*/
         if (amFileName)
-        {   /* If file created successfully without errors */
+        {                                         /* If file created successfully without errors */
             am_file = open_file(amFileName, "r"); /* Open am file for read mode */
             if (am_file)
             {
@@ -25,9 +25,9 @@ int main(int argc, char **argv)
                     if (err_flag != 1)
                     { /* Run second pass */
                         /* Secondpass success */
-                        createEntFile(argv[i]); /* Create ent file */
+                        createEntFile(argv[i]);                /* Create ent file */
                         createExtFile(argv[i], &extern_usage); /* Create ext file */
-                        createObFile(argv[i]);  /* Create ob file */
+                        createObFile(argv[i]);                 /* Create ob file */
                     }
                 }
                 fclose(am_file); /* Close file */

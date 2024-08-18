@@ -241,7 +241,7 @@ int is_macro_body(char *line, struct Macro **macro_ptr)
 
 /**
  * @brief Checks if the given line is a macro call and updates the macro pointer if it is.
- * 
+ *
  * @param line The line of text to check for a macro call.
  * @param macro_table Pointer to the macro table containing defined macros.
  * @param macro_ptr Pointer to the macro that matches the call, if found.
@@ -429,7 +429,7 @@ struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int 
             break;
         }
 
-        if(*result == -1 || *result == -2 || *result == -3)
+        if (*result == -1 || *result == -2 || *result == -3)
         {
             mcr_counter--;
             *macro_counter = mcr_counter;
@@ -450,7 +450,7 @@ struct MacroContext fill_am_file(FILE *am_file, FILE *as_file, int *result, int 
     *result = 0;
     macro_context.macro_table = macro_table;
     macro_context.macro_counter = mcr_counter;
-    
+
     return macro_context;
 }
 
