@@ -11,7 +11,8 @@
 /* Prototypes */
 int firstPass(char * file_name, FILE * file, struct MacroContext *macro_table);
 
-extern table_ptr head_ptr;
-extern table_ptr found;
+/* External variable declarations */
+extern table_ptr head_ptr; /* Pointer to the head of the symbol table */
+extern table_ptr found; /* Pointer to the found symbol in the table */
 
 #endif

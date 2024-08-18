@@ -10,6 +10,7 @@
 #define MAX_BUFFER_LENGTH 83 /* 83 for 80 chars and '\n' and '\0' and if there another char*/
 #define MAX_SYMBOL_NAME 31
 
+/* Types of symbols */
 enum type{
     extern_symbol,
     entry_symbol,
@@ -19,6 +20,12 @@ enum type{
     entry_data
 };
 
+/**
+ * @brief Structure representing a symbol table.
+ *
+ * This structure holds the name, type, and address of a symbol in the assembly program,
+ * along with a pointer to the next symbol in the symbol table linked list.
+ */
 typedef struct symbol_table {
     char symbol_name[MAX_SYMBOL_NAME];
     enum type symbol_type;
@@ -26,6 +33,12 @@ typedef struct symbol_table {
     struct symbol_table * next;
 } symbol_table, * table_ptr;
 
+/**
+ * @brief Structure representing externals and the address they have been used.
+ *
+ * This structure holds the name of the external symbol, an array of addresses where it is used,
+ * a counter for the number of uses, and a pointer to the next external address entry in the linked list.
+ */
 typedef struct extern_adresses {
     char name[MAX_SYMBOL_NAME];
     int used_addresses[MAX_BUFFER_LENGTH];

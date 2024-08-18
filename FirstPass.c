@@ -1,10 +1,27 @@
 #include "FirstPass.h"
 
 table_ptr found = NULL; /* Recive the address of the symbol inside the table*/
-translation machine_code = {0};
 table_ptr head_ptr = NULL; /* The poiner to the head of the table*/
-translation_ptr machine_code_ptr = &machine_code;
+translation machine_code = {0}; /* Structure to hold machine code information, initialized to zero */
+translation_ptr machine_code_ptr = &machine_code; /* Pointer to the machine code structure */
 
+/**
+ * Performs the first pass of the assembly process.
+ * 
+ * This function processes an assembly file, parses lines to extract symbols and
+ * directives, updates the symbol table, and computes addresses for instructions
+ * and data. It handles errors related to line length, symbol redefinition, and
+ * memory size limitations. It calculates the number of words needed
+ * for Directive, codes the data into the data image,
+ * 
+ * @param file_name       The name of the assembly source file being processed.
+ * @param file            The file pointer to the assembly source file.
+ * @param macro_context   A pointer to the macro context structure used for macro
+ *                        processing (may be NULL if not used).
+ * 
+ * @return                An integer error flag: 0 if no errors occurred, 1 if
+ *                        errors were detected.
+ */
 int firstPass(char *file_name, FILE *file, struct MacroContext *macro_context)
 {
     /* Declarations */

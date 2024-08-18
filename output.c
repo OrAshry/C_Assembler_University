@@ -1,6 +1,13 @@
 #include "output.h"
 
-/* Entry output file */
+/**
+ * @brief Creates the entry file (.ent) for the given input file.
+ *
+ * This function generates a .ent file containing all the entry symbols from the symbol table
+ * and their corresponding addresses. The file is named after the input file with a .ent extension.
+ *
+ * @param input_file_name The name of the original input file (without the .ent extension).
+ */
 void createEntFile(const char *input_file_name)
 {
     char *ent_file_name;
@@ -49,7 +56,15 @@ void createEntFile(const char *input_file_name)
     free(ent_file_name);
 }
 
-/* Extern output file */
+/**
+ * @brief Creates the extern file (.ext) for the given input file.
+ *
+ * This function generates a .ext file containing all the external symbols from the symbol table
+ * and their usage addresses. The file is named after the input file with a .ext extension.
+ *
+ * @param input_file_name The name of the original input file (without the .ext extension).
+ * @param extern_usage_head_ptr A pointer to the head of the linked list containing extern usage information.
+ */
 void createExtFile(const char *input_file_name, extern_addresses_ptr extern_usage_head_ptr)
 {
     char *ext_file_name;
@@ -101,8 +116,15 @@ void createExtFile(const char *input_file_name, extern_addresses_ptr extern_usag
     free(ext_file_name);
 }
 
-
-/* Object output file */
+/**
+ * @brief Creates the object file (.ob) for the given input file.
+ *
+ * This function generates a .ob file containing the assembled machine code and data image.
+ * The file is named after the input file with a .ob extension and includes the number of instructions
+ * and directives.
+ *
+ * @param input_file_name The name of the original input file (without the .ob extension).
+ */
 void createObFile(const char *input_file_name) {
     char *ob_file_name;
     FILE *ob_file;
