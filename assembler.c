@@ -1,7 +1,4 @@
-#include "macroProcessing.h"
-#include "firstPass.h"
-#include "SecondPass.h"
-#include "output.h"
+#include "assembler.h"
 
 int main(int argc, char **argv)
 {
