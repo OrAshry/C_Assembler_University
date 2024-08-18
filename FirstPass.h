@@ -2,8 +2,8 @@
 #define FIRST_PASS_H
 
 #include <stdio.h>
-#include "Translate.h"
-#include "SymbolTable.h"
+#include "translate.h"
+#include "symbolTable.h"
 #include "lineParser.h"
 #include "output.h"
 #include "macroProcessing.h"

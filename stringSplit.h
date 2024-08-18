@@ -3,7 +3,7 @@
 
 #include <string.h>
 #include <ctype.h>
-#include "Constants.h"
+#include "constants.h"
 
 struct string_split{
     char * string[81];
