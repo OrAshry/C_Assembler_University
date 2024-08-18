@@ -1,5 +1,12 @@
 #include "stringSplit.h"
 
+/**
+ * @brief Split a string into substrings using a delimiter
+ * 
+ * @param str The string to split
+ * @param delimiter The delimiter to split the string by
+ * @return struct string_split A structure containing the split strings
+ */
 struct string_split split_string(char *str, const char *delimiter)
 {
     int strings_count = 0, in_quotes = 0;
