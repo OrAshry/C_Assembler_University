@@ -191,8 +191,8 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
     for (i = 0; i < num_of_words - 1; i++, (machine_code_ptr->IC)++) 
     {
         
-        /* Checking if the operand is source or destination */
-        if((i == 0 && (num_of_words == 2))|| (i == 1) || (a.ast_options.inst.operands[i].operand_type == ast_immidiate)) 
+        /* Checking how much to move the bits */
+        if((i == 0 && (num_of_words == 2)) || (i == 1) || (a.ast_options.inst.operands[i].operand_type == ast_immidiate || (a.ast_options.inst.operands[i].operand_type == ast_label))) 
         {
             val = 3;
         }
@@ -203,7 +203,7 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
         /* If the addressing method is immidiate */
         if (a.ast_options.inst.operands[i].operand_type == ast_immidiate)
         {
-            machine_code_ptr->code_image[machine_code_ptr->IC] = 1 << A;                                                      /* A,R,E */
+            machine_code_ptr->code_image[machine_code_ptr->IC] = 1 << A; /* A,R,E */
             machine_code_ptr->code_image[machine_code_ptr->IC] |= a.ast_options.inst.operands[i].operand_option.immed << val; /* Operand */
         }
 
@@ -219,7 +219,7 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
             {
                 machine_code_ptr -> code_image[machine_code_ptr->IC] = 1 << R; /* A,R,E */
             }
-            machine_code_ptr -> code_image[machine_code_ptr->IC] |= found -> symbol_address << ADDRESS_BIT_LOCATION; /*Address of the label*/
+            machine_code_ptr -> code_image[machine_code_ptr->IC] |= found -> symbol_address << val; /*Address of the label*/
         }
 
         /* If the addressing method is register_address or register_direct*/
@@ -231,6 +231,7 @@ void codeWords(int num_of_words, struct ast a, int *flag, const char *name_of_fi
     }
 }
 
+/* Clean up function for the extern struct*/
 void free_extern_table(extern_addresses_ptr *head){
     extern_addresses_ptr current = *head;
     extern_addresses_ptr next;
