@@ -12,4 +12,4 @@ prog: $(OBJ_FILES)
 	$(CC) -c $< $(CFLAGS) -o $@
 
 clean:
-	rm -rf *.o prog
+	rm -rf *.o
