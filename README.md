@@ -1,6 +1,6 @@
 # C Assembler
 
-A two-pass assembler written in C, developed as part of a university computer architecture course.  
+A two-pass assembler written in C, developed as part of a university C course.  
 The assembler reads custom assembly language files (.as) and translates them into machine code output files.
 
 ---
